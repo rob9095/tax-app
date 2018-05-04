@@ -21,7 +21,7 @@ export function apiCall(method, path, data){
 }
 
 export function teamworkApiCall(method, path){
-	const key = 'twp_ddoXk75DNPbv0zvWMKRmy4ySEiB8';
+	const key = '';
 	const headerObj = {
 		headers: {"Authorization": "BASIC " + window.btoa(key + ":xxx")}
 	};
