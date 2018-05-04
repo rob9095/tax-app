@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { logout } from '../store/actions/auth';
-import { fetchTeamworkProjectData } from '../store/actions/teamworkApi';
+import { fetchTeamworkProjectData, updateProjectsDB } from '../store/actions/teamworkApi';
 
 class Homepage extends Component {
     constructor(props) {
@@ -13,6 +13,10 @@ class Homepage extends Component {
     logout = e => {
       e.preventDefault();
       this.props.logout();
+    }
+
+    buildProjectData = () => {
+      this.props.updateProjectsDB();
     }
 
     componentDidMount() {
@@ -42,6 +46,7 @@ class Homepage extends Component {
     		<div>
           <h2>You logged in congrats fool!</h2>
           <button onClick={this.logout}>Logout</button>
+          <button onClick={this.buildProjectData}>Build the Project Database!</button>
     		</div>
     	);
     }
@@ -54,4 +59,4 @@ function mapStateToProps(state) {
 	};
 }
 
-export default connect(mapStateToProps, { logout, fetchTeamworkProjectData })(Homepage);
+export default connect(mapStateToProps, { logout, fetchTeamworkProjectData, updateProjectsDB })(Homepage);
