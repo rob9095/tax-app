@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
 const projectSchema = new mongoose.Schema({
-  id: {
+  teamwork_id: {
     type: Number,
     required: true,
     unique: true
@@ -18,9 +18,6 @@ const projectSchema = new mongoose.Schema({
 	status: {
 		type: String,
 		required: true
-	},
-	category: {
-		type: mongoose.Schema.Types.Mixed
 	}
 });
 

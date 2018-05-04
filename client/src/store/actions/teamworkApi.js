@@ -1,4 +1,4 @@
-import { teamworkApiCall } from '../../services/api';
+import { apiCall, teamworkApiCall } from '../../services/api';
 import { LOAD_TEAMWORK_DATA } from '../actionTypes';
 import {addError, removeError} from './errors';
 
@@ -19,7 +19,7 @@ export function fetchTeamworkProjectData() {
 				resolve();
 			})
 			.catch(err => {
-				dispatch(addError(err.message));
+        console.log(err);
 				reject();
 			})
 		});
@@ -48,18 +48,18 @@ export function updateProjectsDB() {
 		return new Promise((resolve,reject) => {
 			return teamworkApiCall('get', url)
 			.then((data) => {
-        let project = data.projects;
+        let projects = data.projects;
           // add each project to array, include name, id, created-on, status, category
           let formatedProjects = [];
           projects.forEach(p=> {
             formatedProjects.push({
+              teamwork_id: p.id,
               name: p.name,
-              id: p.id,
-              createdOn: p.created-on,
+              createdOn: p['created-on'],
               status: p.status,
-              category: p.category
             })
           })
+          // send formatted array to backend to add to DB
           addProjectsDB(formatedProjects);
 				resolve();
 			})
