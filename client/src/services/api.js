@@ -19,3 +19,19 @@ export function apiCall(method, path, data){
 		});
 	});
 }
+
+export function teamworkApiCall(method, path){
+	const key = 'twp_ddoXk75DNPbv0zvWMKRmy4ySEiB8';
+	const headerObj = {
+		headers: {"Authorization": "BASIC " + window.btoa(key + ":xxx")}
+	};
+	return new Promise((resolve, reject) => {
+		return axios[method.toLowerCase()](path, headerObj)
+		.then(res => {
+			return resolve(res.data);
+		})
+		.catch(err => {
+			return reject(err.response.data.error);
+		});
+	});
+}
