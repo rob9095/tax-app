@@ -1,8 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const { addProjects, addProjectsNew, addProjectsAsync, addProjectsOnebyOne } = require('../handlers/projects');
+const { getAllProjects, proccesProjects } = require('../handlers/projects');
 
-//prefixed with /api -> /api/projects
-router.post('/projects', addProjectsOnebyOne);
+// prefixed with /api -> /api/projects
+//post new projects
+router.post('/', proccesProjects);
+
+//get all projects
+router.get('/', getAllProjects);
 
 module.exports = router;
