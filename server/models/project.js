@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
 
 const projectSchema = new mongoose.Schema({
   teamwork_id: {

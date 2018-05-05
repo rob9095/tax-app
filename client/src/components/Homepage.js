@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { logout } from '../store/actions/auth';
-import { fetchTeamworkProjectData, updateProjectsDB } from '../store/actions/teamworkApi';
+import { fetchAndUpdateTasklists , fetchDBProjects , fetchTeamworkProjectData, updateProjectsDB } from '../store/actions/teamworkApi';
 
 class Homepage extends Component {
     constructor(props) {
@@ -19,9 +19,30 @@ class Homepage extends Component {
       this.props.updateProjectsDB();
     }
 
+    triggerTaskListRequest = (id) => {
+      return new Promise(async (resolve, reject) => {
+        try{
+          setTimeout(() => {
+            this.props.fetchAndUpdateTasklists(id);
+            resolve(id);
+          }, 30000)
+        }catch(err) {
+          reject(err);
+        }
+      })
+    }
+
+    buildTasklistData = async () => {
+      for (let p of this.props.projects.projectsInDB) {
+        let result = await this.triggerTaskListRequest(p.teamwork_id);
+        console.log(result);
+      }
+    }
+
     componentDidMount() {
-      if(this.props.currentUser.isAuthenticated){
+      if(this.props.currentUser.isAuthenticated) {
         this.props.fetchTeamworkProjectData();
+        this.props.fetchDBProjects();
       }
     }
 
@@ -47,6 +68,7 @@ class Homepage extends Component {
           <h2>You logged in congrats fool!</h2>
           <button onClick={this.logout}>Logout</button>
           <button onClick={this.buildProjectData}>Build the Project Database!</button>
+          <button onClick={this.buildTasklistData}>Build the Tasklist Database!</button>
     		</div>
     	);
     }
@@ -59,4 +81,4 @@ function mapStateToProps(state) {
 	};
 }
 
-export default connect(mapStateToProps, { logout, fetchTeamworkProjectData, updateProjectsDB })(Homepage);
+export default connect(mapStateToProps, { logout, fetchTeamworkProjectData, updateProjectsDB, fetchDBProjects, fetchAndUpdateTasklists })(Homepage);
