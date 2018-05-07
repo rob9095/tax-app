@@ -9,3 +9,4 @@ mongoose.connect('mongodb://localhost/tax-app', {
 module.exports.User = require('./user');
 module.exports.Project = require('./project');
 module.exports.Tasklist = require('./tasklist');
+module.exports.Task = require('./task');

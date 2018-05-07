@@ -7,16 +7,35 @@ const errorHandler = require('./handlers/error');
 const authRoutes = require('./routes/auth');
 const projectsRoutes = require('./routes/projects');
 const tasklistsRoutes = require('./routes/tasklists');
+const milestonesRoutes = require('./routes/milestones');
+const tasksRoutes = require('./routes/tasks');
 const { loginRequired, ensureCorrectUser } = require('./middleware/auth');
 const PORT = 8082;
+
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 
 app.use(cors())
 app.use(bodyParser.json());
 
 // all routes here
 
+// milestones router
+app.use(
+		'/api/tasks',
+		// loginRequired,
+		// ensureCorrectUser,
+		tasksRoutes);
+
 //auth routes
 app.use('/api/auth', authRoutes);
+
+// milestones router
+app.use(
+		'/api/milestones',
+		// loginRequired,
+		// ensureCorrectUser,
+		milestonesRoutes);
 
 // tasklists router
 app.use(
@@ -37,6 +56,7 @@ app.use(
 // error handler
 app.use(errorHandler);
 
-app.listen(PORT, function(){
+let server = app.listen(PORT, function(){
 	console.log(`Server starting on port ${PORT}`)
 });
+server.timeout = 60000;

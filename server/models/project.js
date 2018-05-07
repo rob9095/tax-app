@@ -17,7 +17,13 @@ const projectSchema = new mongoose.Schema({
 	status: {
 		type: String,
 		required: true
-	}
+	},
+  tasklists: [{
+    type: mongoose.Schema.Types.Mixed
+  }],
+  tasks: [{
+    type: mongoose.Schema.Types.Mixed
+  }]
 });
 
 const Project = mongoose.model('Project', projectSchema);

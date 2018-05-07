@@ -5,12 +5,12 @@ mongoose.Promise = Promise;
 const addTaskList = (tasklist) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let createdTasklist = await db.Tasklist.create(tasklist);
-      let foundTasklist = await db.Tasklist.findById(createdTasklist.id);
-      if (foundTasklist !== null) {
-        resolve(foundTasklist);
+      let foundTasklist = await db.Tasklist.findOne({teamwork_id: tasklist.teamwork_id});
+      if (foundTasklist) {
+        resolve({});
       } else {
-        reject(createdTasklist)
+        let createdTasklist = await db.Tasklist.create(tasklist);
+        resolve(createdTasklist);
       }
     } catch(err) {
       reject(err);

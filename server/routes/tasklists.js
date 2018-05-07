@@ -2,10 +2,10 @@ const express = require('express');
 const router = express.Router();
 const { proccessTasklists } = require('../handlers/tasklists');
 
-//add projects to DB, prefixed with /api -> /api/projects
+//add tasklist to DB, prefixed with /api -> /api/tasklists
 router.post('/', proccessTasklists);
 
-//get all projects
+//get all tasklists
 // router.get('/tasklists', getAllTasklists);
 
 module.exports = router;

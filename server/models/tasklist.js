@@ -32,7 +32,10 @@ const tasklistSchema = new mongoose.Schema({
 	},
   uncompleteCount: {
 		type: Number
-	}
+	},
+  completedOn: {
+    type: Date,
+  }
 });
 
 const Tasklist = mongoose.model('Tasklist', tasklistSchema);
