@@ -128,3 +128,79 @@ export const fetchAndUpdateTasklists = (id) => {
   		});
   	}
 };
+
+
+const handleLocalApiRequest = (data, type) => {
+  return new Promise((resolve,reject) => {
+    setTimeout(()=> {
+      return apiCall('post', `/api/${type}`, data)
+      .then((res) => {
+        resolve(res);
+      })
+      .catch(err => {
+        reject(err);
+      })
+    }, 1000)
+  });
+}
+
+const processChunk = (arr) => {
+  return new Promise(async (resolve,reject) => {
+    try {
+      let formatedRequest = {
+        milestones: arr
+      }
+      let result = await handleLocalApiRequest(formatedRequest, 'milestones');
+      console.log(result);
+      resolve();
+    } catch(err) {
+      reject(err);
+    }
+  })
+}
+
+const chunkifyArray = (arr) => {
+  return new Promise(async (resolve,reject) => {
+    try {
+      let results = [];
+      let chunkIndex = 0;
+      const l = parseInt(arr.length);
+      const totalChunks = parseInt(arr.length/50)
+      const chunkLength = parseInt(l / totalChunks);
+      for (let n = 1; n <= totalChunks; n++) {
+        let chunk = [];
+        if (n === totalChunks) {
+          chunk = arr.slice(chunkIndex)
+        } else {
+          chunk = arr.slice(chunkIndex, chunkIndex + chunkLength)
+        }
+        chunkIndex = chunkIndex + chunkLength;
+        results.push(chunk);
+      }
+      console.log(results);
+      for (let chunk of results) {
+        let result = await processChunk(chunk);
+        resolve(result);
+      }
+    } catch(err) {
+      reject(err);
+    }
+  })
+}
+
+export const fetchAndUpdateCompletedMilestones = (arr) => {
+  const url = 'https://taxsamaritan.teamwork.com/milestones.json?find=completed&pageSize=1000';
+  return dispatch => {
+    return new Promise((resolve,reject) => {
+      return teamworkApiCall('get', url)
+      .then(async (data) => {
+        let result = await chunkifyArray(data.milestones)
+        resolve(result);
+      })
+      .catch(err => {
+        console.log(err);
+        reject();
+      })
+    });
+  }
+}

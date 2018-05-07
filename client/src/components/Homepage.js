@@ -2,7 +2,9 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { logout } from '../store/actions/auth';
-import { fetchAndUpdateTasklists , fetchDBProjects , fetchTeamworkProjectData, updateProjectsDB } from '../store/actions/teamworkApi';
+import { fetchAndUpdateCompletedMilestones, fetchAndUpdateTasklists , fetchDBProjects , fetchTeamworkProjectData, updateProjectsDB } from '../store/actions/teamworkApi';
+import { requestAndUpdateTasks } from '../store/actions/tasks';
+import Button from 'material-ui/Button';
 
 class Homepage extends Component {
     constructor(props) {
@@ -19,13 +21,21 @@ class Homepage extends Component {
       this.props.updateProjectsDB();
     }
 
+    updateCompletedDates = () => {
+      this.props.fetchAndUpdateCompletedMilestones();
+    }
+
+    fetchAndUpdateTasks = () => {
+      this.props.requestAndUpdateTasks();
+    }
+
     triggerTaskListRequest = (id) => {
       return new Promise(async (resolve, reject) => {
         try{
           setTimeout(() => {
             this.props.fetchAndUpdateTasklists(id);
             resolve(id);
-          }, 30000)
+          }, 5000)
         }catch(err) {
           reject(err);
         }
@@ -41,7 +51,7 @@ class Homepage extends Component {
 
     componentDidMount() {
       if(this.props.currentUser.isAuthenticated) {
-        this.props.fetchTeamworkProjectData();
+        //this.props.fetchTeamworkProjectData();
         this.props.fetchDBProjects();
       }
     }
@@ -69,6 +79,11 @@ class Homepage extends Component {
           <button onClick={this.logout}>Logout</button>
           <button onClick={this.buildProjectData}>Build the Project Database!</button>
           <button onClick={this.buildTasklistData}>Build the Tasklist Database!</button>
+          <button onClick={this.updateCompletedDates}>Update Completed Dates via Milestones!</button>
+          <button onClick={this.fetchAndUpdateTasks}>Fetch and Update Tasks</button>
+            <Button color="primary">
+          Primary
+        </Button>
     		</div>
     	);
     }
@@ -81,4 +96,4 @@ function mapStateToProps(state) {
 	};
 }
 
-export default connect(mapStateToProps, { logout, fetchTeamworkProjectData, updateProjectsDB, fetchDBProjects, fetchAndUpdateTasklists })(Homepage);
+export default connect(mapStateToProps, { logout, requestAndUpdateTasks, fetchAndUpdateCompletedMilestones, fetchTeamworkProjectData, updateProjectsDB, fetchDBProjects, fetchAndUpdateTasklists })(Homepage);
