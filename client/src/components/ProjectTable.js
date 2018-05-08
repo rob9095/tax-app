@@ -235,24 +235,25 @@ class EnhancedTable extends React.Component {
 
     projects.forEach(p => {
       let clientNames = this.sanitizeName(p.name)
-      let ipTaskDate = '';
-      let piTaskDate = '';
-      let pTaskDate = '';
-      let fpTaskDate = '';
-      let crTaskDate = '';
-      let feTaskDate = '';
+      let ipTaskDate = false;
+      let piTaskDate = false;
+      let pTaskDate = false;
+      let fpTaskDate = false;
+      let crTaskDate = false;
+      let feTaskDate = false;
       let ipTask = p.tasklists.filter(t => t.taskName === 'INITIAL PAYMENT' && t.complete === true);
-      ipTask.length === 0 || ipTask[0].complete === false ? ipTaskDate = false : ipTaskDate = ipTask[0].completedOn;
+      ipTask.length === 0 || ipTask[0].complete === false ? ipTaskDate = false : ipTaskDate = ipTask[0].lastChangedOn;
       let piTask = p.tasklists.filter(t => t.taskName === 'PROVIDE INFORMATION');
-      piTask.length === 0 || piTask[0].complete === false ? piTaskDate = false : piTaskDate = piTask[0].completedOn;
+      piTask.length === 0 || piTask[0].complete === false ? piTaskDate = false : piTaskDate = piTask[0].lastChangedOn;
       let pTask =  p.tasklists.filter(t => t.taskName === 'PREPARATION');
-      pTask.length === 0 || pTask[0].complete === false ? pTaskDate = false : pTaskDate = pTask[0].completedOn;
+      pTask.length === 0 || pTask[0].complete === false ? pTaskDate = false : pTaskDate = pTask[0].lastChangedOn;
       let fpTask = p.tasklists.filter(t => t.taskName === 'FINALIZE PAYMENT');
-      fpTask.length === 0 || fpTask[0].complete === false ? fpTaskDate = false : fpTaskDate = fpTask[0].completedOn;
+      fpTask.length === 0 || fpTask[0].complete === false ? fpTaskDate = false : fpTaskDate = fpTask[0].lastChangedOn;
       let crTask = p.tasklists.filter(t => t.taskName === 'CLIENT REVIEW');
-      crTask.length === 0 || crTask[0].complete === false ? crTaskDate = false : crTaskDate = crTask[0].completedOn;
+      crTask.length === 0 || crTask[0].complete === false ? crTaskDate = false : crTaskDate = crTask[0].lastChangedOn;
       let feTask = p.tasklists.filter(t => t.taskName === 'FINALIZE ENGAGEMENT');
-      feTask.length === 0 || feTask[0].complete === false ? feTaskDate = false : feTaskDate = feTask[0].completedOn;
+      console.log(feTask)
+      feTask.length === 0 || feTask[0].complete === false ? feTaskDate = false : feTaskDate = feTask[0].lastChangedOn;
       let formattedProject = {
         id: p.teamwork_id,
         projectName: p.name,

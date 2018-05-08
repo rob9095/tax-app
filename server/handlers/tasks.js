@@ -25,6 +25,7 @@ exports.processTasks = async(req, res, next) => {
     for (let t of tasks) {
       let formattedTask = {
         teamwork_id: t.id,
+        completed: t.completed,
         hasUnreadComments: t['has-unread-comments'],
         content: t.content,
         teamworkProject_id: t['project-id'],

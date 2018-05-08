@@ -33,7 +33,7 @@ const tasklistSchema = new mongoose.Schema({
   uncompleteCount: {
 		type: Number
 	},
-  completedOn: {
+  lastChangedOn: {
     type: Date,
   }
 });
