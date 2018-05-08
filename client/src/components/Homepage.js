@@ -26,7 +26,7 @@ class Homepage extends Component {
     }
 
     fetchAndUpdateTasks = () => {
-      this.props.requestAndUpdateTasks();
+      this.props.requestAndUpdateTasks(this.props.projects.projectsInDB);
     }
 
     triggerTaskListRequest = (id) => {
@@ -35,7 +35,7 @@ class Homepage extends Component {
           setTimeout(() => {
             this.props.fetchAndUpdateTasklists(id);
             resolve(id);
-          }, 5000)
+          }, 1000)
         }catch(err) {
           reject(err);
         }

@@ -11,7 +11,7 @@ const updateTasklist = (milestone) => {
         if (tasklist === null) {
           resolve();
         }
-        tasklist.completedOn = milestone['completed-on'];
+        tasklist.lastChangedOn = milestone['completed-on'];
         await tasklist.save();
         resolve(tasklist)
       }).catch(err => {

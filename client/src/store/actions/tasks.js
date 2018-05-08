@@ -14,6 +14,7 @@ const buildPages = (num) => {
 const handleLocalApiRequest = (data, type) => {
   return new Promise((resolve,reject) => {
     setTimeout(()=> {
+			console.log(data)
       return apiCall('post', `/api/${type}`, data)
       .then((res) => {
         resolve(res);
@@ -26,8 +27,8 @@ const handleLocalApiRequest = (data, type) => {
   });
 }
 
-const handleApiRequest = (pageNumber) => {
-  const url = `https://taxsamaritan.teamwork.com/tasks.json?page=${pageNumber}&pageSize=250`
+const handleApiRequest = (project_id) => {
+  const url = `https://taxsamaritan.teamwork.com/projects/240722/tasks.json?includeCompletedTasks=true&pageSize=250`
 	return new Promise((resolve,reject) => {
 		return teamworkApiCall('get', url)
 		.then(async (data) => {
@@ -40,15 +41,20 @@ const handleApiRequest = (pageNumber) => {
 	});
 }
 
-export const requestAndUpdateTasks = () => {
+export const requestAndUpdateTasks = (projects) => {
   return dispatch => {
     let results = [];
-    let pages = buildPages(19);
+    let pages = buildPages(32);
     setTimeout(async ()=> {
-      for (let p of pages) {
-        let result = await handleApiRequest(p);
-        console.log(result);
-      }
+			let counter = 0;
+      for (let p of projects) {
+        let result = await handleApiRequest(p.teamwork_id);
+				console.log(result)
+				counter++
+			}
+			if (counter === projects.length) {
+				console.log('all done!')
+			}
     }, 3000)
   }
 }

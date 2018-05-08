@@ -6,6 +6,10 @@ const taskSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
+  completed: {
+    type: Boolean,
+    required: true,
+  },
   hasUnreadComments: {
     type: Boolean,
     required: true,

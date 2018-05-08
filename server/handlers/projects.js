@@ -6,12 +6,18 @@ mongoose.Promise = Promise;
 const addProject = (project) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let createdProject = await db.Project.create(project);
-      let foundProject = await db.Project.findById(createdProject.id);
-      if (foundProject !== null) {
+      let foundProject = await db.Project.findOne({teamwork_id: project.teamwork_id});
+      if (foundProject) {
+        //update it instead of create it
+        foundProject.name = project.name;
+        foundProject.createdOn = project.createdOn;
+        foundProject.status = project.status;
+        await foundProject.save();
         resolve(foundProject);
       } else {
-        reject(createdProject)
+        //create it
+        let createdProject = await db.Project.create(project);
+        resolve(createdProject);
       }
     } catch(err) {
       reject(err);
@@ -51,11 +57,9 @@ exports.getAllProjects = async (req, res, next) => {
       if (tasklists === null) {
         tasklists = [];
       }
-      for (let t of tasklists) {
-        tasks = await db.Task.find({teamworkProject_id: p.teamwork_id, tasklistId: t.teamwork_id})
-        if (tasks === null) {
-          tasks = [];
-        }
+      tasks = await db.Task.find({teamworkProject_id: p.teamwork_id})
+      if (tasks === null) {
+        tasks = [];
       }
       formattedProjects.push({
         projectData: p,
@@ -83,16 +87,35 @@ exports.mapTasksToProjects = async (req, res, next) => {
   try {
     let results = [];
     let projects = req.body;
-    let foundProject = [];
+    let foundProject = {};
+    //  loop the projects
     for (p of projects) {
       let counter = 0;
+      // find the projects and update them
       foundProject = await db.Project.findOne({teamwork_id: p.projectData.teamwork_id})
       foundProject.tasklists = p.projectTasklists;
       foundProject.tasks = p.projectTasks;
+      // loop the tasklists
       for(let t of p.projectTasklists) {
+        let dates = [];
+        let lastTaskChangedOn = '';
         let currentTasks = p.projectTasks.filter(task => task.tasklistId === t.teamwork_id)
-        console.log(foundProject.tasklists[counter])
         foundProject.tasklists[counter].tasks = currentTasks;
+        // loop the tasks in each tasklist if they exist
+        if (currentTasks.length > 0) {
+          for (let task of currentTasks) {
+            // push the dates into dates array
+            dates.push({
+              lastChangedOn: task.lastChangedOn
+            })
+          }
+        }
+        // sort the dates and save the first index to the project tasklist
+        if (dates.length  > 0) {
+          let sortedDates = dates.sort((a, b) => new Date(b.lastChangedOn) - new Date(a.lastChangedOn));
+          lastTaskChangedOn = sortedDates[0].lastChangedOn
+        }
+        foundProject.tasklists[counter].lastChangedOn = lastTaskChangedOn
         counter++
       }
       foundProject.save();
