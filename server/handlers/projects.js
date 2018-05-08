@@ -6,6 +6,10 @@ mongoose.Promise = Promise;
 const addProject = (project) => {
   return new Promise(async (resolve, reject) => {
     try {
+      let check = project.name.split('-');
+      if (check[0] !== 'Tax') {
+        resolve();
+      }
       let foundProject = await db.Project.findOne({teamwork_id: project.teamwork_id});
       if (foundProject) {
         //update it instead of create it
@@ -99,6 +103,7 @@ exports.mapTasksToProjects = async (req, res, next) => {
       for(let t of p.projectTasklists) {
         let dates = [];
         let lastTaskChangedOn = '';
+        let lastTaskName = '';
         let currentTasks = p.projectTasks.filter(task => task.tasklistId === t.teamwork_id)
         foundProject.tasklists[counter].tasks = currentTasks;
         // loop the tasks in each tasklist if they exist
@@ -106,7 +111,9 @@ exports.mapTasksToProjects = async (req, res, next) => {
           for (let task of currentTasks) {
             // push the dates into dates array
             dates.push({
-              lastChangedOn: task.lastChangedOn
+              tasklistName: task.tasklistName,
+              lastChangedOn: task.lastChangedOn,
+              completed: task.completed
             })
           }
         }
@@ -114,8 +121,18 @@ exports.mapTasksToProjects = async (req, res, next) => {
         if (dates.length  > 0) {
           let sortedDates = dates.sort((a, b) => new Date(b.lastChangedOn) - new Date(a.lastChangedOn));
           lastTaskChangedOn = sortedDates[0].lastChangedOn
+          lastTaskName = sortedDates[0].tasklistName
+          if (lastTaskName !== 'FINALIZE ENGAGEMENT') {
+            // check if any tasklists are not completed
+            let taskFilter = dates.filter(t => t.completed === false)
+            // if all tasks are completed set the last task to 'FINALIZE ENGAGEMENT'
+            if (taskFilter.length === 0) {
+              lastTaskName = 'FINALIZE ENGANGEMENT'
+            }
+          }
         }
         foundProject.tasklists[counter].lastChangedOn = lastTaskChangedOn
+        foundProject.lastTasklistChanged = lastTaskName
         counter++
       }
       foundProject.save();

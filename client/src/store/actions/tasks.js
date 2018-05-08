@@ -28,7 +28,7 @@ const handleLocalApiRequest = (data, type) => {
 }
 
 const handleApiRequest = (project_id) => {
-  const url = `https://taxsamaritan.teamwork.com/projects/240722/tasks.json?includeCompletedTasks=true&pageSize=250`
+  const url = `https://taxsamaritan.teamwork.com/projects/${project_id}/tasks.json?includeCompletedTasks=true&pageSize=250`
 	return new Promise((resolve,reject) => {
 		return teamworkApiCall('get', url)
 		.then(async (data) => {

@@ -18,6 +18,9 @@ const projectSchema = new mongoose.Schema({
 		type: String,
 		required: true
 	},
+  lastTasklistChanged: {
+    type: String,
+  },
   tasklists: [{
     type: mongoose.Schema.Types.Mixed
   }],
