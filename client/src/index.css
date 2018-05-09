@@ -9,3 +9,12 @@ body {
     width: 100%;
     margin: 0 auto;
 }
+
+.chart-container {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.chart-container #projects-chart {
+    font-family: 'Roboto', sans-serif !important;
+}

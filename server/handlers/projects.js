@@ -94,6 +94,7 @@ exports.mapTasksToProjects = async (req, res, next) => {
     let foundProject = {};
     //  loop the projects
     for (p of projects) {
+      let lastTaskName = '';
       let counter = 0;
       // find the projects and update them
       foundProject = await db.Project.findOne({teamwork_id: p.projectData.teamwork_id})
@@ -103,7 +104,6 @@ exports.mapTasksToProjects = async (req, res, next) => {
       for(let t of p.projectTasklists) {
         let dates = [];
         let lastTaskChangedOn = '';
-        let lastTaskName = '';
         let currentTasks = p.projectTasks.filter(task => task.tasklistId === t.teamwork_id)
         foundProject.tasklists[counter].tasks = currentTasks;
         // loop the tasks in each tasklist if they exist
@@ -122,23 +122,21 @@ exports.mapTasksToProjects = async (req, res, next) => {
           let sortedDates = dates.sort((a, b) => new Date(b.lastChangedOn) - new Date(a.lastChangedOn));
           lastTaskChangedOn = sortedDates[0].lastChangedOn
           lastTaskName = sortedDates[0].tasklistName
-          if (lastTaskName !== 'FINALIZE ENGAGEMENT') {
-            // check if any tasklists are not completed
-            let taskFilter = dates.filter(t => t.completed === false)
-            // if all tasks are completed set the last task to 'FINALIZE ENGAGEMENT'
-            if (taskFilter.length === 0) {
-              lastTaskName = 'FINALIZE ENGANGEMENT'
-            }
-          }
         }
         foundProject.tasklists[counter].lastChangedOn = lastTaskChangedOn
-        foundProject.lastTasklistChanged = lastTaskName
         counter++
       }
+      let lastTasklstFilter = p.projectTasklists.filter(tasklist => tasklist.complete === false)
+      if (lastTasklstFilter.length > 0) {
+        lastTaskName = lastTasklstFilter[0].taskName
+      } else {
+        lastTaskName = 'FINALIZE ENGAGEMENT'
+      }
+      foundProject.lastTasklistChanged = lastTaskName
       foundProject.save();
       results.push(foundProject);
     }
-    return res.status(200).json({projectsUpdated: [results], message: `${results.length} projects were updated`});
+    return res.status(200).json({message: `${results.length} projects were updated`});
   } catch(err) {
     return next(err);
   }

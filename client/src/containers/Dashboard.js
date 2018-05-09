@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { logout } from '../store/actions/auth';
 import { fetchDBProjects } from '../store/actions/teamworkApi';
 import EnhancedTable from '../components/ProjectTable'
+import ProjectChart from '../components/ProjectChart'
 
 class Dashboard extends Component {
     constructor(props) {
@@ -42,6 +43,11 @@ class Dashboard extends Component {
     	return (
     		<div>
           <h2>Project Dashboard</h2>
+          <div className="chart-container">
+            <ProjectChart
+              projectData={projects}
+             />
+          </div>
         <EnhancedTable
           projectData={projects}
         />

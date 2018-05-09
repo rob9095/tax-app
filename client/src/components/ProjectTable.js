@@ -23,6 +23,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import { lighten } from 'material-ui/styles/colorManipulator';
 import Close from '@material-ui/icons/Close';
+import TasklistPopover from '../containers/TasklistPopover'
 
 let counter = 0;
 function createData(name, calories, fat, carbs, protein) {
@@ -31,24 +32,42 @@ function createData(name, calories, fat, carbs, protein) {
 }
 
 const columnData = [
-  { id: 'projectName', numeric: false, disablePadding: true, label: 'Project' },
-  { id: 'clientLastName', numeric: false, disablePadding: true, label: 'Client Last Name' },
-  { id: 'clientFirstName', numeric: false, disablePadding: true, label: 'Client First Name' },
-  { id: 'projectStatus', numeric: false, disablePadding: true, label: 'Status' },
-  { id: 'projectNotes', numeric: false, disablePadding: true, label: 'Notes' },
-  { id: 'dateProjectCreated', numeric: false, disablePadding: true, label: 'Date Project Created' },
-  { id: 'initialPayment', numeric: false, disablePadding: true, label: 'Initial Payment' },
-  { id: 'provideInformation', numeric: false, disablePadding: true, label: 'Provide Information' },
-  { id: 'preparation', numeric: false, disablePadding: true, label: 'Preparation' },
-  { id: 'finalizePayment', numeric: false, disablePadding: true, label: 'Finalize Payment' },
-  { id: 'clientReview', numeric: false, disablePadding: true, label: 'Client Review' },
-  { id: 'finalizeEngagement', numeric: false, disablePadding: true, label: 'Finalize Engagment' },
+  { id: 'projectName', hidden: false, numeric: false, disablePadding: true, label: 'Project' },
+  { id: 'clientLastName', hidden: false, numeric: false, disablePadding: true, label: 'Client Last Name' },
+  { id: 'clientFirstName', hidden: false, numeric: false, disablePadding: true, label: 'Client First Name' },
+  { id: 'projectStatus', hidden: false, numeric: false, disablePadding: true, label: 'Status' },
+  { id: 'projectNotes', hidden: false, numeric: false, disablePadding: true, label: 'Notes' },
+  { id: 'dateProjectCreated', hidden: false, numeric: false, disablePadding: true, label: 'Date Project Created' },
+  { id: 'initialPayment', hidden: false, tasklistName: 'INITIAL PAYMENT', numeric: false, disablePadding: true, label: 'Initial Payment', tasks: ['Initial Payment Recieved Task','Initial Payment'] },
+  { id: 'initialPaymentReceivedTask', hidden: true, tasklistName: 'INITIAL PAYMENT', numeric: false, disablePadding: true, label: 'Initial Payment Recieved Task' },
+  { id: 'provideInformation', hidden: false, isTasklist: true, numeric: false, disablePadding: true, label: 'Provide Information' },
+  { id: 'preparation', hidden: false, isTasklist: true, numeric: false, disablePadding: true, label: 'Preparation' },
+  { id: 'finalizePayment', hidden: false, isTasklist: true, numeric: false, disablePadding: true, label: 'Finalize Payment' },
+  { id: 'clientReview', hidden: false, isTasklist: true, numeric: false, disablePadding: true, label: 'Client Review' },
+  { id: 'finalizeEngagement', hidden: false, isTasklist: true, numeric: false, disablePadding: true, label: 'Finalize Engagment' },
 ];
 
 class EnhancedTableHead extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state= {
+      initialPaymentReceivedTask: false,
+    }
+  }
+
   createSortHandler = property => event => {
     this.props.onRequestSort(event, property);
   };
+
+  showTasklistTasks = tasklist => event => {
+      this.setState({
+        initialPaymentReceivedTask: true,
+      })
+      this.props.projects.projectsInDB.forEach(p => {
+      let columnTasklists = p.tasklists.filter(t => t.taskName === tasklist)
+      this.props.onShowShowTasklistTasks(columnTasklists)
+    })
+  }
 
   render() {
     const { onSelectAllClick, order, orderBy, numSelected, rowCount } = this.props;
@@ -64,28 +83,39 @@ class EnhancedTableHead extends React.Component {
             />
           </TableCell>
           {columnData.map(column => {
-            return (
-              <TableCell
-                key={column.id}
-                numeric={column.numeric}
-                padding={column.disablePadding ? 'none' : 'default'}
-                sortDirection={orderBy === column.id ? order : false}
-              >
-                <Tooltip
-                  title="Sort"
-                  placement={column.numeric ? 'bottom-end' : 'bottom-start'}
-                  enterDelay={300}
-                >
-                  <TableSortLabel
-                    active={orderBy === column.id}
-                    direction={order}
-                    onClick={this.createSortHandler(column.id)}
+            {if (this.state[column.id] != false || this.state[column.id] === undefined){
+              return (
+                  <TableCell
+                    key={column.id}
+                    numeric={column.numeric}
+                    padding={column.disablePadding ? 'none' : 'default'}
+                    sortDirection={orderBy === column.id ? order : false}
                   >
-                    {column.label}
-                  </TableSortLabel>
-                </Tooltip>
-              </TableCell>
-            );
+                    <Tooltip
+                      title="Sort"
+                      placement={column.numeric ? 'bottom-end' : 'bottom-start'}
+                      enterDelay={300}
+                    >
+                      <TableSortLabel
+                        active={orderBy === column.id}
+                        direction={order}
+                        onClick={this.createSortHandler(column.id)}
+                        //onMouseOver={this.showTasklistTasks(column.tasklistName)}
+                      >
+                      {column.tasklistName === undefined ?
+                        column.label
+                        :
+                        <TasklistPopover
+                          columnLabel={column.label}
+                          columnTasklistName={column.tasklistName}
+                          columnTasks={column.tasks}
+                        />
+                      }
+                      </TableSortLabel>
+                    </Tooltip>
+                  </TableCell>
+              )
+            }}
           }, this)}
         </TableRow>
       </TableHead>
@@ -97,9 +127,11 @@ EnhancedTableHead.propTypes = {
   numSelected: PropTypes.number.isRequired,
   onRequestSort: PropTypes.func.isRequired,
   onSelectAllClick: PropTypes.func.isRequired,
+  onShowShowTasklistTasks: PropTypes.func.isRequired,
   order: PropTypes.string.isRequired,
   orderBy: PropTypes.string.isRequired,
   rowCount: PropTypes.number.isRequired,
+  projects: PropTypes.object.isRequired,
 };
 
 const toolbarStyles = theme => ({
@@ -235,14 +267,15 @@ class EnhancedTable extends React.Component {
 
     projects.forEach(p => {
       let clientNames = this.sanitizeName(p.name)
-      let ipTaskDate = false;
-      let piTaskDate = false;
-      let pTaskDate = false;
-      let fpTaskDate = false;
-      let crTaskDate = false;
-      let feTaskDate = false;
+      let ipTaskDate, piTaskDate, fpTaskDate, pTaskDate, feTaskDate, crTaskDate = false;
+      let ipTaskInitialPaymentRecievedDate, ipTaskInitialPaymentRecievedCompleted = false;
       let ipTask = p.tasklists.filter(t => t.taskName === 'INITIAL PAYMENT' && t.complete === true);
       ipTask.length === 0 || ipTask[0].complete === false ? ipTaskDate = false : ipTaskDate = ipTask[0].lastChangedOn;
+      if (ipTask.length > 0) {
+        let intialPaymentRecievedTask = ipTask[0].tasks.filter(task => task.content === 'Initial Payment Received')
+        ipTaskInitialPaymentRecievedDate = intialPaymentRecievedTask[0].lastChangedOn
+        ipTaskInitialPaymentRecievedCompleted = intialPaymentRecievedTask[0].completed
+      }
       let piTask = p.tasklists.filter(t => t.taskName === 'PROVIDE INFORMATION');
       piTask.length === 0 || piTask[0].complete === false ? piTaskDate = false : piTaskDate = piTask[0].lastChangedOn;
       let pTask =  p.tasklists.filter(t => t.taskName === 'PREPARATION');
@@ -252,17 +285,22 @@ class EnhancedTable extends React.Component {
       let crTask = p.tasklists.filter(t => t.taskName === 'CLIENT REVIEW');
       crTask.length === 0 || crTask[0].complete === false ? crTaskDate = false : crTaskDate = crTask[0].lastChangedOn;
       let feTask = p.tasklists.filter(t => t.taskName === 'FINALIZE ENGAGEMENT');
-      console.log(feTask)
       feTask.length === 0 || feTask[0].complete === false ? feTaskDate = false : feTaskDate = feTask[0].lastChangedOn;
       let formattedProject = {
         id: p.teamwork_id,
         projectName: p.name,
         clientFirstName: clientNames.firstName,
         clientLastName: clientNames.lastName,
+        lastTasklistChanged: p.lastTasklistChanged,
         projectStatus: p.status,
         projectNotes: '',
         dateProjectCreated: p.createdOn,
         initialPayment: ipTaskDate,
+        intialPaymentRecieved: {
+          hidden: true,
+          lastChangedOn: ipTaskInitialPaymentRecievedDate,
+          completed: ipTaskInitialPaymentRecievedCompleted,
+        },
         provideInformation: piTaskDate,
         preparation: pTaskDate,
         finalizePayment: fpTaskDate,
@@ -278,8 +316,18 @@ class EnhancedTable extends React.Component {
     console.log(this.state.data)
   }
 
+  handleShowTasklistTask = (tasklist) => {
+    let updatedState = this.state.data.map(p => {
+      let newProject = {
+        ...p
+      };
+      newProject.intialPaymentRecieved['hidden'] = false
+      return newProject;
+    });
+    this.setState({updatedState})
+  }
+
   handleRequestSort = (event, property) => {
-    console.log(property)
     const orderBy = property;
     let order = 'desc';
 
@@ -353,6 +401,8 @@ class EnhancedTable extends React.Component {
               onSelectAllClick={this.handleSelectAllClick}
               onRequestSort={this.handleRequestSort}
               rowCount={data.length}
+              projects={projectData}
+              onShowShowTasklistTasks={this.handleShowTasklistTask}
             />
             <TableBody>
               {data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(n => {
@@ -373,7 +423,7 @@ class EnhancedTable extends React.Component {
                     <TableCell className="table-cell" padding="none">{n.projectName}</TableCell>
                     <TableCell className="table-cell" padding="none">{n.clientLastName}</TableCell>
                     <TableCell className="table-cell" padding="none">{n.clientFirstName}</TableCell>
-                    <TableCell className="table-cell" padding="none">{n.projectStatus}</TableCell>
+                    <TableCell className="table-cell" padding="none">{n.lastTasklistChanged}</TableCell>
                     <TableCell className="table-cell" padding="none">{n.projectNotes}</TableCell>
                     <TableCell className="table-cell" padding="none">
                       <Moment format="MM/DD/YY">{n.dateProjectCreated}</Moment>
@@ -381,6 +431,15 @@ class EnhancedTable extends React.Component {
                     <TableCell className="table-cell tasklist" padding="none">
                       {n.initialPayment ? <Moment format="MM/DD/YY">{n.initialPayment}</Moment> : <Close className="incomplete-tasklist" />}
                     </TableCell>
+                    {!n.intialPaymentRecieved.hidden && (
+                      <TableCell className="table-cell tasklist" padding="none">
+                        {n.intialPaymentRecieved.completed ?
+                          <Moment format="MM/DD/YY">{n.intialPaymentRecieved.lastChangedOn}</Moment>
+                          :
+                          <Close className="incomplete-tasklist" />
+                        }
+                      </TableCell>
+                    )}
                     <TableCell className="table-cell tasklist" padding="none">
                       {n.provideInformation ? <Moment format="MM/DD/YY">{n.provideInformation}</Moment> : <Close className="incomplete-tasklist" />}
                     </TableCell>
