@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import ReactChartkick, { BarChart } from 'react-chartkick';
+import ReactChartkick, { BarChart, ColumnChart } from 'react-chartkick';
 import Chart from 'chart.js';
 ReactChartkick.addAdapter(Chart)
 
@@ -29,7 +29,7 @@ class ProjectChart extends Component {
   render() {
     const { projectData } = this.props
     return(
-        <BarChart xtitle={`${this.props.projects.projectsInDB.length} Projects`} label="Projects" id="projects-chart" colors={["#ffa500", "#ffae1a"]}  data={this.state.chartData} />
+      <ColumnChart label="Projects" id="projects-chart" colors={["#6c0e0f", "#550b0c"]}  data={this.state.chartData} />
     )
   }
 

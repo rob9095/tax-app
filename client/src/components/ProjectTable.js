@@ -23,7 +23,6 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import { lighten } from 'material-ui/styles/colorManipulator';
 import Close from '@material-ui/icons/Close';
-import TasklistPopover from '../containers/TasklistPopover'
 
 let counter = 0;
 function createData(name, calories, fat, carbs, protein) {
@@ -38,8 +37,8 @@ const columnData = [
   { id: 'projectStatus', hidden: false, numeric: false, disablePadding: true, label: 'Status' },
   { id: 'projectNotes', hidden: false, numeric: false, disablePadding: true, label: 'Notes' },
   { id: 'dateProjectCreated', hidden: false, numeric: false, disablePadding: true, label: 'Date Project Created' },
-  { id: 'initialPayment', hidden: false, tasklistName: 'INITIAL PAYMENT', numeric: false, disablePadding: true, label: 'Initial Payment', tasks: ['Initial Payment Recieved Task','Initial Payment'] },
   { id: 'initialPaymentReceivedTask', hidden: true, tasklistName: 'INITIAL PAYMENT', numeric: false, disablePadding: true, label: 'Initial Payment Recieved Task' },
+  { id: 'initialPayment', hidden: false, tasklistName: 'INITIAL PAYMENT', numeric: false, disablePadding: true, label: 'Initial Payment', tasks: ['Initial Payment Recieved Task','Initial Payment'] },
   { id: 'provideInformation', hidden: false, isTasklist: true, numeric: false, disablePadding: true, label: 'Provide Information' },
   { id: 'preparation', hidden: false, isTasklist: true, numeric: false, disablePadding: true, label: 'Preparation' },
   { id: 'finalizePayment', hidden: false, isTasklist: true, numeric: false, disablePadding: true, label: 'Finalize Payment' },
@@ -51,21 +50,36 @@ class EnhancedTableHead extends React.Component {
   constructor(props) {
     super(props);
     this.state= {
+      noSort: false,
       initialPaymentReceivedTask: false,
     }
+  }
+
+  componentWillReceiveProps(newProps) {
+    if (newProps.lastCheckedTask != this.props.lastCheckedTask) {
+      this.props.onShowShowTasklistTasks()
+      this.setState({
+        initialPaymentReceivedTask: true,
+      })
+    }
+  }
+
+  handlePopover = (tasks) => {
+    console.log(tasks)
   }
 
   createSortHandler = property => event => {
     this.props.onRequestSort(event, property);
   };
 
-  showTasklistTasks = tasklist => event => {
-      this.setState({
-        initialPaymentReceivedTask: true,
-      })
+  showTasklistTasks = (tasklistName, tasks) => event => {
+      // this.setState({
+      //   initialPaymentReceivedTask: true,
+      // })
+      this.props.onShowPopOver(tasks, tasklistName)
       this.props.projects.projectsInDB.forEach(p => {
-      let columnTasklists = p.tasklists.filter(t => t.taskName === tasklist)
-      this.props.onShowShowTasklistTasks(columnTasklists)
+      let columnTasklists = p.tasklists.filter(t => t.taskName === tasklistName)
+      //this.props.onShowShowTasklistTasks(columnTasklists)
     })
   }
 
@@ -105,11 +119,7 @@ class EnhancedTableHead extends React.Component {
                       {column.tasklistName === undefined ?
                         column.label
                         :
-                        <TasklistPopover
-                          columnLabel={column.label}
-                          columnTasklistName={column.tasklistName}
-                          columnTasks={column.tasks}
-                        />
+                        <span onClick={this.showTasklistTasks(column.tasklistName,column.tasks)}>{column.label}</span>
                       }
                       </TableSortLabel>
                     </Tooltip>
@@ -128,6 +138,7 @@ EnhancedTableHead.propTypes = {
   onRequestSort: PropTypes.func.isRequired,
   onSelectAllClick: PropTypes.func.isRequired,
   onShowShowTasklistTasks: PropTypes.func.isRequired,
+  onShowPopOver: PropTypes.func.isRequired,
   order: PropTypes.string.isRequired,
   orderBy: PropTypes.string.isRequired,
   rowCount: PropTypes.number.isRequired,
@@ -229,6 +240,7 @@ class EnhancedTable extends React.Component {
       rowsPerPage: 20,
     };
     this.sanitizeName = this.sanitizeName.bind(this);
+    this.handleShowPopover = this.handleShowPopover.bind(this)
   }
 
   sanitizeName = (s) => {
@@ -300,6 +312,7 @@ class EnhancedTable extends React.Component {
           hidden: true,
           lastChangedOn: ipTaskInitialPaymentRecievedDate,
           completed: ipTaskInitialPaymentRecievedCompleted,
+          name: 'Initial Payment Received',
         },
         provideInformation: piTaskDate,
         preparation: pTaskDate,
@@ -313,10 +326,13 @@ class EnhancedTable extends React.Component {
     this.setState({
       data: formattedProjectData
     })
-    console.log(this.state.data)
   }
 
-  handleShowTasklistTask = (tasklist) => {
+  handleShowPopover = (tasklistName,tasks) => {
+    this.props.onTogglePopover(tasklistName,tasks)
+  }
+
+  handleShowTasklistTask = () => {
     let updatedState = this.state.data.map(p => {
       let newProject = {
         ...p
@@ -386,9 +402,10 @@ class EnhancedTable extends React.Component {
   isSelected = id => this.state.selected.indexOf(id) !== -1;
 
   render() {
-    const { classes, projectData } = this.props;
+    const { classes, projectData, lastCheckedTask } = this.props;
     const { data, order, orderBy, selected, rowsPerPage, page } = this.state;
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage);
+    console.log(lastCheckedTask)
     return (
       <Paper className={classes.root}>
         <EnhancedTableToolbar numSelected={selected.length} />
@@ -403,6 +420,8 @@ class EnhancedTable extends React.Component {
               rowCount={data.length}
               projects={projectData}
               onShowShowTasklistTasks={this.handleShowTasklistTask}
+              onShowPopOver={this.handleShowPopover}
+              lastCheckedTask={lastCheckedTask}
             />
             <TableBody>
               {data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(n => {
@@ -428,9 +447,6 @@ class EnhancedTable extends React.Component {
                     <TableCell className="table-cell" padding="none">
                       <Moment format="MM/DD/YY">{n.dateProjectCreated}</Moment>
                     </TableCell>
-                    <TableCell className="table-cell tasklist" padding="none">
-                      {n.initialPayment ? <Moment format="MM/DD/YY">{n.initialPayment}</Moment> : <Close className="incomplete-tasklist" />}
-                    </TableCell>
                     {!n.intialPaymentRecieved.hidden && (
                       <TableCell className="table-cell tasklist" padding="none">
                         {n.intialPaymentRecieved.completed ?
@@ -440,6 +456,9 @@ class EnhancedTable extends React.Component {
                         }
                       </TableCell>
                     )}
+                    <TableCell className="table-cell tasklist" padding="none">
+                      {n.initialPayment ? <Moment format="MM/DD/YY">{n.initialPayment}</Moment> : <Close className="incomplete-tasklist" />}
+                    </TableCell>
                     <TableCell className="table-cell tasklist" padding="none">
                       {n.provideInformation ? <Moment format="MM/DD/YY">{n.provideInformation}</Moment> : <Close className="incomplete-tasklist" />}
                     </TableCell>

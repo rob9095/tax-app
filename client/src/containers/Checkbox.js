@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import {  FormControlLabel } from 'material-ui/Form';
 import Checkbox from 'material-ui/Checkbox';
 
 class PrimaryCheckbox extends Component {
@@ -11,16 +12,21 @@ class PrimaryCheckbox extends Component {
 
   handleChange = name => event => {
     this.setState({ [name]: event.target.checked });
+    this.props.handleToggle(this.props.label);
   };
 
   render() {
-    console.log(this.props.label)
     return (
       <div>
-        <Checkbox
-          checked={this.state.checked}
-          onChange={this.handleChange('checked')}
-          value={this.props.label}
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={this.state.checked}
+              onChange={this.handleChange('checked')}
+              value={this.props.label}
+            />
+          }
+          label={this.props.label}
         />
       </div>
     );

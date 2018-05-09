@@ -5,17 +5,37 @@ import { logout } from '../store/actions/auth';
 import { fetchDBProjects } from '../store/actions/teamworkApi';
 import EnhancedTable from '../components/ProjectTable'
 import ProjectChart from '../components/ProjectChart'
+import TasklistPopover from '../containers/TasklistPopover'
 
 class Dashboard extends Component {
     constructor(props) {
       super(props);
-      this.state = {};
+      this.state = {
+        showPopover: false,
+        tasks: [],
+        currentTaskName: '',
+      };
+      this.togglePopover = this.togglePopover.bind(this);
+      this.toggleColumn = this.toggleColumn.bind(this);
     }
 
     componentDidMount() {
       if(this.props.currentUser.isAuthenticated) {
         this.props.fetchDBProjects();
       }
+    }
+
+    toggleColumn = (task) => {
+      this.setState({
+        currentTaskName: task
+      })
+    }
+
+    togglePopover = (tasks) => {
+      this.setState({
+        showPopover: true,
+        tasks: tasks
+      })
     }
 
     render() {
@@ -48,9 +68,19 @@ class Dashboard extends Component {
               projectData={projects}
              />
           </div>
-        <EnhancedTable
-          projectData={projects}
-        />
+          {this.state.showPopover && (
+            <div className="tasklist-popover">
+              <TasklistPopover
+                tasks={this.state.tasks}
+                handleColumnToggle={this.toggleColumn}
+              />
+            </div>
+          )}
+          <EnhancedTable
+            projectData={projects}
+            onTogglePopover={this.togglePopover}
+            lastCheckedTask={this.state.currentTaskName}
+          />
     		</div>
     	);
     }
