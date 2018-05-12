@@ -11,6 +11,9 @@ class PrimaryCheckbox extends Component {
   }
 
   handleChange = name => event => {
+    if (this.state.checked === true) {
+      console.log('i just got unchecked!')
+    }
     this.setState({ [name]: event.target.checked });
     this.props.handleToggle(this.props.label);
   };
@@ -24,6 +27,7 @@ class PrimaryCheckbox extends Component {
               checked={this.state.checked}
               onChange={this.handleChange('checked')}
               value={this.props.label}
+              color="primary"
             />
           }
           label={this.props.label}

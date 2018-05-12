@@ -32,7 +32,18 @@ class TasklistPopover extends Component {
     })
   }
 
+  componentWillReceiveProps(newProps) {
+    this.setState({
+      tasks: newProps.tasks,
+    })
+  }
+
   render() {
+    if (this.state.tasks === undefined) {
+        return(
+          <div />
+        )
+    }
     let checkboxes = this.state.tasks.map(t=>(
       <PrimaryCheckbox
         key={t}
@@ -42,12 +53,11 @@ class TasklistPopover extends Component {
     ))
     const { classes } = this.props;
     return(
-      <div>
+      <div className="checkbox-container">
         <Paper className={classes.root} elevation={4}>
-          <Typography component="p">
-            Paper can be used to build surface or other elements for your application.
-          </Typography>
+          <div className="task-checkboxes">
             {checkboxes}
+          </div>
         </Paper>
       </div>
     )

@@ -17,3 +17,32 @@ body {
 .chart-container #projects-chart {
     font-family: 'Roboto', sans-serif !important;
 }
+
+.container .spacer {
+  height: 24px;
+  width: 24px;
+}
+
+.tasklist-task-menu {
+  margin-top: -40px;
+}
+
+.tasklist-menu.trigger {
+  min-width: 100px;
+  min-height: 10px;
+}
+
+.tasklist-task {
+    width: 80px;
+}
+
+.tasklist-popover {
+  display: flex;
+      justify-content: center;
+}
+
+.task-checkboxes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
