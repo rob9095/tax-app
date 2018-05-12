@@ -18,6 +18,15 @@ class PrimaryCheckbox extends Component {
     this.props.handleToggle(this.props.label);
   };
 
+  componentDidMount() {
+    let isChecked = this.props.activeTasks.filter(t => t.label === this.props.label)
+    if (isChecked.length > 0){
+      this.setState({
+        checked: true,
+      })
+    }
+  }
+
   render() {
     return (
       <div>

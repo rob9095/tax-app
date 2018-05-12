@@ -377,11 +377,11 @@ class EnhancedTableHead extends React.Component {
   }
 
   componentWillReceiveProps(newProps) {
-    if (newProps.lastCheckedTask !== this.props.lastCheckedTask) {
+    if (newProps.lastCheckedTask !== this.props.lastCheckedTask || newProps.removeTask !== this.props.removeTask) {
       let updatedState = this.state
       updatedState.columnData.forEach(c => {
         if (c.label === newProps.lastCheckedTask && c.isTask === true) {
-            c.hidden = false
+            c.hidden = !c.hidden
             console.log(c)
         }
       })
@@ -395,7 +395,9 @@ class EnhancedTableHead extends React.Component {
     if (option === 'Sort') {
       this.props.onRequestSort(this.state.currentEvent, this.state.currentColumn);
     } else {
-      this.props.onShowPopOver(this.state.currentTasks, this.state.currentColumn)
+      // find any shown tasks
+      let activeTasks = this.state.columnData.filter(c => c.isTask === true && c.hidden === false )
+      this.props.onShowPopOver(this.state.currentTasks, this.state.currentColumn, activeTasks)
     }
   }
 
@@ -403,7 +405,7 @@ class EnhancedTableHead extends React.Component {
 
   }
 
-  createSortHandler = (property,isTasklist,tasks) => event => {
+  createSortHandler = (property,isTasklist,tasks,isTask,label) => event => {
     if (isTasklist) {
       this.setState({
         showAddTasksMenu: true,
@@ -411,8 +413,10 @@ class EnhancedTableHead extends React.Component {
         currentColumn: property,
         currentTasks: tasks,
       })
+    } else if (isTask) {
+      this.props.onRequestSort(event, label, isTask);
     } else {
-      this.props.onRequestSort(event, property);
+      this.props.onRequestSort(event, property)
     }
   };
 
@@ -464,7 +468,7 @@ class EnhancedTableHead extends React.Component {
                       <TableSortLabel
                         active={orderBy === column.id}
                         direction={order}
-                        onClick={this.createSortHandler(column.id,column.isTasklist,column.tasks)}
+                        onClick={this.createSortHandler(column.id,column.isTasklist,column.tasks,column.isTask,column.label)}
                         //onMouseOver={this.showTasklistTasks(column.tasklistName)}
                       >
                       {column.isTasklist ? <TasklistMenu label={column.label} handleSelect={this.handleTasklistMenuSelect} /> : column.label }
@@ -598,6 +602,7 @@ class EnhancedTable extends React.Component {
     };
     this.sanitizeName = this.sanitizeName.bind(this);
     this.handleShowPopover = this.handleShowPopover.bind(this)
+    this.handleShowTasklistTask = this.handleShowTasklistTask.bind(this);
   }
 
   sanitizeName = (s) => {
@@ -646,14 +651,14 @@ class EnhancedTable extends React.Component {
       if (ipTask.length > 0) {
         // inital payment task
         let intialPaymentTask = ipTask[0].tasks.filter(task => task.content === 'Initial Payment')
-        if (intialPaymentTask[0] !== undefined) {
+        if (intialPaymentTask[0] !== undefined && intialPaymentTask[0].completed !== false) {
           ipInitialPaymentDate = intialPaymentTask[0].lastChangedOn
           ipInitialPaymentCompleted = intialPaymentTask[0].completed
         }
 
         // intial payment recieved task
         let intialPaymentRecievedTask = ipTask[0].tasks.filter(task => task.content === 'Initial Payment Received')
-        if (intialPaymentRecievedTask[0] !== undefined) {
+        if (intialPaymentRecievedTask[0] !== undefined && intialPaymentRecievedTask[0].completed !== false) {
           ipInitialPaymentRecievedDate = intialPaymentRecievedTask[0].lastChangedOn
           ipInitialPaymentRecievedCompleted = intialPaymentRecievedTask[0].completed
         }
@@ -664,63 +669,63 @@ class EnhancedTable extends React.Component {
       if (piTask.length > 0) {
       // 'Getting Started'
       let gettingStartedTask = piTask[0].tasks.filter(task => task.content === 'Getting Started')
-      if (gettingStartedTask[0] !== undefined) {
+      if (gettingStartedTask[0] !== undefined && gettingStartedTask[0].completed !== false) {
         piGettingStartedDate = gettingStartedTask[0].lastChangedOn
         piGettingStartedCompleted = gettingStartedTask[0].completed
       }
 
       // 'Tax Organizer'
       let taxOrangizerTask = piTask[0].tasks.filter(task => task.content === 'Tax Organizer')
-      if (taxOrangizerTask[0] !== undefined) {
+      if (taxOrangizerTask[0] !== undefined && taxOrangizerTask[0].completed !== false) {
         piTaxOrganizerDate = taxOrangizerTask[0].lastChangedOn
         piTaxOrganizerCompleted = taxOrangizerTask[0].completed
       }
 
       // 'Questionnaire-Travel Worksheet'
       let qTravelWorksheetTask = piTask[0].tasks.filter(task => task.content === 'Questionnaire-Travel Worksheet')
-      if (qTravelWorksheetTask[0] !== undefined) {
+      if (qTravelWorksheetTask[0] !== undefined && qTravelWorksheetTask[0].completed !== false) {
         piQTravelWorksheetDate = qTravelWorksheetTask[0].lastChangedOn
         piQTravelWorksheetCompleted = qTravelWorksheetTask[0].completed
       }
 
       // 'Questionnaire-FBAR and Form 8938'
       let qFbarTask = piTask[0].tasks.filter(task => task.content === 'Questionnaire-FBAR and Form 8938')
-      if (qFbarTask[0] !== undefined) {
+      if (qFbarTask[0] !== undefined && qFbarTask[0].completed !== false) {
         piQFbarDate = qFbarTask[0].lastChangedOn
         piQFbarCompleted = qFbarTask[0].completed
       }
 
       // 'Questionnaire-Form 5471 (Foreign Corporation)'
       let qForm5471Task = piTask[0].tasks.filter(task => task.content === 'Questionnaire-Form 5471 (Foreign Corporation)')
-      if (qForm5471Task[0] !== undefined) {
+      if (qForm5471Task[0] !== undefined && qForm5471Task[0].completed !== false) {
         piQForm5471Date = qForm5471Task[0].lastChangedOn
         piQForm5471Completed = qForm5471Task[0].completed
       }
 
       // 'Questionnaire-Schedule A'
       let qScheduleATask = piTask[0].tasks.filter(task => task.content === 'Questionnaire-Schedule A')
-      if (qScheduleATask[0] !== undefined) {
+      if (qScheduleATask[0] !== undefined && qScheduleATask[0].completed !== false) {
         piQScheduleADate = qScheduleATask[0].lastChangedOn
         piQScheduleACompleted = qScheduleATask[0].completed
       }
 
       // 'Questionnaire-Schedule C'
       let qScheduleCTask = piTask[0].tasks.filter(task => task.content === 'Questionnaire-Schedule C')
-      if (qScheduleCTask[0] !== undefined) {
+      if (qScheduleCTask[0] !== undefined && qScheduleCTask[0].completed !== false) {
         piQScheduleCDate = qScheduleCTask[0].lastChangedOn
         piQScheduleCCompleted = qScheduleCTask[0].completed
       }
 
       // 'Questionnaire-Schedule D'
       let qScheduleDTask = piTask[0].tasks.filter(task => task.content === 'Questionnaire-Schedule D')
-      if (qScheduleDTask[0] !== undefined) {
+      if (qScheduleDTask[0] !== undefined && qScheduleDTask[0].completed !== false) {
         piQScheduleDDate = qScheduleDTask[0].lastChangedOn
         piQScheduleDCompleted = qScheduleDTask[0].completed
       }
 
       // 'Questionnaire-Schedule E'
       let qScheduleETask = piTask[0].tasks.filter(task => task.content === 'Questionnaire-Schedule E')
-      if (qScheduleETask[0] !== undefined) {
+      if (qScheduleETask[0] !== undefined && qScheduleETask[0].completed !== false) {
         piQScheduleEDate = qScheduleETask[0].lastChangedOn
         piQScheduleECompleted = qScheduleETask[0].completed
       }
@@ -732,49 +737,49 @@ class EnhancedTable extends React.Component {
       if (pTask.length > 0) {
         // 'Client Welcome Call'
         let clientWelcomeCallTask = pTask[0].tasks.filter(task => task.content === 'Client Welcome Call')
-        if (clientWelcomeCallTask[0] !== undefined) {
+        if (clientWelcomeCallTask[0] !== undefined && clientWelcomeCallTask[0].completed !== false) {
           pClientWelcomeCallDate = clientWelcomeCallTask[0].lastChangedOn
           pClientWelcomeCallCompleted = clientWelcomeCallTask[0].completed
         }
 
         // 'Audit Protection Plan - IRS Monitoring'
         let auditProtectionTask = pTask[0].tasks.filter(task => task.content = 'Audit Protection Plan - IRS Monitoring')
-        if (auditProtectionTask[0] !== undefined) {
+        if (auditProtectionTask[0] !== undefined && auditProtectionTask[0].completed !== false) {
           pAuditProtectionDate = auditProtectionTask[0].lastChangedOn
           pAuditProtectionCompleted = auditProtectionTask[0].completed
         }
 
         // 'Workpaper Preparation'
         let workPaperPrepTask = pTask[0].tasks.filter(task => task.content = 'Workpaper Preparation')
-        if (workPaperPrepTask[0] !== undefined) {
+        if (workPaperPrepTask[0] !== undefined && workPaperPrepTask[0].completed !== false) {
           pWorkPaperPrepDate = workPaperPrepTask[0].lastChangedOn
           pWorkPaperPrepCompleted = workPaperPrepTask[0].completed
         }
 
         // 'Data Entry'
         let dataEntryTask = pTask[0].tasks.filter(task => task.content = 'Data Entry')
-        if (dataEntryTask[0] !== undefined) {
+        if (dataEntryTask[0] !== undefined && dataEntryTask[0].completed !== false) {
           pDataEntryDate = dataEntryTask[0].lastChangedOn
           pDataEntryCompleted = dataEntryTask[0].completed
         }
 
         // 'Data Entry Review'
         let dataEntryReviewTask = pTask[0].tasks.filter(task => task.content = 'Data Entry Review')
-        if (dataEntryReviewTask[0] !== undefined) {
+        if (dataEntryReviewTask[0] !== undefined && dataEntryReviewTask[0].completed !== false) {
           pDataEntryReviewDate = dataEntryReviewTask[0].lastChangedOn
           pDataEntryReviewCompleted = dataEntryReviewTask[0].completed
         }
 
         // 'Data Entry Corrections'
         let dataEntryCorrectionsTask = pTask[0].tasks.filter(task => task.content = 'Data Entry Corrections')
-        if (dataEntryCorrectionsTask[0] !== undefined) {
+        if (dataEntryCorrectionsTask[0] !== undefined && dataEntryCorrectionsTask[0].completed !== false) {
           pDataEntryCorrectionsDate = dataEntryCorrectionsTask[0].lastChangedOn
           pDataEntryCorrectionsCompleted = dataEntryCorrectionsTask[0].completed
         }
 
         // 'Final Review'
         let finalReviewTask = pTask[0].tasks.filter(task => task.content = 'Final Review')
-        if (finalReviewTask[0] !== undefined) {
+        if (finalReviewTask[0] !== undefined && finalReviewTask[0].completed !== false) {
           pFinalReviewDate = finalReviewTask[0].lastChangedOn
           pFinalReviewCompleted = finalReviewTask[0].completed
         }
@@ -785,14 +790,14 @@ class EnhancedTable extends React.Component {
       if (fpTask.length > 0) {
         // 'Final Payment Received'
         let finalPaymentReceivedTask = fpTask[0].tasks.filter(task => task.content = 'Final Payment Received')
-        if (finalPaymentReceivedTask[0] !== undefined) {
+        if (finalPaymentReceivedTask[0] !== undefined && finalPaymentReceivedTask[0].completed !== false) {
           fpFinalPaymentReceivedDate = finalPaymentReceivedTask[0].lastChangedOn
           fpFinalPaymentReceivedCompleted = finalPaymentReceivedTask[0].completed
         }
 
         // 'Final Invoice Due'
         let finalInvoiceDueTask = fpTask[0].tasks.filter(task => task.content = 'Final Invoice Due')
-        if (finalInvoiceDueTask[0] !== undefined) {
+        if (finalInvoiceDueTask[0] !== undefined && finalInvoiceDueTask[0].completed !== false) {
           fpFinalInvoiceDueDate = finalInvoiceDueTask[0].lastChangedOn
           fpFinalInvoiceDueCompleted = finalInvoiceDueTask[0].completed
         }
@@ -803,21 +808,21 @@ class EnhancedTable extends React.Component {
       if (crTask.length > 0) {
         // 'Return Review Instructions'
         let returnReviewInstructionsTask = crTask[0].tasks.filter(task => task.content = 'Return Review Instructions')
-        if (returnReviewInstructionsTask[0] !== undefined) {
+        if (returnReviewInstructionsTask[0] !== undefined && returnReviewInstructionsTask[0].completed !== false) {
           crReturnReviewInstructionsDate = returnReviewInstructionsTask[0].lastChangedOn
           crReturnReviewInstructionsCompleted = returnReviewInstructionsTask[0].completed
         }
 
         // 'Streamlined Procedure Instructions'
         let streamlinedProcedureTask = crTask[0].tasks.filter(task => task.content = 'Streamlined Procedure Instructions')
-        if (streamlinedProcedureTask[0] !== undefined) {
+        if (streamlinedProcedureTask[0] !== undefined && streamlinedProcedureTask[0].completed !== false) {
           crStreamlinedProcedureDate = streamlinedProcedureTask[0].lastChangedOn
           crStreamlinedProcedureCompleted = streamlinedProcedureTask[0].completed
         }
 
         // 'Client Review Call'
         let clientReviewCallTask = crTask[0].tasks.filter(task => task.content = 'Client Review Call')
-        if (clientReviewCallTask[0] !== undefined) {
+        if (clientReviewCallTask[0] !== undefined && clientReviewCallTask[0].completed !== false) {
           crClientReviewCallDate = clientReviewCallTask[0].lastChangedOn
           crClientReviewCallCompleted = clientReviewCallTask[0].completed
         }
@@ -829,14 +834,14 @@ class EnhancedTable extends React.Component {
       if (feTask.length > 0) {
         // 'Closing Letter'
         let closingLetterTask = feTask[0].tasks.filter(task => task.content = 'Closing Letter')
-        if (closingLetterTask[0] !== undefined) {
+        if (closingLetterTask[0] !== undefined && closingLetterTask[0].completed !== false) {
           feClosingLetterDate = closingLetterTask[0].lastChangedOn
           feClosingLetterCompleted = closingLetterTask[0].completed
         }
 
         // 'Close Engagement & Archive Teamwork Project'
         let closeEngagementTask = feTask[0].tasks.filter(task => task.content = 'Close Engagement & Archive Teamwork Project')
-        if (closeEngagementTask[0] !== undefined) {
+        if (closeEngagementTask[0] !== undefined && closeEngagementTask[0].completed !== false) {
           feCloseEngagementDate = closeEngagementTask[0].lastChangedOn
           feCloseEngagementCompleted = closeEngagementTask[0].completed
         }
@@ -991,37 +996,53 @@ class EnhancedTable extends React.Component {
     })
   }
 
-  handleShowPopover = (tasklistName,tasks) => {
-    this.props.onTogglePopover(tasklistName,tasks)
+  handleShowPopover = (tasks,tasklistName,activeTasks) => {
+    this.props.onTogglePopover(tasks,tasklistName,activeTasks)
   }
 
   handleShowTasklistTask = (task) => {
-    let updatedData = this.state.data.map(p => {
-      let newProject = {
-        ...p
-      };
-      newProject[task].hidden = false
-      return newProject;
-    });
+    let updatedData = this.state.data
+    updatedData.forEach(p => {
+      p[task].hidden = !p[task].hidden
+    })
+
+    // let updatedData = this.state.data.map(p => {
+    //   let newProject = {
+    //     ...p
+    //   };
+    //   newProject[task].hidden = false
+    //   return newProject;
+    // });
     this.setState({
       data: updatedData,
       lastCheckedTask: task,
     })
   }
 
-  handleRequestSort = (event, property) => {
+  handleRequestSort = (event, property, isTask) => {
     const orderBy = property;
     let order = 'desc';
+    let data = this.state.data;
 
     if (this.state.orderBy === property && this.state.order === 'desc') {
       order = 'asc';
     }
 
-    const data =
-      order === 'desc'
-        ? this.state.data.sort((a, b) => (b[orderBy] === false ) - (a[orderBy] === false) || (b[orderBy] < a[orderBy] ? -1 : 1))
-        : this.state.data.sort((a, b) => (a[orderBy] === false ) - (b[orderBy] === false) || (a[orderBy] < b[orderBy] ? -1 : 1));
+    if (isTask) {
+      data =
+        order === 'desc'
+            ? this.state.data.sort((a, b) => (b[orderBy].lastChangedOn === undefined ) - (a[orderBy].lastChangedOn === undefined) || (b[orderBy].lastChangedOn < a[orderBy].lastChangedOn ? -1 : 1))
+            : this.state.data.sort((a, b) => (a[orderBy].lastChangedOn === undefined ) - (b[orderBy].lastChangedOn === undefined) || (a[orderBy].lastChangedOn < b[orderBy].lastChangedOn ? -1 : 1));
+    } else {
+      data =
+        order === 'desc'
+            ? this.state.data.sort((a, b) => (b[orderBy] === false ) - (a[orderBy] === false) || (b[orderBy] < a[orderBy] ? -1 : 1))
+            : this.state.data.sort((a, b) => (a[orderBy] === false ) - (b[orderBy] === false) || (a[orderBy] < b[orderBy] ? -1 : 1));
+    }
 
+    // this.state.data.sort((a,b) => {
+    //   console.log(a[orderBy])
+    // })
     this.setState({ data, order, orderBy });
   };
 

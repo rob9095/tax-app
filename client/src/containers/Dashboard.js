@@ -15,6 +15,7 @@ class Dashboard extends Component {
         tasks: [],
         currentTaskName: '',
         removeTask: false,
+        toggleCount: 0,
       };
       this.togglePopover = this.togglePopover.bind(this);
       this.toggleColumn = this.toggleColumn.bind(this);
@@ -27,20 +28,31 @@ class Dashboard extends Component {
     }
 
     toggleColumn = (task) => {
-      if (task === this.state.currentTaskName) {
+      if (this.state.toggleCount === 1) {
         this.setState({
+          currentTaskName: task,
+          removeTask: false,
+          toggleCount: 0,
+        })
+      } else if (task === this.state.currentTaskName && this.state.toggleCount !== 1) {
+        this.setState({
+          currentTaskName: task,
           removeTask: true,
+          toggleCount: 1,
+        })
+      } else {
+        this.setState({
+          currentTaskName: task,
+          removeTask: false,
         })
       }
-      this.setState({
-        currentTaskName: task,
-      })
     }
 
-    togglePopover = (tasks) => {
+    togglePopover = (tasks,tasklistName, activeTasks) => {
       this.setState({
         showPopover: true,
-        tasks: tasks
+        tasks: tasks,
+        activeTasks: activeTasks,
       })
     }
 
@@ -77,8 +89,9 @@ class Dashboard extends Component {
           {this.state.showPopover && (
             <div className="tasklist-popover">
               <TasklistPopover
+                activeTasks={this.state.activeTasks}
                 tasks={this.state.tasks}
-                handleColumnToggle={this.toggleColumn}
+                handleToggle={this.toggleColumn}
               />
             </div>
           )}

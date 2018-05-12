@@ -23,7 +23,7 @@ class TasklistPopover extends Component {
   }
 
   handleCheckmarkToggle = (task) => {
-    this.props.handleColumnToggle(task)
+    this.props.handleToggle(task)
   }
 
   componentDidMount() {
@@ -49,6 +49,7 @@ class TasklistPopover extends Component {
         key={t}
         label={t}
         handleToggle={this.handleCheckmarkToggle}
+        activeTasks={this.props.activeTasks}
       />
     ))
     const { classes } = this.props;
