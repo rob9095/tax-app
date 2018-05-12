@@ -56,6 +56,12 @@ class Dashboard extends Component {
       })
     }
 
+    hidePopover = () => {
+      this.setState({
+        showPopover: false,
+      })
+    }
+
     render() {
       {if (this.props.projects.projectsInDB === undefined) {
         return(
@@ -92,6 +98,7 @@ class Dashboard extends Component {
                 activeTasks={this.state.activeTasks}
                 tasks={this.state.tasks}
                 handleToggle={this.toggleColumn}
+                onHidePopover={this.hidePopover}
               />
             </div>
           )}

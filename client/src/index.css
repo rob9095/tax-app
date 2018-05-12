@@ -41,6 +41,15 @@ body {
       justify-content: center;
 }
 
+span.popover-close {
+    float: right;
+}
+
+span.popover-close:hover {
+    opacity: .8;
+    cursor: pointer;
+}
+
 .task-checkboxes {
     display: flex;
     flex-wrap: wrap;

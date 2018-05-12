@@ -4,13 +4,14 @@ import { withStyles } from 'material-ui/styles';
 import Paper from 'material-ui/Paper';
 import Typography from 'material-ui/Typography';
 import PrimaryCheckbox from './Checkbox';
+import CloseIcon from '@material-ui/icons/Close';
 
 const styles = theme => ({
   root: theme.mixins.gutters({
     paddingTop: 16,
     paddingBottom: 16,
     marginTop: theme.spacing.unit * 3,
-  }),
+  })
 });
 
 class TasklistPopover extends Component {
@@ -38,6 +39,10 @@ class TasklistPopover extends Component {
     })
   }
 
+  handleHidePopover = () => {
+    this.props.onHidePopover();
+  }
+
   render() {
     if (this.state.tasks === undefined) {
         return(
@@ -54,13 +59,16 @@ class TasklistPopover extends Component {
     ))
     const { classes } = this.props;
     return(
+      <div className={classes.root}>
       <div className="checkbox-container">
+        <span onClick={this.handleHidePopover} className="popover-close"><CloseIcon color="primary" /></span>
         <Paper className={classes.root} elevation={4}>
           <div className="task-checkboxes">
             {checkboxes}
           </div>
         </Paper>
       </div>
+    </div>
     )
   }
 }
