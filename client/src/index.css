@@ -10,6 +10,8 @@ body {
     margin: 0 auto;
 }
 
+
+/* Dashboard & Project Table */
 .chart-container {
     margin: 0 auto;
 }
@@ -63,4 +65,12 @@ span.popover-close:hover {
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-start;
+}
+
+
+/* Navbar */
+
+a.plain-a {
+  color: inherit;
+  text-decoration: inherit;
 }

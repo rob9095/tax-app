@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import PropTypes from 'prop-types';
@@ -8,6 +9,7 @@ import Toolbar from 'material-ui/Toolbar';
 import Typography from 'material-ui/Typography';
 import Button from 'material-ui/Button';
 import NavbarDrawer from '../components/NavbarDrawer';
+import {logout} from '../store/actions/auth';
 
 const styles = {
   root: {
@@ -24,6 +26,11 @@ class Navbar extends Component {
     this.state = {}
   }
 
+  logout = e => {
+    e.preventDefault();
+    this.props.logout();
+  }
+
   render() {
     const { classes, errors, currentUser } = this.props;
     return(
@@ -31,14 +38,17 @@ class Navbar extends Component {
         <AppBar position="static">
           <Toolbar>
             <NavbarDrawer />
-            <Typography variant="title" color="inherit" className={classes.flex}>
-              Tax Samaritan
-            </Typography>
-            {currentUser.isAuthenticated ?
-              <Button color="inherit">Logout</Button>
-            :
-              <Button color="inherit">Login</Button>
-            }
+              <Typography variant="title" color="inherit" className={classes.flex}>
+                <Link className="plain-a" to="/">Tax Samaritan</Link>
+              </Typography>
+              {currentUser.isAuthenticated ?
+                <Button onClick={this.logout} color="inherit">Logout</Button>
+              :
+                <div>
+                  <Link className="plain-a" to="/signin"><Button color="inherit">Login</Button></Link>
+                  <Link className="plain-a" to="/signup"><Button color="inherit">Sign Up</Button></Link>
+                </div>
+              }
           </Toolbar>
         </AppBar>
       </div>
@@ -57,4 +67,4 @@ function mapStateToProps(state) {
 	};
 }
 
-export default compose(withStyles(styles), connect(mapStateToProps, { }), )(Navbar);
+export default compose(withStyles(styles), connect(mapStateToProps, { logout }), )(Navbar);

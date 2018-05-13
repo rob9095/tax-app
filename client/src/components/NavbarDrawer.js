@@ -37,19 +37,6 @@ class NavbarDrawer extends React.Component {
 
   render() {
     const { classes } = this.props;
-
-    const sideList = (
-      <div className={classes.list}>
-        <Divider />
-      </div>
-    );
-
-    const fullList = (
-      <div className={classes.fullList}>
-        <Divider />
-      </div>
-    );
-
     return (
       <div>
         <IconButton className={classes.menuButton} color="inherit" aria-label="Menu">
@@ -62,7 +49,9 @@ class NavbarDrawer extends React.Component {
             onClick={this.toggleDrawer('left', false)}
             onKeyDown={this.toggleDrawer('left', false)}
           >
-            {sideList}
+            <div className={classes.list}>
+              <Divider />
+            </div>
           </div>
         </Drawer>
       </div>

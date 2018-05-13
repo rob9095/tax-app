@@ -63,17 +63,12 @@ class Dashboard extends Component {
     }
 
     render() {
-      {if (this.props.projects.projectsInDB === undefined) {
-        return(
-          <div />
-        )
-      }}
       const { currentUser, projects } = this.props;
-      if(!currentUser.isAuthenticated){
+      if(!currentUser.isAuthenticated || this.props.projects.projectsInDB === undefined){
     		return (
     			<div className="home-hero">
     				<h1>Tax-App Web Portal</h1>
-    				<h4>Singup</h4>
+    				<h4>Signup</h4>
     				<Link to="/signup" className="btn btn-primary">
     					Signup
     				</Link>
