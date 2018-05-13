@@ -17,8 +17,12 @@ class TasklistMenu extends React.Component {
   };
 
   handleClose = (event) => {
+    if (event.currentTarget.textContent) {
     this.props.handleSelect(event.currentTarget.textContent);
     this.setState({ anchorEl: null });
+  } else {
+    this.setState({ anchorEl: null });
+  }
   };
 
   render() {
