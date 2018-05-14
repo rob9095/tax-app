@@ -37,7 +37,7 @@ class Navbar extends Component {
       <div className={classes.root}>
         <AppBar position="static">
           <Toolbar>
-            <NavbarDrawer />
+            <NavbarDrawer currentUser={currentUser} />
               <Typography variant="title" color="inherit" className={classes.flex}>
                 <Link className="plain-a" to="/">Tax Samaritan</Link>
               </Typography>

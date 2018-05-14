@@ -10,3 +10,4 @@ module.exports.User = require('./user');
 module.exports.Project = require('./project');
 module.exports.Tasklist = require('./tasklist');
 module.exports.Task = require('./task');
+module.exports.Invitation = require('./invitation');

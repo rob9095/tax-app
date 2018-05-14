@@ -39,6 +39,19 @@ exports.signin = async function(req, res, next) {
 
 exports.signup = async function(req, res, next){
 	try {
+		let invitationCheck = await db.Invitation.findOne({email: req.body.email})
+		if (invitationCheck === null) {
+			return next({
+				status: 400,
+				message: 'To create an account you must be invited',
+			})
+		}
+		if (req.body.password.length <= 6) {
+			return next({
+				status: 400,
+				message: 'Choose a password longer than 6 characters',
+			})
+		}
 		let user = await db.User.create(req.body);
 		let { id, username, profileImageUrl } = user;
 		let token = jwt.sign(
@@ -59,9 +72,12 @@ exports.signup = async function(req, res, next){
 		if(err.code === 11000) {
 			err.message = 'Sorry, that username and/or email has been taken.'
 		}
+		if(err._message === 'User validation failed') {
+			err.message = `Sorry, we can't create an account with this information. Double check the feilds and try again.`
+		}
 		return next({
 			status:400,
 			message: err.message
-		});	
+		});
 	}
 };

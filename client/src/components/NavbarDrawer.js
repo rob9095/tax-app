@@ -7,6 +7,7 @@ import List from 'material-ui/List';
 import Divider from 'material-ui/Divider';
 import IconButton from 'material-ui/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
+import DrawerMenu from '../containers/DrawerMenu';
 
 const styles = {
   list: {
@@ -36,11 +37,11 @@ class NavbarDrawer extends React.Component {
   };
 
   render() {
-    const { classes } = this.props;
+    const { classes, currentUser } = this.props;
     return (
       <div>
-        <IconButton className={classes.menuButton} color="inherit" aria-label="Menu">
-          <MenuIcon onClick={this.toggleDrawer('left', true)} />
+        <IconButton onClick={this.toggleDrawer('left', true)} className={classes.menuButton} color="inherit" aria-label="Menu">
+          <MenuIcon />
         </IconButton>
         <Drawer open={this.state.left} onClose={this.toggleDrawer('left', false)}>
           <div
@@ -50,7 +51,7 @@ class NavbarDrawer extends React.Component {
             onKeyDown={this.toggleDrawer('left', false)}
           >
             <div className={classes.list}>
-              <Divider />
+              <DrawerMenu currentUser={currentUser} />
             </div>
           </div>
         </Drawer>

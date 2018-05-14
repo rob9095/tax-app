@@ -9,6 +9,7 @@ const projectsRoutes = require('./routes/projects');
 const tasklistsRoutes = require('./routes/tasklists');
 const milestonesRoutes = require('./routes/milestones');
 const tasksRoutes = require('./routes/tasks');
+const invitationsRoutes = require('./routes/invitations');
 const { loginRequired, ensureCorrectUser } = require('./middleware/auth');
 const PORT = 8082;
 
@@ -19,6 +20,13 @@ app.use(cors())
 app.use(bodyParser.json());
 
 // all routes here
+
+// invitations routes
+app.use(
+		'/api/invitations',
+		// loginRequired,
+		// ensureCorrectUser,
+		invitationsRoutes);
 
 // milestones router
 app.use(

@@ -1,4 +1,32 @@
 import React, { Component } from 'react';
+import { Switch, Route, withRouter, Redirect } from 'react-router-dom';
+import { connect } from 'react-redux';
+import { compose } from 'redux';
+import { authUser } from '../store/actions/auth';
+import { addError, removeError } from '../store/actions/errors';
+import PropTypes from 'prop-types';
+import { withStyles } from 'material-ui/styles';
+import Button from 'material-ui/Button';
+import Input from 'material-ui/Input';
+import Paper from 'material-ui/Paper';
+import CloseIcon from '@material-ui/icons/Close';
+
+const styles = theme => ({
+  container: {
+    display: 'flex',
+    flexWrap: 'wrap',
+  },
+  input: {
+    margin: theme.spacing.unit,
+		width: '100%',
+		fontSize: '.95rem',
+  },
+	button: {
+		margin: theme.spacing.unit,
+		marginTop: 20,
+		width: '100%',
+	}
+});
 
 class AuthForm extends Component {
 	constructor(props) {
@@ -7,7 +35,8 @@ class AuthForm extends Component {
 			email: '',
 			username: '',
 			password: '',
-			profileImageUrl: ''
+			passwordCheck: '',
+			profileImageUrl: '',
 		};
 	}
 
@@ -17,11 +46,23 @@ class AuthForm extends Component {
 		});
 	};
 
+	closeErrors = () => {
+		this.props.removeError();
+	}
+
 	handleSubmit = e => {
 		e.preventDefault();
+		if (this.state.password !== this.state.passwordCheck && this.props.signUp) {
+			this.props.addError('Passwords must match')
+			return
+		}
+		if (this.state.username.length <= 4 && this.props.signUp) {
+			this.props.addError('Choose a username longer than 4 characters')
+			return
+		}
 		const authType = this.props.signUp ? 'signup' : 'signin';
 		this.props.onAuth(authType, this.state).then(() => {
-			this.props.history.push('/');
+			this.props.history.push('/dashboard');
 		})
 		.catch(() => {
 			return;
@@ -29,23 +70,60 @@ class AuthForm extends Component {
 	};
 
 	render() {
-		const { email, username, password, profileImageUrl } = this.state;
-		const { signUp, heading, buttonText, errors, history, removeError } = this.props;
-
-		history.listen(() => {
-			removeError();
-		});
-
+		const { email, username, password, passwordCheck, profileImageUrl } = this.state;
+		const { classes, signUp, heading, buttonText, errors, history, removeError } = this.props;
+		// history.listen(() => {
+		// 	removeError();
+		// });
 		return(
 		<div>
-			<div className="row justify-content-md-center text-center">
-				<div className="col-md-6">
-					<form onSubmit={this.handleSubmit}>
+			<div className="form-container">
+				<div>
+					<form className="auth-form" onSubmit={this.handleSubmit}>
 						<h2>{heading}</h2>
 						{errors.message && (
-							<div className="alert alert-danger">{errors.message}</div>
+							<Paper elevation={4} className="alert alert-error">
+								{errors.message}
+								<CloseIcon onClick={this.closeErrors} color="primary" className="alert-close" />
+							</Paper>
 						)}
-						<label htmlFor="email">Email:</label>
+            {signUp && (
+								<Input
+									autoComplete="off"
+									id="username"
+									name="username"
+									onChange={this.handleChange}
+									value={username}
+									type="text"
+									placeholder="Username"
+									className={classes.input}
+									inputProps={{'aria-label': 'Description',}}
+								/>
+						)}
+							<Input
+								autoComplete="off"
+								id="email"
+								name="email"
+								onChange={this.handleChange}
+								value={email}
+								type="text"
+								placeholder="Email"
+	        			className={classes.input}
+	        			inputProps={{'aria-label': 'Description',}}
+							/>
+							<Input
+								autoComplete="off"
+								className="form-control"
+								id="password"
+								name="password"
+								onChange={this.handleChange}
+								type="password"
+								placeholder="Password"
+								className={classes.input}
+								inputProps={{'aria-label': 'Description',}}
+								error={this.state.password !== this.state.passwordCheck && signUp ? true : false}
+							/>
+						{/* <label htmlFor="email">Email:</label>
 						<input
 							autoComplete="off"
 							className="form-control"
@@ -54,8 +132,8 @@ class AuthForm extends Component {
 							onChange={this.handleChange}
 							value={email}
 							type="text"
-						/>
-						<label htmlFor="password">Password:</label>
+						/> */}
+						{/* <label htmlFor="password">Password:</label>
 						<input
 							autoComplete="off"
 							className="form-control"
@@ -63,34 +141,25 @@ class AuthForm extends Component {
 							name="password"
 							onChange={this.handleChange}
 							type="password"
-						/>
+						/> */}
 						{signUp && (
-							<div>
-								<label htmlFor="username">Username:</label>
-								<input
+								<Input
 									autoComplete="off"
-									className="form-control"
-									id="username"
-									name="username"
+									id="passwordCheck"
+									name="passwordCheck"
 									onChange={this.handleChange}
-									value={username}
-									type="text"
+									value={passwordCheck}
+									type="password"
+									placeholder="Confirm Password"
+									className={classes.input}
+									inputProps={{'aria-label': 'Description',}}
+									error={this.state.password !== this.state.passwordCheck ? true : false}
 								/>
-								<label htmlFor="image-url">Image Url:</label>
-								<input
-				                    autoComplete="off"
-									className="form-control"
-									id="image-url"
-									name="profileImageUrl"
-									onChange={this.handleChange}
-									type="text"
-									value={profileImageUrl}
-								/>
-							</div>
 						)}
-						<button type="submit" className="btn btn-primary btn-block btn-lg">
+						<Button className={classes.button} variant="raised" type="submit" color="primary">{buttonText}</Button>
+						{/* <button type="submit" className="btn btn-primary btn-block btn-lg">
 							{buttonText}
-						</button>
+						</button> */}
 					</form>
 				</div>
 			</div>
@@ -99,4 +168,15 @@ class AuthForm extends Component {
 	}
 }
 
-export default AuthForm;
+AuthForm.propTypes = {
+  classes: PropTypes.object.isRequired,
+};
+
+function mapStateToProps(state) {
+	return {
+		currentUser: state.currentUser,
+		errors: state.errors
+	};
+}
+
+export default  withRouter(compose(withStyles(styles), connect(mapStateToProps, { authUser, removeError, addError }),)(AuthForm));

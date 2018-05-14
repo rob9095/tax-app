@@ -43,7 +43,6 @@ class ProjectTableToolbar extends Component {
 
   render() {
     const { numSelected, classes, currentTasks } = this.props;
-    console.log(currentTasks)
     return (
       <Toolbar
         className={classNames(classes.root, {

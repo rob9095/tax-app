@@ -643,7 +643,7 @@ class EnhancedTable extends React.Component {
                         {n['Questionnaire-Travel Worksheet'].completed ?
                           <Moment format="M/D/YY">{n['Questionnaire-Travel Worksheet'].lastChangedOn}</Moment>
                           :
-                          <Close className="incomplete-tasklist" />
+                          n['Questionnaire-Travel Worksheet'].completed === undefined ? <span>N/A</span> : <Close className="incomplete-tasklist" />
                         }
                       </TableCell>
                     )}

@@ -2,11 +2,12 @@ import React from 'react';
 import { Switch, Route, withRouter, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import Dashboard from './Dashboard'
-import Homepage from '../components/Homepage';
+import Setup from '../components/Setup';
 import AuthForm from '../components/AuthForm';
 import { authUser } from '../store/actions/auth';
 import { removeError } from '../store/actions/errors';
 import Grid from 'material-ui/Grid';
+import AccountPage from './AccountPage';
 
 const Main = props => {
 	const {authUser, errors, removeError, currentUser } = props;
@@ -15,8 +16,10 @@ const Main = props => {
 			<Grid item xs={12}>
 				<div>
 					<Switch>
-						<Route exact path="/homepage" render={props => <Homepage currentUser={currentUser} {...props} />} />
-					<Route exact path="/" render={props => <Dashboard currentUser={currentUser} {...props} />} />
+						<Route exact path="/account" render={props => <AccountPage currentUser={currentUser} {...props} />} />
+						<Route exact path="/setup" render={props => <Setup currentUser={currentUser} {...props} />} />
+						<Route exact path="/" render={props => <Dashboard currentUser={currentUser} {...props} />} />
+						<Route exact path="/dashboard" render={props => <Dashboard currentUser={currentUser} {...props} />} />
 						<Route
 							exact
 							path="/signin"
@@ -27,7 +30,7 @@ const Main = props => {
 										errors={errors}
 										onAuth={authUser}
 										buttonText="Log In"
-										heading="Welcome Back."
+										heading="Welcome Back"
 										{...props}
 									/>
 								);
@@ -43,8 +46,8 @@ const Main = props => {
 										errors={errors}
 										onAuth={authUser}
 										signUp
-										buttonText="Sign me up!"
-										heading="Sign up now."
+										buttonText="Sign Up"
+										heading="Create Account"
 										{...props}
 									/>
 								);

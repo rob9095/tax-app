@@ -3,9 +3,10 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { logout } from '../store/actions/auth';
 import { fetchDBProjects } from '../store/actions/teamworkApi';
-import EnhancedTable from '../components/ProjectTable'
-import ProjectChart from '../components/ProjectChart'
-import TasklistPopover from '../containers/TasklistPopover'
+import EnhancedTable from '../components/ProjectTable';
+import ProjectChart from '../components/ProjectChart';
+import TasklistPopover from '../containers/TasklistPopover';
+import OnBoardingTabs from '../containers/OnBoardingTabs';
 
 class Dashboard extends Component {
     constructor(props) {
@@ -16,16 +17,31 @@ class Dashboard extends Component {
         currentTaskName: '',
         removeTask: false,
         toggleCount: 0,
+        isLoading: true,
       };
-      this.togglePopover = this.togglePopover.bind(this);
-      this.toggleColumn = this.toggleColumn.bind(this);
     }
 
     componentDidMount() {
       if(this.props.currentUser.isAuthenticated) {
-        this.props.fetchDBProjects();
+        this.props.fetchDBProjects()
+        .then(()=> {
+          this.setState({
+            isLoading: false,
+          })
+        })
       }
     }
+
+    // componentWillReceiveProps(newProps){
+    //   if (newProps.currentUser.isAuthenticated) {
+    //     this.props.fetchDBProjects()
+    //     .then(()=> {
+    //       this.setState({
+    //         isLoading: false,
+    //       })
+    //     })
+    //   }
+    // }
 
     toggleColumn = (task) => {
       if (this.state.toggleCount === 1) {
@@ -63,20 +79,15 @@ class Dashboard extends Component {
     }
 
     render() {
-      const { currentUser, projects } = this.props;
-      if(!currentUser.isAuthenticated || this.props.projects.projectsInDB === undefined){
+      const { currentUser, projects, errors } = this.props;
+      {if (this.state.isLoading && currentUser.isAuthenticated){
+        return(
+          <div>loading...</div>
+        )
+      }}
+      if(!currentUser.isAuthenticated){
     		return (
-    			<div className="home-hero">
-    				<h1>Tax-App Web Portal</h1>
-    				<h4>Signup</h4>
-    				<Link to="/signup" className="btn btn-primary">
-    					Signup
-    				</Link>
-            <h4>Login</h4>
-    				<Link to="/signin" className="btn btn-primary">
-    					Login
-    				</Link>
-    			</div>
+    			<OnBoardingTabs errors={errors} />
     		);
     	}
     	return (
@@ -111,6 +122,7 @@ class Dashboard extends Component {
 function mapStateToProps(state) {
 	return {
 		currentUser: state.currentUser,
+    errors: state.errors,
     projects: state.projects
 	};
 }
