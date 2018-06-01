@@ -10,6 +10,7 @@ const tasklistsRoutes = require('./routes/tasklists');
 const milestonesRoutes = require('./routes/milestones');
 const tasksRoutes = require('./routes/tasks');
 const invitationsRoutes = require('./routes/invitations');
+const accountRoutes = require('./routes/account');
 const { loginRequired, ensureCorrectUser } = require('./middleware/auth');
 const PORT = 8082;
 
@@ -20,6 +21,13 @@ app.use(cors())
 app.use(bodyParser.json());
 
 // all routes here
+
+// account routes
+app.use(
+		'/api/account',
+		// loginRequired,
+		// ensureCorrectUser,
+		accountRoutes);
 
 // invitations routes
 app.use(

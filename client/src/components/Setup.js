@@ -69,8 +69,9 @@ class Setup extends Component {
           <h2>Setup your account</h2>
           <button onClick={this.buildProjectData}>Build the Project Database!</button>
           <button onClick={this.buildTasklistData}>Build the Tasklist Database!</button>
-          <button onClick={this.updateCompletedDates}>Update Completed Dates via Milestones!</button>
+          <button onClick={this.updateCompletedDates}>Update Completed Dates via Milestones! (depreciated)</button>
           <button onClick={this.fetchAndUpdateTasks}>Fetch and Update Tasks</button>
+          <button>Fetch/Update Notes!</button>
             <Button color="primary">
           Primary
         </Button>

@@ -107,7 +107,7 @@ class AuthForm extends Component {
 								onChange={this.handleChange}
 								value={email}
 								type="text"
-								placeholder="Email"
+								placeholder="Email (same as Teamwork email)"
 	        			className={classes.input}
 	        			inputProps={{'aria-label': 'Description',}}
 							/>

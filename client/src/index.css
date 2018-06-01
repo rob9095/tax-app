@@ -16,6 +16,10 @@ body {
     outline: -webkit-focus-ring-color auto 0px;
 }
 
+input:disabled, textarea:disabled {
+    color: #333;
+}
+
 
 /* Dashboard & Project Table */
 .chart-container {
@@ -139,7 +143,7 @@ form.auth-form {
     padding: 10px 30px 30px;
     display: flex;
     flex-direction: column;
-    max-width: 500px;
+    max-width: 400px;
     margin: 0 auto;
     align-items: center;
 }
@@ -163,4 +167,45 @@ form.auth-form {
 
 .account-container .button-group {
   display: flex;
+}
+
+/* Invitation Modal */
+
+ul.invite-list {
+    list-style: none;
+    margin-top: -10px;
+    margin-left: -35px;
+    max-width: 97%;
+}
+
+ul.invite-list li {
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+ul.invite-list li:hover {
+    background: #f0e6e7;
+    cursor: pointer;
+}
+
+ul.invite-list li span {
+    width: 55px;
+    font-size: 14px;
+}
+
+.invite-title-container {
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.invite-title-container span {
+    font-size: 12px;
+    font-weight: bold;
+    width: 65px;
+    margin-left: 5px;
+    margin-bottom: 5px;
 }
