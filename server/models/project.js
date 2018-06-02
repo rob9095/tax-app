@@ -26,7 +26,10 @@ const projectSchema = new mongoose.Schema({
   }],
   tasks: [{
     type: mongoose.Schema.Types.Mixed
-  }]
+  }],
+  internalProjectMessageId: {
+    type: String,
+  }
 });
 
 const Project = mongoose.model('Project', projectSchema);

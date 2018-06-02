@@ -141,3 +141,20 @@ exports.mapTasksToProjects = async (req, res, next) => {
     return next(err);
   }
 }
+
+exports.updateProjectInternalMessage = async (req, res, next) => {
+  try {
+    let foundProject = await db.Project.findOne({teamwork_id: req.body.projectId})
+    if (foundProject === null) {
+      return next({
+        status: 400,
+        message: `Project ID: ${req.projectId} not found`
+      })
+    }
+    foundProject.internalProjectMessageId = req.body.messageId
+    foundProject.save();
+    return res.status(200).json(foundProject);
+  } catch(err) {
+    return next(err);
+  }
+}
