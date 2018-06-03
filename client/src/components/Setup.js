@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { logout } from '../store/actions/auth';
 import { fetchAndUpdateCompletedMilestones, fetchAndUpdateTasklists , fetchDBProjects , fetchTeamworkProjectData, updateProjectsDB } from '../store/actions/teamworkApi';
 import { requestAndUpdateTasks } from '../store/actions/tasks';
-import { getMessages } from '../store/actions/messages';
+import { getMessages, getMessageReplies } from '../store/actions/messages';
 import Button from 'material-ui/Button';
 import OnBoardingTabs from '../containers/OnBoardingTabs';
 
@@ -73,6 +73,26 @@ class Setup extends Component {
       }
     }
 
+    triggerGetMessageReplies = (project_id,message_id) => {
+      return new Promise(async (resolve,reject) => {
+        try {
+          setTimeout(() => {
+            this.props.getMessageReplies(project_id,message_id,this.props.currentUser.user.apiKey)
+            resolve(project_id);
+          }, 1000)
+        } catch(err) {
+          reject(err);
+        }
+      })
+    }
+
+    fetchMessageReplies = async () => {
+      for (let p of this.props.projects.projectsInDB) {
+        let result = await this.triggerGetMessageReplies(p.teamwork_id,p.internalProjectMessageId)
+        console.log(result)
+      }
+    }
+
     componentDidMount() {
       if(this.props.currentUser.isAuthenticated) {
         //this.props.fetchTeamworkProjectData();
@@ -94,7 +114,8 @@ class Setup extends Component {
           <button onClick={this.buildTasklistData}>Build the Tasklist Database!</button>
           <button onClick={this.updateCompletedDates}>Update Completed Dates via Milestones! (depreciated)</button>
           <button onClick={this.fetchAndUpdateTasks}>Fetch and Update Tasks</button>
-          <button onClick={this.fetchProjectMessages}>Fetch/Update Messages/Replies!</button>
+          <button onClick={this.fetchProjectMessages}>Fetch Messages IDs!</button>
+          <button onClick={this.fetchMessageReplies}>Fetch Messages Replies!</button>
             <Button color="primary">
           Primary
         </Button>
@@ -111,4 +132,4 @@ function mapStateToProps(state) {
 	};
 }
 
-export default connect(mapStateToProps, { logout, requestAndUpdateTasks, fetchAndUpdateCompletedMilestones, fetchTeamworkProjectData, updateProjectsDB, fetchDBProjects, fetchAndUpdateTasklists, getMessages })(Setup);
+export default connect(mapStateToProps, { logout, requestAndUpdateTasks, fetchAndUpdateCompletedMilestones, fetchTeamworkProjectData, updateProjectsDB, fetchDBProjects, fetchAndUpdateTasklists, getMessages, getMessageReplies })(Setup);

@@ -11,6 +11,7 @@ const milestonesRoutes = require('./routes/milestones');
 const tasksRoutes = require('./routes/tasks');
 const invitationsRoutes = require('./routes/invitations');
 const accountRoutes = require('./routes/account');
+const messageRepliesRoutes = require('./routes/messageReplies');
 const { loginRequired, ensureCorrectUser } = require('./middleware/auth');
 const PORT = 8082;
 
@@ -21,6 +22,13 @@ app.use(cors())
 app.use(bodyParser.json());
 
 // all routes here
+
+// message reply routes
+app.use(
+		'/api/message-replies',
+		// loginRequired,
+		// ensureCorrectUser,
+		messageRepliesRoutes);
 
 // account routes
 app.use(

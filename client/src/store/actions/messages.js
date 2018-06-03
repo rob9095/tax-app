@@ -52,7 +52,7 @@ const handleMessageReplyApiRequest = (project_id,message_id,key) => {
     return teamworkApiCall('get',url,key)
     .then(async(res) => {
       const formattedMessageReplies = [];
-      for (let m of res.getMessageReplies) {
+      for (let m of res.messageReplies) {
         formattedMessageReplies.push({
           teamwork_id: m.id,
           projectId: project_id,
@@ -69,8 +69,12 @@ const handleMessageReplyApiRequest = (project_id,message_id,key) => {
           replyNo: m.replyNo,
         })
       }
-      let result = await handleLocalApiRequest(formattedMessageReplies, 'message-replies');
-      resolve(result);
+      if (formattedMessageReplies.length > 0) {
+        let result = await handleLocalApiRequest(formattedMessageReplies, 'message-replies');
+        resolve(result);
+      } else {
+        resolve(`No Messages Found for Project ID: ${project_id}`)
+      }
     })
     .catch((err) => {
       reject(err);
