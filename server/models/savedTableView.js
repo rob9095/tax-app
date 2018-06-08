@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const db = require('../models');
 const User = require('./user');
 
 const SavedTableViewSchema = new mongoose.Schema({
@@ -32,7 +33,7 @@ const SavedTableViewSchema = new mongoose.Schema({
 SavedTableViewSchema.pre('remove', async function(next) {
 	try {
 		// find the related user
-		let user = await User.findById(this.user);
+		let user = await db.User.findById(this.user);
 		// remove the id of the saved view from the user
 		user.savedTableViews.remove(this.id);
 		await user.save();

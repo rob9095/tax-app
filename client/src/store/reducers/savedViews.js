@@ -7,7 +7,7 @@ export default (state = [], action) => {
     case ADD_VIEW:
       return [...state, action.view];
     case REMOVE_VIEW:
-      return state.filter(view => view._id !== view.id);
+      return state.filter(view => view._id !== action.id);
     default:
       return state;
   }

@@ -1,42 +1,39 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { handleSavedViewDisplay, clearSavedViewDisplay } from '../store/actions/savedTableView';
+import { deleteSavedTableView } from '../store/actions/savedTableViews';
 import IconButton from 'material-ui/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
 
 class SavedViewListItem extends Component {
   constructor(props) {
     super(props)
-    this.state = {};
+    this.state = {
+      deleteClicked: false,
+    };
     this.handleClick = this.handleClick.bind(this);
   }
 
   handleDelete = () => {
     this.props.deleteSavedTableView(this.props.view);
+    this.props.clearSavedViewDisplay(this.props.view);
   }
 
   handleClick = () => {
-    // if (this.props.savedView.length > 0) {
-    //   this.props.clearSavedViewDisplay(this.props.view);
-    // }
     this.props.handleSavedViewDisplay(this.props.view);
   }
 
   render() {
     const { view } = this.props;
     return(
-      <li
-        onClick={this.handleClick}
-      >
-        <span className="title">{view.title}</span>
+      <li>
+        <span onClick={this.handleClick} className="title">{view.title}</span>
         <span className="delete">
           <IconButton
             onClick={this.handleDelete}
             aria-label="Delete"
             >
-            <DeleteIcon
-              onClick={this.handleDelete}
-            />
+            <DeleteIcon />
           </IconButton>
         </span>
       </li>
@@ -54,4 +51,4 @@ function mapStateToProps(state) {
 	};
 }
 
-export default connect(mapStateToProps, { handleSavedViewDisplay, clearSavedViewDisplay })(SavedViewListItem);
+export default connect(mapStateToProps, { handleSavedViewDisplay, clearSavedViewDisplay, deleteSavedTableView })(SavedViewListItem);
