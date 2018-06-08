@@ -369,7 +369,9 @@ class ProjectTableHead extends Component {
       lastCheckedTask: null,
       savedViewTitle: '',
       tasks: [],
-
+      currentColumnIsTasklist: false,
+      currentColumnIsTask: false,
+      currentColumnLabel: '',
     }
     this.handleTasklistMenuSelect = this.handleTasklistMenuSelect.bind(this);
   }
@@ -434,7 +436,7 @@ class ProjectTableHead extends Component {
       if (viewTitle !== this.state.savedViewTitle && viewTitle !== undefined) {
         console.log(`we confirmed that the new title: ${viewTitle} is different from the last one: ${this.state.savedViewTitle}`)
         console.log(this.state)
-        // fist clear any tasks if they exist
+        // then clear any tasks if they exist
         this.state.columnData.forEach(c => {
           if (c.hidden === false && c.isTask === true) {
               this.updateColumnData(c.label);
@@ -448,6 +450,15 @@ class ProjectTableHead extends Component {
           ...viewState.headerState,
           savedViewTitle: viewTitle,
         })
+        // check if we need to sort
+        if (!viewState.noSort) {
+          console.log('we needa sort!')
+          if (viewState.headerState.currentColumnIsTask) {
+            this.props.onRequestSort(null, viewState.headerState.currentColumnLabel, true);
+          } else {
+            this.props.onRequestSort(null, viewState.headerState.currentColumn)
+          }
+        }
         console.log('we updated the view in the header because the title was different')
         this.props.triggerViewUpdate(viewState.bodyState, viewState.headerState.tasks);
       }
@@ -469,7 +480,6 @@ class ProjectTableHead extends Component {
       this.setState({
         showAddTasksMenu: true,
         currentEvent: event,
-        currentColumn: property,
         currentTasks: tasks,
       })
     } else if (isTask) {
@@ -477,6 +487,12 @@ class ProjectTableHead extends Component {
     } else {
       this.props.onRequestSort(event, property)
     }
+    this.setState({
+      currentColumn: property,
+      currentColumnIsTasklist: isTasklist,
+      currentColumnIsTask: isTask,
+      currentColumnLabel: label,
+    })
   };
 
   showTasklistTasks = (tasklistName, tasks) => event => {
