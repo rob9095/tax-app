@@ -33,7 +33,6 @@ exports.getInvitations = async(req, res, next) => {
 }
 
 exports.removeInvitation = async(req, res, next) => {
-  console.log(req.body)
   try {
     let foundInvitation = await db.Invitation.findById(req.params.invite_id);
     if (foundInvitation === null) {

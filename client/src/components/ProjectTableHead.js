@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { compose } from 'redux';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
@@ -12,6 +14,9 @@ import Table, {
 } from 'material-ui/Table';
 import TasklistMenu from '../containers/TasklistMenu';
 import Checkbox from 'material-ui/Checkbox';
+import { saveTableState } from '../store/actions/savedTableViews';
+import { SAVE_TABLE_HEAD_STATE } from '../store/actionTypes';
+import { handleSavedViewDisplay, clearSavedViewDisplay } from '../store/actions/savedTableView';
 
 const columnData = [
   {
@@ -20,6 +25,13 @@ const columnData = [
     numeric: false,
     disablePadding: true,
     label: 'Project',
+  },
+  {
+    id: 'preparer',
+    hidden: false,
+    numeric: false,
+    disablePadding: true,
+    label: 'Preparer',
   },
   {
     id: 'clientLastName',
@@ -36,10 +48,10 @@ const columnData = [
     label: 'Client First Name',
   },
   {
-    id: 'projectStatus',
+    id: 'lastTasklistChanged',
     hidden: false,
     numeric: false,
-    disablePadding: true,
+    disablePadding: false,
     label: 'Status',
   },
   {
@@ -332,7 +344,7 @@ const columnData = [
     isTask: true
   },
   {
-    id: '',
+    id: 'finalizeEngagement',
     hidden: false,
     tasklistName: 'FINALIZE ENGAGEMENT',
     isTasklist: true,
@@ -355,23 +367,90 @@ class ProjectTableHead extends Component {
       columnData: [],
       currentColumn: '',
       lastCheckedTask: null,
+      savedViewTitle: '',
+      tasks: [],
+
     }
     this.handleTasklistMenuSelect = this.handleTasklistMenuSelect.bind(this);
-    this.handleToggleTask = this.handleToggleTask.bind(this);
+  }
+
+  updateColumnData = (lastCheckedTask) => {
+    let updatedColumnData = this.state.columnData
+    updatedColumnData.forEach(c => {
+      if (c.label === lastCheckedTask && c.isTask === true) {
+          c.hidden = !c.hidden
+          //console.log(c)
+      }
+    })
+    this.setState({
+      columnData: updatedColumnData,
+      lastCheckedTask: lastCheckedTask,
+    })
+    this.props.onShowShowTasklistTasks(lastCheckedTask)
   }
 
   componentWillReceiveProps(newProps) {
     if (newProps.lastCheckedTask !== this.props.lastCheckedTask || newProps.removeTask !== this.props.removeTask) {
-      let updatedState = this.state
-      updatedState.columnData.forEach(c => {
-        if (c.label === newProps.lastCheckedTask && c.isTask === true) {
-            c.hidden = !c.hidden
-            console.log(c)
+      this.updateColumnData(newProps.lastCheckedTask)
+      // let updatedState = this.state
+      // updatedState.columnData.forEach(c => {
+      //   if (c.label === newProps.lastCheckedTask && c.isTask === true) {
+      //       c.hidden = !c.hidden
+      //       console.log(c)
+      //   }
+      // })
+      // this.props.onShowShowTasklistTasks(newProps.lastCheckedTask)
+      // updatedState.lastCheckedTask = newProps.lastCheckedTask
+      // this.setState({
+      //   ...updatedState
+      // })
+    }
+
+    if (newProps.saveState === true && this.props.saveState === false) {
+      // this.props.saveTableState(this.state,'SAVE_TABLE_HEAD_STATE');
+      this.props.toggleGetHeadState(this.state);
+    }
+
+    // if (newProps.viewCheck) {
+    //   if (newProps.viewCheck[0].title !== this.props.viewCheck[0].title) {
+    //     console.log('we have loaded a saved different view available in table header')
+    //     for (let t of newProps.viewCheck[0].headerState.tasks) {
+    //       this.updateColumnData(t)
+    //     }
+    //     this.setState({
+    //       ...newProps.viewCheck[0].headerState,
+    //     })
+    //     console.log('we updated the view in the header')
+    //     this.props.triggerViewUpdate(newProps.viewCheck[0].bodyState, newProps.viewCheck[0].headerState.tasks);
+    //   }
+    // }
+
+      const viewCheck = Object.entries(newProps.savedView)
+      if (viewCheck.length > 0) {
+      const viewTitle = viewCheck[viewCheck.length - 1][1].title
+      const viewState = viewCheck[viewCheck.length - 1][1]
+      console.log('we have a saved view(s) available in table header')
+      console.log(this.state)
+      if (viewTitle !== this.state.savedViewTitle && viewTitle !== undefined) {
+        console.log(`we confirmed that the new title: ${viewTitle} is different from the last one: ${this.state.savedViewTitle}`)
+        console.log(this.state)
+        // fist clear any tasks if they exist
+        this.state.columnData.forEach(c => {
+          if (c.hidden === false && c.isTask === true) {
+              this.updateColumnData(c.label);
+          }
+        })
+        // show new tasks
+        for (let t of viewState.headerState.tasks) {
+          this.updateColumnData(t)
         }
-      })
-      this.props.onShowShowTasklistTasks(newProps.lastCheckedTask)
-      updatedState.lastCheckedTask = newProps.lastCheckedTask
-      this.setState({updatedState})
+        this.setState({
+          ...viewState.headerState,
+          savedViewTitle: viewTitle,
+        })
+        console.log('we updated the view in the header because the title was different')
+        this.props.triggerViewUpdate(viewState.bodyState, viewState.headerState.tasks);
+      }
     }
   }
 
@@ -383,10 +462,6 @@ class ProjectTableHead extends Component {
       let activeTasks = this.state.columnData.filter(c => c.isTask === true && c.hidden === false )
       this.props.onShowPopOver(this.state.currentTasks, this.state.currentColumn, activeTasks)
     }
-  }
-
-  handleToggleTask = (task) => {
-
   }
 
   createSortHandler = (property,isTasklist,tasks,isTask,label) => event => {
@@ -486,4 +561,13 @@ ProjectTableHead.propTypes = {
   projects: PropTypes.object.isRequired,
 };
 
-export default ProjectTableHead;
+function mapStateToProps(state) {
+	return {
+		currentUser: state.currentUser,
+    projects: state.projects,
+    tableState: state.tableState,
+    savedView: state.savedView,
+	};
+}
+
+export default connect(mapStateToProps, { saveTableState, handleSavedViewDisplay })(ProjectTableHead);

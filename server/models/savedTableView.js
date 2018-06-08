@@ -1,0 +1,47 @@
+const mongoose = require('mongoose');
+const User = require('./user');
+
+const SavedTableViewSchema = new mongoose.Schema({
+  table: {
+    type: String,
+    required: true,
+  },
+  title: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+		ref: 'User',
+    required: true,
+  },
+  username: {
+    type: String,
+  },
+  headerState: {
+    type: mongoose.Schema.Types.Mixed,
+    required: true,
+  },
+  bodyState: {
+    type: mongoose.Schema.Types.Mixed,
+    required: true,
+  },
+});
+
+SavedTableViewSchema.pre('remove', async function(next) {
+	try {
+		// find the related user
+		let user = await User.findById(this.user);
+		// remove the id of the saved view from the user
+		user.savedTableViews.remove(this.id);
+		await user.save();
+		return next();
+	} catch(err) {
+		return next(err);
+	}
+})
+
+const SavedTableView = mongoose.model('SavedTableView', SavedTableViewSchema);
+
+module.exports = SavedTableView;

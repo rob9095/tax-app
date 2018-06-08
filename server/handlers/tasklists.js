@@ -7,7 +7,9 @@ const addTaskList = (tasklist) => {
     try {
       let foundTasklist = await db.Tasklist.findOne({teamwork_id: tasklist.teamwork_id});
       if (foundTasklist) {
-        resolve({});
+        foundTasklist.set(tasklist);
+        await foundTasklist.save();
+        resolve(foundTasklist);
       } else {
         let createdTasklist = await db.Tasklist.create(tasklist);
         resolve(createdTasklist);

@@ -42,11 +42,11 @@ export function fetchDBProjects() {
 	}
 }
 
-export function updateProjectsDB() {
+export function updateProjectsDB(key) {
   const url = 'https://taxsamaritan.teamwork.com/projects.json?status=ACTIVE'
 	return dispatch => {
 		return new Promise((resolve,reject) => {
-			return teamworkApiCall('get', url)
+			return teamworkApiCall('get', url, key)
 			.then((data) => {
         console.log(data);
         let projects = data.projects;
@@ -58,6 +58,7 @@ export function updateProjectsDB() {
               name: p.name,
               createdOn: p['created-on'],
               status: p.status,
+							preparer: p.category.name,
             })
           })
           // send formatted array to backend to add to DB

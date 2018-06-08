@@ -22,7 +22,7 @@ class Setup extends Component {
     }
 
     buildProjectData = () => {
-      this.props.updateProjectsDB();
+      this.props.updateProjectsDB(this.props.currentUser.user.apiKey);
     }
 
     updateCompletedDates = () => {

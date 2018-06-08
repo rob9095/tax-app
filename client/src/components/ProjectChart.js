@@ -2,13 +2,26 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import ReactChartkick, { BarChart, ColumnChart } from 'react-chartkick';
 import Chart from 'chart.js';
-ReactChartkick.addAdapter(Chart)
+import 'chartjs-plugin-datalabels';
+ReactChartkick.addAdapter(Chart);
 
 class ProjectChart extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      chartData: []
+      chartData: [],
+      options: {
+        animation: {
+          easing: "easeOutElastic",
+		      duration: 800,
+        },
+        plugins: {
+          datalabels: {
+            display: true,
+            color: '#fff'
+          }
+        },
+      }
     }
   }
 
@@ -29,7 +42,7 @@ class ProjectChart extends Component {
   render() {
     const { projectData } = this.props
     return(
-      <ColumnChart label="Projects" id="projects-chart" colors={["#6c0e0f", "#550b0c"]}  data={this.state.chartData} />
+      <ColumnChart label="Projects" id="projects-chart" colors={["#c49e9f"]}  options={this.state.options} data={this.state.chartData} />
     )
   }
 

@@ -9,6 +9,8 @@ import Typography from 'material-ui/Typography';
 import IconButton from 'material-ui/IconButton';
 import Tooltip from 'material-ui/Tooltip';
 import FilterListIcon from '@material-ui/icons/FilterList';
+import SaveIcon from '@material-ui/icons/Save';
+import SaveViewModal from '../containers/SaveViewModal';
 
 const toolbarStyles = theme => ({
   root: {
@@ -38,17 +40,41 @@ const toolbarStyles = theme => ({
 class ProjectTableToolbar extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      showSaveModal: false,
+    };
+  }
+
+  componentWillReceiveProps(newProps) {
+    if (newProps.openSaveModal === true && this.props.openSaveModal === false) {
+      this.setState({
+        showSaveModal: true,
+      })
+      this.props.toggleSaveModel();
+    }
+  }
+
+  handleModalToggle = () => {
+    this.setState({
+      showSaveModal: !this.state.showSaveModal,
+    })
+  }
+
+  handleSaveView = () => {
+    this.props.toggleGetHeadState();
   }
 
   render() {
-    const { numSelected, classes, currentTasks } = this.props;
+    const { numSelected, classes, currentTasks, tableState } = this.props;
     return (
       <Toolbar
         className={classNames(classes.root, {
           [classes.highlight]: numSelected > 0,
         })}
       >
+        {this.state.showSaveModal && (
+          <SaveViewModal tasks={currentTasks} tableData={tableState} toggleModal={this.handleModalToggle} />
+        )}
         <div className={classes.title}>
           {numSelected > 0 ? (
             <Typography color="inherit" variant="subheading">
@@ -67,11 +93,21 @@ class ProjectTableToolbar extends Component {
               </IconButton>
             </Tooltip>
           ) : (
-            <Tooltip title="Filter list">
-              <IconButton aria-label="Filter list">
-                <FilterListIcon />
-              </IconButton>
-            </Tooltip>
+            <div className="toolbar-container">
+              <Tooltip title="Save View">
+                <IconButton
+                  aria-label="Save View"
+                  onClick={this.handleSaveView}
+                  >
+                  <SaveIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Filter list">
+                <IconButton aria-label="Filter list">
+                  <FilterListIcon />
+                </IconButton>
+              </Tooltip>
+            </div>
           )}
         </div>
       </Toolbar>

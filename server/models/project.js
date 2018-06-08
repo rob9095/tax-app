@@ -32,6 +32,9 @@ const projectSchema = new mongoose.Schema({
   }],
   internalProjectMessageId: {
     type: String,
+  },
+  preparer: {
+    type: String,
   }
 });
 

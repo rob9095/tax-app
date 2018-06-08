@@ -26,6 +26,9 @@ import Close from '@material-ui/icons/Close';
 import TasklistMenu from '../containers/TasklistMenu';
 import ProjectTableToolbar from './ProjectTableToolbar';
 import ProjectTableHead from './ProjectTableHead';
+import ProjectNotes from './ProjectNotes';
+import { saveTableState } from '../store/actions/savedTableViews';
+import { SAVE_TABLE_BODY_STATE } from '../store/actionTypes';
 
 const styles = theme => ({
   root: {
@@ -55,11 +58,29 @@ class EnhancedTable extends React.Component {
       page: 0,
       rowsPerPage: 20,
       lastCheckedTask: '',
+      getHeaderState: false,
+      showSaveModal: false,
+      savedViewTitle: '',
+      headState: {},
     };
     this.sanitizeName = this.sanitizeName.bind(this);
     this.handleShowPopover = this.handleShowPopover.bind(this)
     this.handleShowTasklistTask = this.handleShowTasklistTask.bind(this);
   }
+
+  // componentWillReceiveProps(newProps) {
+  //   console.log(this.props.savedView)
+  //   console.log(newProps.savedView)
+  //   if (newProps.savedView) {
+  //     console.log('view loaded in table body')
+  //     if (newProps.savedView.title !== this.props.savedView.title && newProps.savedView.title !== undefined) {
+  //       this.setState({
+  //         ...newProps.savedView.bodyState
+  //       })
+  //       console.log(this.state)
+  //     }
+  //   }
+  // }
 
   sanitizeName = (s) => {
     let check = s.split('').filter(s => s === '-')
@@ -306,11 +327,11 @@ class EnhancedTable extends React.Component {
       let formattedProject = {
         id: p.teamwork_id,
         projectName: p.name,
+        preparer: p.preparer,
         clientFirstName: clientNames.firstName,
         clientLastName: clientNames.lastName,
         lastTasklistChanged: p.lastTasklistChanged,
-        projectStatus: p.status,
-        projectNotes: '',
+        projectNotes: p.messageReplies,
         dateProjectCreated: p.createdOn,
         initialPayment: ipTaskDate,
         "Initial Payment Recieved": {
@@ -460,6 +481,7 @@ class EnhancedTable extends React.Component {
     let updatedData = this.state.data
     updatedData.forEach(p => {
       p[task].hidden = !p[task].hidden
+      // console.log(p[task].hidden)
     })
 
     // let updatedData = this.state.data.map(p => {
@@ -544,6 +566,42 @@ class EnhancedTable extends React.Component {
 
   isSelected = id => this.state.selected.indexOf(id) !== -1;
 
+  handleShowSaveModal = () => {
+    this.setState({
+      showSaveModal: !this.state.showSaveModal,
+    })
+  }
+
+  handleGetHeadState = (headerState) => {
+    this.setState({
+      getHeaderState: !this.state.getHeaderState,
+    })
+    if (headerState) {
+      this.setState({
+        headState: {
+          ...headerState,
+        }
+      })
+    }
+    if (this.state.getHeaderState) {
+      // const savedState = {
+      //   ...this.state,
+      // }
+      // delete savedState.data;
+      // delete savedState.getHeaderState;
+      // delete savedState.showSaveModal;
+      // this.props.saveTableState(savedState,'SAVE_TABLE_BODY_STATE');
+      this.handleShowSaveModal();
+    }
+  }
+
+  handleViewUpdate = (viewBodyState, tasks) => {
+    this.setState({
+      ...viewBodyState,
+    })
+    console.log('we updated the table body state!')
+  }
+
   render() {
     const { classes, projectData, lastCheckedTask, removeTask } = this.props;
     const { data, order, orderBy, selected, rowsPerPage, page } = this.state;
@@ -552,14 +610,24 @@ class EnhancedTable extends React.Component {
     if (this.state.data.length > 0) {
       let obj = this.state.data[0]
       for (let el in obj) {
-        if (obj[el].hidden === false) {
-          currentTasks.push(el)
+        if (typeof obj[el] === 'object') {
+          if (obj[el].hidden === false) {
+            currentTasks.push(el)
+          }
         }
       }
-      }
+    }
     return (
       <Paper className={classes.root}>
-        <ProjectTableToolbar currentTasks={currentTasks} numSelected={selected.length} />
+        <ProjectTableToolbar
+          bodyState={this.state}
+          currentTasks={currentTasks}
+          numSelected={selected.length}
+          toggleGetHeadState={this.handleGetHeadState}
+          openSaveModal={this.state.showSaveModal}
+          toggleSaveModel={this.handleShowSaveModal}
+          tableState={this.state}
+        />
         <div className={classes.tableWrapper}>
           <Table className={classes.table}>
             <ProjectTableHead
@@ -574,6 +642,9 @@ class EnhancedTable extends React.Component {
               onShowPopOver={this.handleShowPopover}
               lastCheckedTask={lastCheckedTask}
               removeTask={removeTask}
+              saveState={this.state.getHeaderState}
+              toggleGetHeadState={this.handleGetHeadState}
+              triggerViewUpdate={this.handleViewUpdate}
             />
             <TableBody>
               {data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(n => {
@@ -582,20 +653,25 @@ class EnhancedTable extends React.Component {
                   <TableRow
                     key={n.id}
                     hover
-                    onClick={event => this.handleClick(event, n.id)}
                     role="checkbox"
                     aria-checked={isSelected}
                     tabIndex={-1}
                     selected={isSelected}
                   >
                     <TableCell padding="checkbox">
-                      <Checkbox checked={isSelected} />
+                      <Checkbox
+                        checked={isSelected}
+                        onClick={event => this.handleClick(event, n.id)}
+                      />
                     </TableCell>
                     <TableCell className="table-cell" padding="none">{n.projectName}</TableCell>
+                    <TableCell className="table-cell" padding="none">{n.preparer}</TableCell>
                     <TableCell className="table-cell" padding="none">{n.clientLastName}</TableCell>
                     <TableCell className="table-cell" padding="none">{n.clientFirstName}</TableCell>
-                    <TableCell className="table-cell" padding="none">{n.lastTasklistChanged}</TableCell>
-                    <TableCell className="table-cell" padding="none">{n.projectNotes}</TableCell>
+                    <TableCell className="table-cell">{n.lastTasklistChanged}</TableCell>
+                    <TableCell className="table-cell" padding="none">
+                      <ProjectNotes notes={n.projectNotes} />
+                    </TableCell>
                     <TableCell className="table-cell" padding="none">
                       <Moment format="M/D/YY">{n.dateProjectCreated}</Moment>
                     </TableCell>
@@ -880,8 +956,9 @@ EnhancedTable.propTypes = {
 function mapStateToProps(state) {
 	return {
 		currentUser: state.currentUser,
-    projects: state.projects
+    projects: state.projects,
+    tableState: state.tableState,
 	};
 }
 
-export default compose(withStyles(styles), connect(mapStateToProps, { }), )(EnhancedTable);
+export default compose(withStyles(styles), connect(mapStateToProps, { saveTableState }), )(EnhancedTable);

@@ -13,9 +13,7 @@ const addProject = (project) => {
       let foundProject = await db.Project.findOne({teamwork_id: project.teamwork_id});
       if (foundProject) {
         //update it instead of create it
-        foundProject.name = project.name;
-        foundProject.createdOn = project.createdOn;
-        foundProject.status = project.status;
+        foundProject.set(project);
         await foundProject.save();
         resolve(foundProject);
       } else {
@@ -39,6 +37,7 @@ exports.proccesProjects = async (req, res, next) => {
             name: p.name,
             createdOn: p.createdOn,
             status: p.status,
+            preparer: p.preparer,
       }
       let result = await addProject(project);
       resultsArr.push(result);

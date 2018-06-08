@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
+const SavedTableView = require('./savedTableView');
 
 const userSchema = new mongoose.Schema({
 	email: {
@@ -22,8 +22,9 @@ const userSchema = new mongoose.Schema({
 	apiKey: {
 		type: String,
 	},
-	savedViews: [{
-		type: mongoose.Schema.Types.Mixed,
+	savedTableViews: [{
+		type: mongoose.Schema.Types.ObjectId,
+		ref: 'SavedTableView',
 	}],
 });
 
@@ -39,6 +40,14 @@ userSchema.pre('save', async function(next) {
 		return next(err);
 	}
 });
+
+// need to add remove hook here to delete all saved views and invitations for user being removed
+// userSchema.pre('remove', async function(next) {
+// 	try {
+// 	} catch(err) {
+// 		return next(err);
+// 	}
+// })
 
 userSchema.methods.comparePassword = async function(candidatePassword, next) {
 	try {

@@ -7,7 +7,9 @@ const createTask = (task) => {
     try {
       let foundTask = await db.Task.findOne({teamwork_id: task.teamwork_id});
       if (foundTask) {
-        resolve()
+        foundTask.set(task)
+        await foundTask.save();
+        resolve();
       } else {
         let createdTask = await db.Task.create(task);
         resolve(createdTask);
