@@ -584,13 +584,6 @@ class EnhancedTable extends React.Component {
       })
     }
     if (this.state.getHeaderState) {
-      // const savedState = {
-      //   ...this.state,
-      // }
-      // delete savedState.data;
-      // delete savedState.getHeaderState;
-      // delete savedState.showSaveModal;
-      // this.props.saveTableState(savedState,'SAVE_TABLE_BODY_STATE');
       this.handleShowSaveModal();
     }
   }
@@ -600,6 +593,8 @@ class EnhancedTable extends React.Component {
       ...viewBodyState,
     })
     console.log('we updated the table body state!')
+    console.log(this.state)
+    console.log(this.viewBodyState)
   }
 
   render() {

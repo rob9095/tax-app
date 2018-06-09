@@ -431,11 +431,12 @@ class ProjectTableHead extends Component {
       if (viewCheck.length > 0) {
       const viewTitle = viewCheck[viewCheck.length - 1][1].title
       const viewState = viewCheck[viewCheck.length - 1][1]
+      const viewBodyState = viewCheck[viewCheck.length - 1][1].bodyState
       console.log('we have a saved view(s) available in table header')
-      console.log(this.state)
+      console.log(viewCheck.length)
+      console.log(viewCheck)
       if (viewTitle !== this.state.savedViewTitle && viewTitle !== undefined) {
         console.log(`we confirmed that the new title: ${viewTitle} is different from the last one: ${this.state.savedViewTitle}`)
-        console.log(this.state)
         // then clear any tasks if they exist
         this.state.columnData.forEach(c => {
           if (c.hidden === false && c.isTask === true) {
@@ -450,6 +451,9 @@ class ProjectTableHead extends Component {
           ...viewState.headerState,
           savedViewTitle: viewTitle,
         })
+        console.log('we updated the view in the header because the title was different')
+        console.log(viewState)
+        this.props.triggerViewUpdate(viewState.bodyState, viewState.headerState.tasks)
         // check if we need to sort
         if (!viewState.noSort) {
           console.log('we needa sort!')
@@ -459,8 +463,6 @@ class ProjectTableHead extends Component {
             this.props.onRequestSort(null, viewState.headerState.currentColumn)
           }
         }
-        console.log('we updated the view in the header because the title was different')
-        this.props.triggerViewUpdate(viewState.bodyState, viewState.headerState.tasks);
       }
     }
   }

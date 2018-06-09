@@ -14,9 +14,10 @@ class SavedViewListItem extends Component {
     this.handleClick = this.handleClick.bind(this);
   }
 
-  handleDelete = () => {
+  handleDelete = (e) => {
     this.props.deleteSavedTableView(this.props.view);
     this.props.clearSavedViewDisplay(this.props.view);
+    e.stopPropagation();
   }
 
   handleClick = () => {
@@ -26,8 +27,10 @@ class SavedViewListItem extends Component {
   render() {
     const { view } = this.props;
     return(
-      <li>
-        <span onClick={this.handleClick} className="title">{view.title}</span>
+      <li
+        onClick={this.handleClick}
+      >
+        <span className="title">{view.title}</span>
         <span className="delete">
           <IconButton
             onClick={this.handleDelete}
