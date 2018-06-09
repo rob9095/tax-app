@@ -428,13 +428,12 @@ class ProjectTableHead extends Component {
     // }
 
       const viewCheck = Object.entries(newProps.savedView)
-      if (viewCheck.length > 0) {
-      const viewTitle = viewCheck[viewCheck.length - 1][1].title
-      const viewState = viewCheck[viewCheck.length - 1][1]
-      const viewBodyState = viewCheck[viewCheck.length - 1][1].bodyState
+      if (newProps.savedView.length > 0) {
+      const viewTitle = newProps.savedView[0].title
+      const view = newProps.savedView[0]
+
       console.log('we have a saved view(s) available in table header')
-      console.log(viewCheck.length)
-      console.log(viewCheck)
+      // console.log(newProps.savedView[0].title)
       if (viewTitle !== this.state.savedViewTitle && viewTitle !== undefined) {
         console.log(`we confirmed that the new title: ${viewTitle} is different from the last one: ${this.state.savedViewTitle}`)
         // then clear any tasks if they exist
@@ -444,25 +443,15 @@ class ProjectTableHead extends Component {
           }
         })
         // show new tasks
-        for (let t of viewState.headerState.tasks) {
+        for (let t of view.headerState.tasks) {
           this.updateColumnData(t)
         }
         this.setState({
-          ...viewState.headerState,
+          ...view.headerState,
           savedViewTitle: viewTitle,
         })
         console.log('we updated the view in the header because the title was different')
-        console.log(viewState)
-        this.props.triggerViewUpdate(viewState.bodyState, viewState.headerState.tasks)
-        // check if we need to sort
-        if (!viewState.noSort) {
-          console.log('we needa sort!')
-          if (viewState.headerState.currentColumnIsTask) {
-            this.props.onRequestSort(null, viewState.headerState.currentColumnLabel, true);
-          } else {
-            this.props.onRequestSort(null, viewState.headerState.currentColumn)
-          }
-        }
+        this.props.triggerViewUpdate(view)
       }
     }
   }
@@ -492,7 +481,7 @@ class ProjectTableHead extends Component {
     this.setState({
       currentColumn: property,
       currentColumnIsTasklist: isTasklist,
-      currentColumnIsTask: isTask,
+      currentColumnIsTask: isTask ? isTask : false,
       currentColumnLabel: label,
     })
   };

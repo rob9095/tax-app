@@ -66,6 +66,7 @@ class EnhancedTable extends React.Component {
     this.sanitizeName = this.sanitizeName.bind(this);
     this.handleShowPopover = this.handleShowPopover.bind(this)
     this.handleShowTasklistTask = this.handleShowTasklistTask.bind(this);
+    this.handleViewUpdate = this.handleViewUpdate.bind(this);
   }
 
   // componentWillReceiveProps(newProps) {
@@ -497,13 +498,20 @@ class EnhancedTable extends React.Component {
     })
   }
 
-  handleRequestSort = (event, property, isTask) => {
+  handleRequestSort = (event, property, isTask, view) => {
+    console.log('im about to sort some stuff')
     const orderBy = property;
     let order = 'desc';
     let data = this.state.data;
-
-    if (this.state.orderBy === property && this.state.order === 'desc') {
-      order = 'asc';
+    if (view) {
+      console.log('its a view I will sort!')
+      console.log(view.bodyState.orderBy)
+      console.log(view.bodyState.order)
+      order = view.bodyState.order;
+    } else {
+      if (this.state.orderBy === property && this.state.order === 'desc') {
+        order = 'asc';
+      }
     }
 
     if (isTask) {
@@ -588,13 +596,22 @@ class EnhancedTable extends React.Component {
     }
   }
 
-  handleViewUpdate = (viewBodyState, tasks) => {
+  handleViewUpdate = (view) => {
     this.setState({
-      ...viewBodyState,
+      ...view.bodyState,
     })
     console.log('we updated the table body state!')
     console.log(this.state)
-    console.log(this.viewBodyState)
+    console.log(view.bodyState)
+    // check if we need to sort
+    if (!view.headerState.noSort) {
+      console.log('we needa sort!')
+      if (view.headerState.currentColumnIsTask) {
+        this.handleRequestSort(null, view.headerState.currentColumnLabel, true, view);
+      } else {
+        this.handleRequestSort(null, view.headerState.currentColumn, false, view)
+      }
+    }
   }
 
   render() {
