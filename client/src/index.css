@@ -179,8 +179,10 @@ form.auth-form {
 /* Modal */
 
 .modal-close {
-  margin-left: auto;
-  margin-bottom: 10px;
+  padding: 10px;
+  top: 1px;
+  position: fixed;
+  right: 5px;
 }
 
 .modal-close:hover {
