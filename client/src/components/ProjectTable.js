@@ -62,6 +62,7 @@ class EnhancedTable extends React.Component {
       showSaveModal: false,
       savedViewTitle: '',
       headState: {},
+      searchOpen: false,
     };
     this.sanitizeName = this.sanitizeName.bind(this);
     this.handleShowPopover = this.handleShowPopover.bind(this)
@@ -596,6 +597,12 @@ class EnhancedTable extends React.Component {
     }
   }
 
+  handleSearchViewToggle = () => {
+    this.setState({
+      searchOpen: !this.state.searchOpen
+    })
+  }
+
   handleViewUpdate = (view) => {
     this.setState({
       ...view.bodyState,
@@ -639,6 +646,7 @@ class EnhancedTable extends React.Component {
           openSaveModal={this.state.showSaveModal}
           toggleSaveModel={this.handleShowSaveModal}
           tableState={this.state}
+          toggleSearchView={this.handleSearchViewToggle}
         />
         <div className={classes.tableWrapper}>
           <Table className={classes.table}>
@@ -657,6 +665,8 @@ class EnhancedTable extends React.Component {
               saveState={this.state.getHeaderState}
               toggleGetHeadState={this.handleGetHeadState}
               triggerViewUpdate={this.handleViewUpdate}
+              searchViewOpen={this.state.searchOpen}
+              tableData={data}
             />
             <TableBody>
               {data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(n => {

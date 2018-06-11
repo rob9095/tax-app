@@ -13,6 +13,7 @@ import Table, {
   TableSortLabel,
 } from 'material-ui/Table';
 import TasklistMenu from '../containers/TasklistMenu';
+import SearchSelect from '../containers/SearchSelect';
 import Checkbox from 'material-ui/Checkbox';
 import { saveTableState } from '../store/actions/savedTableViews';
 import { SAVE_TABLE_HEAD_STATE } from '../store/actionTypes';
@@ -60,6 +61,7 @@ const columnData = [
     numeric: false,
     disablePadding: true,
     label: 'Notes',
+    noSearch: true,
   },
   {
     id: 'dateProjectCreated',
@@ -372,6 +374,7 @@ class ProjectTableHead extends Component {
       currentColumnIsTasklist: false,
       currentColumnIsTask: false,
       currentColumnLabel: '',
+      searchOpen: true,
     }
     this.handleTasklistMenuSelect = this.handleTasklistMenuSelect.bind(this);
   }
@@ -504,7 +507,7 @@ class ProjectTableHead extends Component {
   }
 
   render() {
-    const { classes, onSelectAllClick, order, orderBy, numSelected, rowCount } = this.props;
+    const { classes, onSelectAllClick, order, orderBy, numSelected, rowCount, searchViewOpen, tableData } = this.props;
 
     return (
       <TableHead>
@@ -526,6 +529,17 @@ class ProjectTableHead extends Component {
                     sortDirection={orderBy === column.id ? order : false}
                     className={column.isTasklist ? 'column-head tasklist' : 'column-head'}
                   >
+                    {searchViewOpen && !column.noSearch && (
+                      <div className="search-container"
+                        key={column.id}
+                      >
+                        <SearchSelect
+                          key={column.id}
+                          column={column}
+                          tableData={tableData}
+                         />
+                      </div>
+                    )}
                     {/* <Tooltip
                       title="Sort"
                       placement={column.numeric ? 'bottom-end' : 'bottom-start'}

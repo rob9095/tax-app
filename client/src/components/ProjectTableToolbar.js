@@ -9,6 +9,7 @@ import Typography from 'material-ui/Typography';
 import IconButton from 'material-ui/IconButton';
 import Tooltip from 'material-ui/Tooltip';
 import FilterListIcon from '@material-ui/icons/FilterList';
+import SearchIcon from '@material-ui/icons/Search';
 import SaveIcon from '@material-ui/icons/Save';
 import SaveViewModal from '../containers/SaveViewModal';
 
@@ -42,6 +43,7 @@ class ProjectTableToolbar extends Component {
     super(props);
     this.state = {
       showSaveModal: false,
+      searchOpen: false,
     };
   }
 
@@ -54,7 +56,14 @@ class ProjectTableToolbar extends Component {
     }
   }
 
-  handleModalToggle = () => {
+  toggleSearch = () => {
+    this.setState({
+      searchOpen: !this.state.searchOpen
+    })
+    this.props.toggleSearchView();
+  }
+
+  toggleSaveViewModal = () => {
     this.setState({
       showSaveModal: !this.state.showSaveModal,
     })
@@ -73,7 +82,7 @@ class ProjectTableToolbar extends Component {
         })}
       >
         {this.state.showSaveModal && (
-          <SaveViewModal tasks={currentTasks} tableData={tableState} toggleModal={this.handleModalToggle} />
+          <SaveViewModal tasks={currentTasks} tableData={tableState} toggleModal={this.toggleSaveViewModal} />
         )}
         <div className={classes.title}>
           {numSelected > 0 ? (
@@ -102,9 +111,12 @@ class ProjectTableToolbar extends Component {
                   <SaveIcon />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Filter list">
-                <IconButton aria-label="Filter list">
-                  <FilterListIcon />
+              <Tooltip title="Search">
+                <IconButton
+                  aria-label="Search"
+                  onClick={this.toggleSearch}
+                  >
+                  <SearchIcon />
                 </IconButton>
               </Tooltip>
             </div>
