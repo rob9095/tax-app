@@ -8,6 +8,7 @@ import { ListItemText } from 'material-ui/List';
 import Select from 'material-ui/Select';
 import Checkbox from 'material-ui/Checkbox';
 import Chip from 'material-ui/Chip';
+import Moment from 'react-moment';
 
 const styles = theme => ({
   container: {
@@ -42,19 +43,6 @@ const MenuProps = {
   },
 };
 
-const names = [
-  'Oliver Hansen',
-  'Van Henry',
-  'April Tucker',
-  'Ralph Hubbard',
-  'Omar Alexander',
-  'Carlos Abbott',
-  'Miriam Wagner',
-  'Bradley Wilkerson',
-  'Virginia Andrews',
-  'Kelly Snyder',
-];
-
 class SearchSelect extends React.Component {
   state = {
     val: [],
@@ -68,14 +56,20 @@ class SearchSelect extends React.Component {
 
   componentDidMount(){
     const columnId = this.props.column.id;
+    const isTask = this.props.column.isTask;
+    const columnLabel = this.props.column.label;
     const data = this.props.tableData.map((p => (
-      p[columnId]
+      isTask ? p[columnLabel].lastChangedOn : p[columnId]
     )))
-    .filter((v, i, a) => a.indexOf(v) === i)
+    .filter((v, i, a) => a.indexOf(v) === i && v !== undefined && v !== '')
+    .map((v => (
+      v ? v.split('.')[1] === '000Z' ? {id: v, isDate: true} : {id: v, isDate: false} : {}
+    )))
+    .sort((a,b) => a.isDate ? (b.id < a.id ? -1 : 1) : (a.id < b.id ? -1 : 1) )
     this.setState({
       data
     })
-    if (columnId === 'projectName'){
+    if (columnId === 'preparer'){
       console.log(data)
     }
   }
@@ -101,14 +95,15 @@ class SearchSelect extends React.Component {
             {this.state.data.map((val,i) => (
               <MenuItem
                 key={i}
-                value={val}
+                value={val.id}
                 style={{
                   fontWeight:
                     this.state.val.indexOf(val) === -1
                       ? theme.typography.fontWeightRegular
                       : theme.typography.fontWeightMedium,
                 }}
-              >{val ? val : 'N/A'}
+              >
+                {val.id && val.isDate ? <Moment format="M/D/YY">{val.id}</Moment> : val.id ? val.id : 'N/A'}
               </MenuItem>
             ))}
           </Select>
