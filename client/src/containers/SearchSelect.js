@@ -51,7 +51,8 @@ class SearchSelect extends React.Component {
 
   handleChange = event => {
     this.setState({ val: event.target.value });
-    console.log(this.state)
+    console.log(event)
+    this.props.onSearchMenuItemSelect(this.state.val, event.nativeEvent.target.firstChild.data);
   };
 
   componentDidMount(){
@@ -69,9 +70,6 @@ class SearchSelect extends React.Component {
     this.setState({
       data
     })
-    if (columnId === 'preparer'){
-      console.log(data)
-    }
   }
 
   render() {

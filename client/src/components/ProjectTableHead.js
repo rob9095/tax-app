@@ -500,6 +500,23 @@ class ProjectTableHead extends Component {
     })
   }
 
+  handleSearchMenuItemSelect = (searchArr, recentValue) => {
+    console.log(`the original searchArr is`)
+    console.log(searchArr)
+    console.log(`the recentValue is`)
+    console.log(recentValue)
+    const check = searchArr.filter(val => val === recentValue)
+    if (check.length > 0) {
+      console.log('chec was hit!')
+      searchArr = searchArr.filter(val => val !== recentValue);
+      check.forEach(v=>{console.log(`im from the check arr my value is: ${v}`)})
+    } else {
+      searchArr.push(recentValue);
+    }
+    console.log(`the updated searchArr is`)
+    console.log(searchArr)
+  }
+
   componentDidMount() {
     this.setState({
       columnData: columnData,
@@ -537,6 +554,7 @@ class ProjectTableHead extends Component {
                           key={column.id}
                           column={column}
                           tableData={tableData}
+                          onSearchMenuItemSelect={this.handleSearchMenuItemSelect}
                          />
                       </div>
                     )}
