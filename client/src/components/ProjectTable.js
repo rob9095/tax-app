@@ -55,6 +55,8 @@ class EnhancedTable extends React.Component {
       orderBy: 'projectName',
       selected: [],
       data: [].sort((a, b) => (a.projectName < b.projectName ? -1 : 1)),
+      dataCopy: [],
+      currentFilters: [],
       page: 0,
       rowsPerPage: 20,
       lastCheckedTask: '',
@@ -329,7 +331,7 @@ class EnhancedTable extends React.Component {
       let formattedProject = {
         id: p.teamwork_id,
         projectName: p.name,
-        preparer: p.preparer,
+        preparer: p.preparer ? p.preparer : 'N/A',
         clientFirstName: clientNames.firstName,
         clientLastName: clientNames.lastName,
         lastTasklistChanged: p.lastTasklistChanged,
@@ -471,7 +473,8 @@ class EnhancedTable extends React.Component {
     })
     console.log(formattedProjectData)
     this.setState({
-      data: formattedProjectData
+      data: formattedProjectData,
+      dataCopy: formattedProjectData,
     })
   }
 
@@ -495,6 +498,7 @@ class EnhancedTable extends React.Component {
     // });
     this.setState({
       data: updatedData,
+      dataCopy: updatedData,
       lastCheckedTask: task,
     })
   }
@@ -530,7 +534,11 @@ class EnhancedTable extends React.Component {
     // this.state.data.sort((a,b) => {
     //   console.log(a[orderBy])
     // })
-    this.setState({ data, order, orderBy });
+    this.setState({
+      dataCopy: data,
+      data,
+      order,
+      orderBy });
   };
 
   handleSelectAllClick = (event, checked) => {
@@ -619,11 +627,70 @@ class EnhancedTable extends React.Component {
         this.handleRequestSort(null, view.headerState.currentColumn, false, view)
       }
     }
+    if (view.bodyState.currentFilters.length > 0) {
+      console.log('we need to filter!')
+      this.handleTableSearch(view.bodyState.currentFilters);
+    }
+  }
+
+  handleTableSearch = (searchArr, removeFilter) => {
+    console.log(`the incoming search Arr is`)
+    console.log(searchArr)
+    let results = [];
+    let filters = this.state.currentFilters.filter(f => f.value !== removeFilter);
+    console.log(`the current filters are`)
+    console.log(filters)
+    if (searchArr.length === 0 && filters.length === 0) {
+      console.log(`we have no search items or filters, resetting data!`)
+      this.setState({
+        data: this.state.dataCopy,
+        currentFilters: [],
+      })
+      return
+    } else if (searchArr.length === 0 && filters.length > 0) {
+      console.log(`we have no search items but we do have filters`)
+      console.log(`the filters/searchArr are now:`)
+      console.log(filters)
+      searchArr = filters;
+    } else if (searchArr.length > 0 && filters.length > 0) {
+      searchArr = [...searchArr, ...filters]
+    }
+    console.log(`We are about to search the searchArr which is now:`)
+    console.log(searchArr)
+    for (let searchItem of searchArr) {
+      console.log(`the searchItem is ${searchItem.value}`)
+      let result = results.length > 0 ?
+        results.filter(p => p[searchItem.column.id].search(searchItem.value) !== -1)
+        :
+        this.state.dataCopy.filter(p => p[searchItem.column.id].search(searchItem.value) !== -1)
+      const check = filters.filter(el => el.value === searchItem.value);
+      if (check.length > 0) {
+        console.log('dont push the filter')
+      } else {
+        console.log('pushing filter')
+        filters.push({column: searchItem.column, value: searchItem.value})
+      }
+      results.length > 0 ? results = [...result] : results.push(...result)
+      console.log(`result for ${searchItem.value} is`)
+      console.log(result)
+    }
+    console.log(`the complied results are:`)
+    console.log(results)
+    if (results.length > 0) {
+      this.setState({
+        data: results,
+      })
+    } else {
+      alert(`No results`)
+    }
+    this.setState({
+      currentFilters: filters,
+    })
   }
 
   render() {
     const { classes, projectData, lastCheckedTask, removeTask } = this.props;
-    const { data, order, orderBy, selected, rowsPerPage, page } = this.state;
+    const { data, order, orderBy, selected, rowsPerPage, page, dataCopy } = this.state;
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage);
     let currentTasks = [];
     if (this.state.data.length > 0) {
@@ -666,7 +733,9 @@ class EnhancedTable extends React.Component {
               toggleGetHeadState={this.handleGetHeadState}
               triggerViewUpdate={this.handleViewUpdate}
               searchViewOpen={this.state.searchOpen}
-              tableData={data}
+              tableData={dataCopy}
+              onTableSearch={this.handleTableSearch}
+              currentFilters={this.state.currentFilters}
             />
             <TableBody>
               {data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(n => {
@@ -686,7 +755,7 @@ class EnhancedTable extends React.Component {
                         onClick={event => this.handleClick(event, n.id)}
                       />
                     </TableCell>
-                    <TableCell className="table-cell" padding="none">{n.projectName}</TableCell>
+                    <TableCell className="table-cell">{n.projectName}</TableCell>
                     <TableCell className="table-cell" padding="none">{n.preparer}</TableCell>
                     <TableCell className="table-cell" padding="none">{n.clientLastName}</TableCell>
                     <TableCell className="table-cell" padding="none">{n.clientFirstName}</TableCell>

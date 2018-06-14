@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import SearchSelectInput from './SearchSelectInput';
 import { withStyles } from 'material-ui/styles';
 import Input, { InputLabel } from 'material-ui/Input';
 import { MenuItem } from 'material-ui/Menu';
@@ -9,6 +10,8 @@ import Select from 'material-ui/Select';
 import Checkbox from 'material-ui/Checkbox';
 import Chip from 'material-ui/Chip';
 import Moment from 'react-moment';
+var moment = require('moment');
+moment().format();
 
 const styles = theme => ({
   container: {
@@ -47,15 +50,27 @@ class SearchSelect extends React.Component {
   state = {
     val: [],
     data: [],
+    displayData: [],
+    clearSearch: 0,
   };
 
   handleChange = event => {
-    this.setState({ val: event.target.value });
-    console.log(event)
-    this.props.onSearchMenuItemSelect(this.state.val, event.nativeEvent.target.firstChild.data);
+    this.setState({
+      val: event.target.value,
+      displayData: this.state.data,
+      clearSearch: this.state.clearSearch + 1,
+    });
+    let searchArr = this.state.val.map((v) => ({value: v, column: this.props.column}))
+    this.props.onSearchMenuItemSelect(searchArr, event.nativeEvent.target.firstChild.data, this.props.column);
   };
 
   componentDidMount(){
+    if (this.props.currentFilters.length > 0) {
+      let vals = this.props.currentFilters.map(f => (f.value))
+      this.setState({
+        val: vals,
+      })
+    }
     const columnId = this.props.column.id;
     const isTask = this.props.column.isTask;
     const columnLabel = this.props.column.label;
@@ -66,10 +81,64 @@ class SearchSelect extends React.Component {
     .map((v => (
       v ? v.split('.')[1] === '000Z' ? {id: v, isDate: true} : {id: v, isDate: false} : {}
     )))
-    .sort((a,b) => a.isDate ? (b.id < a.id ? -1 : 1) : (a.id < b.id ? -1 : 1) )
+    .sort((a,b) => a.isDate ? (b.id < a.id ? -1 : 1) : (a.id < b.id ? -1 : 1))
     this.setState({
-      data
+      data,
+      displayData: data,
     })
+    // let date = moment("2018-04-24T01:00:34.000Z", moment.ISO_8601).format('M/D/YY');
+    // console.log(date)
+  }
+
+  handleSearch = (input, isDate) => {
+    if (input.length > 0) {
+      let day, month, year, dateMatchType = null;
+      if (isDate) {
+        const inputSplit = input.split('/')
+        if (inputSplit.length === 0 || inputSplit.length === 1) {
+          month = inputSplit[0];
+          day = '01'
+          year = (new Date()).getFullYear();
+          dateMatchType = 'month'
+        } else if (inputSplit.length === 2) {
+          if (inputSplit[1] !== '') {
+            month = inputSplit[0];
+            day = inputSplit[1];
+            year = (new Date()).getFullYear();
+            dateMatchType = 'day'
+          } else {
+            month = inputSplit[0];
+            day = '01'
+            year = (new Date()).getFullYear();
+            dateMatchType = 'month'
+          }
+        } else if (inputSplit.length === 3) {
+          if (inputSplit[2] !== '') {
+            month = inputSplit[0];
+            day = inputSplit[1];
+            year = inputSplit[2].length <= 2 ? `20${inputSplit[2]}` : inputSplit[2]
+            dateMatchType = 'day'
+          } else {
+            month = inputSplit[0];
+            day = inputSplit[1];
+            year = (new Date()).getFullYear();
+            dateMatchType = 'day'
+          }
+        }
+        console.log(`${year}-${month}-${day}`, dateMatchType)
+      }
+      const displayData = isDate ?
+        this.state.data.filter(v => moment(v.id, moment.ISO_8601).isSame(`${year}-${month}-${day}`, dateMatchType))
+        :
+        this.state.data.filter(v => v.id.toLowerCase().search(input) !== -1)
+      this.setState({
+        displayData,
+      })
+    } else {
+      this.setState({
+        displayData: this.state.data
+      })
+    }
   }
 
   render() {
@@ -86,11 +155,12 @@ class SearchSelect extends React.Component {
             input={<Input id="select-multiple" />}
             MenuProps={MenuProps}
           >
-            <MenuItem
-              key={90921}
-              value={'im at the top!'}
-            >yo im at the top!</MenuItem>
-            {this.state.data.map((val,i) => (
+            <SearchSelectInput
+              onSearch={this.handleSearch}
+              onClearSearch={this.state.clearSearch}
+              isDate={column.isTask || column.isTasklist || column.isDate ? true : false}
+            />
+            {this.state.displayData.map((val,i) => (
               <MenuItem
                 key={i}
                 value={val.id}

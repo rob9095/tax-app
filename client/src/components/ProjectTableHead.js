@@ -24,8 +24,9 @@ const columnData = [
     id: 'projectName',
     hidden: false,
     numeric: false,
-    disablePadding: true,
+    disablePadding: false,
     label: 'Project',
+    noSearch: true,
   },
   {
     id: 'preparer',
@@ -69,6 +70,8 @@ const columnData = [
     numeric: false,
     disablePadding: true,
     label: 'Date Project Created',
+    isDate: true,
+    noSearch: true,
   },
   {
     id: 'initialPaymentReceivedTask',
@@ -78,6 +81,7 @@ const columnData = [
     disablePadding: true,
     label: 'Initial Payment Recieved',
     isTask: true,
+    noSearch: true,
   },
   {
     id: 'initialPaymentTask',
@@ -86,7 +90,8 @@ const columnData = [
     numeric: false,
     disablePadding: true,
     label: 'Initial Payment',
-    isTask: true
+    isTask: true,
+    noSearch: true,
   },
   {
     id: 'initialPayment',
@@ -97,6 +102,7 @@ const columnData = [
     disablePadding: true,
     label: 'Initial Payment',
     tasks: ['Initial Payment','Initial Payment Recieved'],
+    noSearch: true,
   },
   {
     id: 'gettingStartedTask',
@@ -106,6 +112,7 @@ const columnData = [
     disablePadding: true,
     label: 'Getting Started',
     isTask: true,
+    noSearch: true,
   },
   {
     id: 'taxOrganizerTask',
@@ -114,7 +121,8 @@ const columnData = [
     numeric: false,
     disablePadding: true,
     label: 'Tax Organizer',
-    isTask: true
+    isTask: true,
+    noSearch: true,
   },
   {
     id: 'qTravelWorksheetTask',
@@ -124,6 +132,7 @@ const columnData = [
     disablePadding: true,
     label: 'Questionnaire-Travel Worksheet',
     isTask: true,
+    noSearch: true,
   },
   {
     id: 'qFbarForm8938Task',
@@ -132,7 +141,8 @@ const columnData = [
     numeric: false,
     disablePadding: true,
     label: 'Questionnaire-FBAR and Form 8938',
-    isTask: true
+    isTask: true,
+    noSearch: true,
   },
   {
     id: 'qForm5471Task',
@@ -142,6 +152,7 @@ const columnData = [
     disablePadding: true,
     label: 'Questionnaire-Form 5471 (Foreign Corporation)',
     isTask: true,
+    noSearch: true,
   },
   {
     id: 'qScheduleATask',
@@ -150,7 +161,8 @@ const columnData = [
     numeric: false,
     disablePadding: true,
     label: 'Questionnaire-Schedule A',
-    isTask: true
+    isTask: true,
+    noSearch: true,
   },
   {
     id: 'qScheduleCTask',
@@ -160,6 +172,7 @@ const columnData = [
     disablePadding: true,
     label: 'Questionnaire-Schedule C',
     isTask: true,
+    noSearch: true,
   },
   {
     id: 'qScheduleDTask',
@@ -168,7 +181,8 @@ const columnData = [
     numeric: false,
     disablePadding: true,
     label: 'Questionnaire-Schedule D',
-    isTask: true
+    isTask: true,
+    noSearch: true,
   },
   {
     id: 'qScheduleETask',
@@ -177,7 +191,8 @@ const columnData = [
     numeric: false,
     disablePadding: true,
     label: 'Questionnaire-Schedule E',
-    isTask: true
+    isTask: true,
+    noSearch: true,
   },
   {
     id: 'provideInformation',
@@ -188,6 +203,7 @@ const columnData = [
     disablePadding: true,
     label: 'Provide Information',
     tasks: ['Getting Started','Tax Organizer','Questionnaire-Travel Worksheet','Questionnaire-FBAR and Form 8938','Questionnaire-Form 5471 (Foreign Corporation)','Questionnaire-Schedule A','Questionnaire-Schedule C','Questionnaire-Schedule D','Questionnaire-Schedule E'],
+    noSearch: true,
   },
   {
     id: 'clientWelcomeCallTask',
@@ -196,7 +212,8 @@ const columnData = [
     numeric: false,
     disablePadding: true,
     label: 'Client Welcome Call',
-    isTask: true
+    isTask: true,
+    noSearch: true,
   },
   {
     id: 'auditProtectionTask',
@@ -205,7 +222,8 @@ const columnData = [
     numeric: false,
     disablePadding: true,
     label: 'Audit Protection Plan - IRS Monitoring',
-    isTask: true
+    isTask: true,
+    noSearch: true,
   },
   {
     id: 'workPaperPrepTask',
@@ -214,7 +232,8 @@ const columnData = [
     numeric: false,
     disablePadding: true,
     label: 'Workpaper Preparation',
-    isTask: true
+    isTask: true,
+    noSearch: true,
   },
   {
     id: 'dataEntryTask',
@@ -223,7 +242,8 @@ const columnData = [
     numeric: false,
     disablePadding: true,
     label: 'Data Entry',
-    isTask: true
+    isTask: true,
+    noSearch: true,
   },
   {
     id: 'dataEntryReviewTask',
@@ -232,7 +252,8 @@ const columnData = [
     numeric: false,
     disablePadding: true,
     label: 'Data Entry Review',
-    isTask: true
+    isTask: true,
+    noSearch: true,
   },
   {
     id: 'dataEntryCorrectionsTask',
@@ -241,7 +262,8 @@ const columnData = [
     numeric: false,
     disablePadding: true,
     label: 'Data Entry Corrections',
-    isTask: true
+    isTask: true,
+    noSearch: true,
   },
   {
     id: 'finalReviewTask',
@@ -250,7 +272,8 @@ const columnData = [
     numeric: false,
     disablePadding: true,
     label: 'Final Review',
-    isTask: true
+    isTask: true,
+    noSearch: true,
   },
   {
     id: 'preparation',
@@ -260,7 +283,8 @@ const columnData = [
     numeric: false,
     disablePadding: true,
     label: 'Preparation',
-    tasks: ['Client Welcome Call','Audit Protection Plan - IRS Monitoring','Workpaper Preparation', 'Data Entry', 'Data Entry Review', 'Data Entry Corrections', 'Final Review']
+    tasks: ['Client Welcome Call','Audit Protection Plan - IRS Monitoring','Workpaper Preparation', 'Data Entry', 'Data Entry Review', 'Data Entry Corrections', 'Final Review'],
+    noSearch: true,
   },
   {
     id: 'finalPaymentReceivedTask',
@@ -269,7 +293,8 @@ const columnData = [
     numeric: false,
     disablePadding: true,
     label: 'Final Payment Received',
-    isTask: true
+    isTask: true,
+    noSearch: true,
   },
   {
     id: 'finalInvoiceDueTask',
@@ -278,7 +303,8 @@ const columnData = [
     numeric: false,
     disablePadding: true,
     label: 'Final Invoice Due',
-    isTask: true
+    isTask: true,
+    noSearch: true,
   },
   {
     id: 'finalizePayment',
@@ -288,7 +314,8 @@ const columnData = [
     numeric: false,
     disablePadding: true,
     label: 'Finalize Payment',
-    tasks: ['Final Payment Received','Final Invoice Due']
+    tasks: ['Final Payment Received','Final Invoice Due'],
+    noSearch: true,
   },
   {
     id: 'returnReviewTask',
@@ -297,7 +324,8 @@ const columnData = [
     numeric: false,
     disablePadding: true,
     label: 'Return Review Instructions',
-    isTask: true
+    isTask: true,
+    noSearch: true,
   },
   {
     id: 'steamlinedProcedureTask',
@@ -306,7 +334,8 @@ const columnData = [
     numeric: false,
     disablePadding: true,
     label: 'Streamlined Procedure Instructions',
-    isTask: true
+    isTask: true,
+    noSearch: true,
   },
   {
     id: 'clientReviewCallTask',
@@ -315,7 +344,8 @@ const columnData = [
     numeric: false,
     disablePadding: true,
     label: 'Client Review Call',
-    isTask: true
+    isTask: true,
+    noSearch: true,
   },
   {
     id: 'clientReview',
@@ -326,6 +356,7 @@ const columnData = [
     disablePadding: true,
     label: 'Client Review',
     tasks: ['Return Review Instructions','Streamlined Procedure Instructions','Client Review Call'],
+    noSearch: true,
   },
   {
     id: 'closingLetterTask',
@@ -334,7 +365,8 @@ const columnData = [
     numeric: false,
     disablePadding: true,
     label: 'Closing Letter',
-    isTask: true
+    isTask: true,
+    noSearch: true,
   },
   {
     id: 'closeEngagementTask',
@@ -343,7 +375,8 @@ const columnData = [
     numeric: false,
     disablePadding: true,
     label: 'Close Engagement & Archive Teamwork Project',
-    isTask: true
+    isTask: true,
+    noSearch: true,
   },
   {
     id: 'finalizeEngagement',
@@ -354,6 +387,7 @@ const columnData = [
     disablePadding: true,
     label: 'Finalize Engagment',
     tasks: ['Closing Letter','Close Engagement & Archive Teamwork Project'],
+    noSearch: true,
   },
 ];
 
@@ -500,21 +534,18 @@ class ProjectTableHead extends Component {
     })
   }
 
-  handleSearchMenuItemSelect = (searchArr, recentValue) => {
-    console.log(`the original searchArr is`)
-    console.log(searchArr)
-    console.log(`the recentValue is`)
+  handleSearchMenuItemSelect = (searchArr, recentValue, column) => {
+    let removeFilter = null;
+    console.log('the recent value in table head is')
     console.log(recentValue)
-    const check = searchArr.filter(val => val === recentValue)
+    const check = searchArr.filter(e => e.value === recentValue)
     if (check.length > 0) {
-      console.log('chec was hit!')
-      searchArr = searchArr.filter(val => val !== recentValue);
-      check.forEach(v=>{console.log(`im from the check arr my value is: ${v}`)})
+      searchArr = searchArr.filter(e => e.value !== recentValue);
+      removeFilter = recentValue;
     } else {
-      searchArr.push(recentValue);
+      searchArr.push({value: recentValue, column});
     }
-    console.log(`the updated searchArr is`)
-    console.log(searchArr)
+    this.props.onTableSearch(searchArr, removeFilter);
   }
 
   componentDidMount() {
@@ -555,6 +586,7 @@ class ProjectTableHead extends Component {
                           column={column}
                           tableData={tableData}
                           onSearchMenuItemSelect={this.handleSearchMenuItemSelect}
+                          currentFilters={this.props.currentFilters}
                          />
                       </div>
                     )}

@@ -78,8 +78,30 @@ span.popover-close:hover {
     justify-content: flex-start;
 }
 
+/* Project Table Search Inputs */
+.search-container {
+    max-width: 165px;
+}
+
+.search-input {
+  background-color: rgba(0, 0, 0, 0.14);
+  color: rgba(0, 0, 0, 0.87);
+  margin: 7px !important;
+  border-radius: 5px;
+  padding: 5px !important;
+}
+
+.search-input div::before {
+  height: 0px !important;
+}
+
+.search-input .search-button:hover {
+  opacity: .8;
+  cursor: pointer;
+}
 
 /* Project Table Toolbar */
+
 .toolbar-container {
     display: flex;
 }
