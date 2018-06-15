@@ -1,6 +1,7 @@
 import { apiCall, teamworkApiCall } from '../../services/api';
 import { LOAD_TEAMWORK_DATA, LOAD_PROJECTS_FROM_DB } from '../actionTypes';
 import {addError, removeError} from './errors';
+import { setCurrentUser, setAuthorizationToken } from './account';
 
 export function loadDBProjects(projectsInDB) {
 	return{
@@ -42,11 +43,52 @@ export function fetchDBProjects() {
 	}
 }
 
-export function updateProjectsDB(key) {
-  const url = 'https://taxsamaritan.teamwork.com/projects.json?status=ACTIVE'
+export function getUserProfileImage(currentUser) {
+	// we know the company id so just hard coding it here
+	// todo in future -> send request to get all companies, return list to show user, ask which company they want to link, use that id
+	const url = `https://taxsamaritan.teamwork.com/companies/31966/people.json`;
+	const key = currentUser.apiKey;
 	return dispatch => {
 		return new Promise((resolve,reject) => {
 			return teamworkApiCall('get', url, key)
+			.then(async (data) => {
+				const user = data.people.filter((person) => person['email-address'] === currentUser.email)
+				if (user.length > 0) {
+					const formattedUser = {
+						email: currentUser.email,
+						profileImageUrl: user[0]['avatar-url']
+					}
+					return new Promise((resolve,reject) => {
+						return apiCall('post', `/api/account/update`, formattedUser)
+						.then(({token, ...user}) => {
+							localStorage.setItem('jwtToken', token);
+							setAuthorizationToken(token);
+							dispatch(setCurrentUser(user));
+							dispatch(addError('Changes Saved!'));
+							resolve();
+						})
+						.catch(err => {
+							dispatch(addError(err.message));
+							reject();
+						})
+					})
+				} else {
+					dispatch(addError(`No Teamwork users found with email ${currentUser.email}`))
+					reject();
+				}
+			})
+			.catch((err) => {
+				dispatch(addError(err))
+			})
+		})
+	}
+}
+
+export function updateProjectsDB(currentUser) {
+  const url = 'https://taxsamaritan.teamwork.com/projects.json?status=ACTIVE'
+	return dispatch => {
+		return new Promise((resolve,reject) => {
+			return teamworkApiCall('get', url, currentUser.apiKey)
 			.then((data) => {
         console.log(data);
         let projects = data.projects;

@@ -22,6 +22,14 @@ const userSchema = new mongoose.Schema({
 	apiKey: {
 		type: String,
 	},
+	isSuperAdmin: {
+		type: Boolean,
+		default: false,
+	},
+	setupComplete: {
+		type: Boolean,
+		default: true,
+	},
 	savedTableViews: [{
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'SavedTableView',

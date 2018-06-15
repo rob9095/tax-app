@@ -14,9 +14,6 @@ exports.signin = async function(req, res, next) {
 				id,
 				username,
 				profileImageUrl,
-				email,
-				apiKey,
-				savedViews,
 			},
 				process.env.SECRET_KEY
 			);
@@ -65,9 +62,6 @@ exports.signup = async function(req, res, next){
 			id,
 			username,
 			profileImageUrl,
-			email,
-			apiKey,
-			savedViews,
 		},
 		process.env.SECRET_KEY
 		);

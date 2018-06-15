@@ -2,11 +2,12 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { logout } from '../store/actions/auth';
-import { fetchAndUpdateCompletedMilestones, fetchAndUpdateTasklists , fetchDBProjects , fetchTeamworkProjectData, updateProjectsDB } from '../store/actions/teamworkApi';
+import { fetchAndUpdateCompletedMilestones, fetchAndUpdateTasklists , fetchDBProjects , fetchTeamworkProjectData, updateProjectsDB, getUserProfileImage } from '../store/actions/teamworkApi';
 import { requestAndUpdateTasks } from '../store/actions/tasks';
 import { getMessages, getMessageReplies } from '../store/actions/messages';
 import Button from 'material-ui/Button';
 import OnBoardingTabs from '../containers/OnBoardingTabs';
+import AccountPage from '../containers/AccountPage';
 
 //update fuctions to send api key from current user!
 
@@ -22,7 +23,8 @@ class Setup extends Component {
     }
 
     buildProjectData = () => {
-      this.props.updateProjectsDB(this.props.currentUser.user.apiKey);
+      this.props.updateProjectsDB(this.props.currentUser.user);
+      this.props.currentUser.user.profileImageUrl ? null : this.props.getUserProfileImage(this.props.currentUser.user);
     }
 
     updateCompletedDates = () => {
@@ -94,7 +96,7 @@ class Setup extends Component {
     }
 
     componentDidMount() {
-      if(this.props.currentUser.isAuthenticated) {
+      if (this.props.currentUser.isAuthenticated) {
         //this.props.fetchTeamworkProjectData();
         this.props.fetchDBProjects();
       }
@@ -107,6 +109,13 @@ class Setup extends Component {
     			<OnBoardingTabs errors={errors} />
     		);
     	}
+      if(!currentUser.user.apiKey){
+        return (
+          <div>
+            <span>Please add your API key!</span>
+          </div>
+        );
+      }
     	return (
     		<div>
           <h2>Setup your account</h2>
@@ -132,4 +141,4 @@ function mapStateToProps(state) {
 	};
 }
 
-export default connect(mapStateToProps, { logout, requestAndUpdateTasks, fetchAndUpdateCompletedMilestones, fetchTeamworkProjectData, updateProjectsDB, fetchDBProjects, fetchAndUpdateTasklists, getMessages, getMessageReplies })(Setup);
+export default connect(mapStateToProps, { logout, requestAndUpdateTasks, fetchAndUpdateCompletedMilestones, fetchTeamworkProjectData, updateProjectsDB, fetchDBProjects, fetchAndUpdateTasklists, getMessages, getMessageReplies, getUserProfileImage })(Setup);
