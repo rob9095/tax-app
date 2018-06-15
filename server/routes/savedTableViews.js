@@ -6,7 +6,7 @@ const { getSavedTableViews, addSavedTableView, removeSavedTableView, toggleShare
 router.post('/', addSavedTableView);
 
 // toggle isShared value for view -> /api/saved-views/share
-router.post('/', toggleSharedView);
+router.post('/share', toggleSharedView);
 
 // get saved table views for user -> /api/saved-views
 router.get('/:user_id', getSavedTableViews);

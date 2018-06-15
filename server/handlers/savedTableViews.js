@@ -55,14 +55,14 @@ exports.removeSavedTableView = async (req, res, next) => {
 
 exports.toggleSharedView = async (req, res, next) => {
   try {
-    let foundView = await db.SavedTableView.findOne(req.body.viewId);
+    let foundView = await db.SavedTableView.findById(req.body.viewId);
     if (foundView === null) {
       return next({
         status: 400,
         message: 'View not found',
       })
     }
-    if (foundView.user !== req.body.userId) {
+    if (foundView.username !== req.body.username) {
       return next({
         status: 400,
         message: 'You cannot share this view'
@@ -70,7 +70,7 @@ exports.toggleSharedView = async (req, res, next) => {
     }
     foundView.isShared = !foundView.isShared;
     await foundView.save();
-    return res.satus(200).json(foundView)
+    return res.status(200).json(foundView)
   } catch(err) {
     return next(err);
   }

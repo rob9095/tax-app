@@ -1,6 +1,11 @@
 import { apiCall } from '../../services/api';
 import { addError, removeError } from './errors';
-import { REMOVE_VIEW, ADD_VIEW, LOAD_VIEWS, LOAD_SHARED_VIEWS } from '../actionTypes';
+import { REMOVE_VIEW, ADD_VIEW, LOAD_VIEWS, LOAD_SHARED_VIEWS, TOGGLE_VIEW_SHARE } from '../actionTypes';
+
+export const toggleIsShared = (view) => ({
+	type: TOGGLE_VIEW_SHARE,
+	view
+})
 
 export const addView = (view) => ({
 	type: ADD_VIEW,
@@ -88,3 +93,19 @@ export function getSavedTableViews(user_id) {
     });
   };
 };
+
+export function toggleSharedView(viewData) {
+	return dispatch => {
+		return new Promise((resolve,reject) => {
+			return apiCall('post', `/api/saved-views/share`, viewData)
+			.then((view) => {
+				dispatch(toggleIsShared(view))
+				resolve(view)
+			})
+			.catch(err=>{
+				dispatch(addError(err.message))
+				reject(err);
+			})
+		})
+	}
+}

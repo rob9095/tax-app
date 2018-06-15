@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { handleSavedViewDisplay, clearSavedViewDisplay } from '../store/actions/savedTableView';
-import { deleteSavedTableView } from '../store/actions/savedTableViews';
+import { deleteSavedTableView, toggleSharedView } from '../store/actions/savedTableViews';
 import IconButton from 'material-ui/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
 import FavoriteIcon from '@material-ui/icons/Favorite';
@@ -17,7 +17,11 @@ class SavedViewListItem extends Component {
   }
 
   handleShareClick = (e) => {
-    console.log('we need to update the view!')
+    const viewData = {
+      viewId: this.props.view._id,
+      username: this.props.currentUser.user.username,
+    }
+    this.props.toggleSharedView(viewData)
     e.stopPropagation();
   }
 
@@ -83,4 +87,4 @@ function mapStateToProps(state) {
 	};
 }
 
-export default connect(mapStateToProps, { handleSavedViewDisplay, clearSavedViewDisplay, deleteSavedTableView })(SavedViewListItem);
+export default connect(mapStateToProps, { handleSavedViewDisplay, clearSavedViewDisplay, deleteSavedTableView, toggleSharedView })(SavedViewListItem);
