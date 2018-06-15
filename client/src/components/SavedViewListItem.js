@@ -4,6 +4,8 @@ import { handleSavedViewDisplay, clearSavedViewDisplay } from '../store/actions/
 import { deleteSavedTableView } from '../store/actions/savedTableViews';
 import IconButton from 'material-ui/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
+import FavoriteIcon from '@material-ui/icons/Favorite';
+import Tooltip from 'material-ui/Tooltip';
 
 class SavedViewListItem extends Component {
   constructor(props) {
@@ -12,6 +14,11 @@ class SavedViewListItem extends Component {
       deleteClicked: false,
     };
     this.handleClick = this.handleClick.bind(this);
+  }
+
+  handleShareClick = (e) => {
+    console.log('we need to update the view!')
+    e.stopPropagation();
   }
 
   handleDelete = (e) => {
@@ -25,20 +32,42 @@ class SavedViewListItem extends Component {
   }
 
   render() {
-    const { view } = this.props;
+    const { view, sharedView, isShared } = this.props;
     return(
       <li
         onClick={this.handleClick}
       >
         <span className="title">{view.title}</span>
-        <span className="delete">
-          <IconButton
-            onClick={this.handleDelete}
-            aria-label="Delete"
-            >
-            <DeleteIcon />
-          </IconButton>
-        </span>
+        {sharedView ?
+          <span className="username">{view.username}</span>
+          :
+          <span className="share">
+          <Tooltip title={isShared ? 'Un Share' : 'Share'}>
+            <IconButton
+              onClick={this.handleShareClick}
+              aria-label={isShared ? 'Un Share' : 'Share'}
+              >
+              <FavoriteIcon
+                className={isShared ? 'share filled' : null}
+              />
+            </IconButton>
+          </Tooltip>
+          </span>
+        }
+        {sharedView ?
+          null
+          :
+          <span className="delete">
+          <Tooltip title="Delete">
+            <IconButton
+              onClick={this.handleDelete}
+              aria-label="Delete"
+              >
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
+          </span>
+        }
       </li>
     )
   }

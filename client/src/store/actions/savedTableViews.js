@@ -1,6 +1,6 @@
 import { apiCall } from '../../services/api';
 import { addError, removeError } from './errors';
-import { REMOVE_VIEW, ADD_VIEW, LOAD_VIEWS, LOAD_SAVED_VIEW, CLEAR_SAVED_VIEW } from '../actionTypes';
+import { REMOVE_VIEW, ADD_VIEW, LOAD_VIEWS, LOAD_SHARED_VIEWS } from '../actionTypes';
 
 export const addView = (view) => ({
 	type: ADD_VIEW,
@@ -15,6 +15,11 @@ export const removeView = (id) => ({
 export const loadViews = (views) => ({
 	type: LOAD_VIEWS,
   views
+})
+
+export const loadSharedViews = (views) => ({
+	type: LOAD_SHARED_VIEWS,
+	views
 })
 
 export const saveState = (state, stateType) => ({
@@ -74,7 +79,7 @@ export function getSavedTableViews(user_id) {
       return apiCall('get', `/api/saved-views/${user_id}`)
       .then((res)=> {
         resolve(res);
-        dispatch(loadViews(res))
+        user_id === 'shared' ? dispatch(loadSharedViews(res)) : dispatch(loadViews(res))
       })
       .catch((err)=> {
         dispatch(addError(err.message));

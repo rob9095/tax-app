@@ -6,6 +6,7 @@ import invitations from './invitations';
 import tableBodyState from './tableBodyState';
 import tableHeadState from './tableHeadState';
 import savedViews from './savedViews';
+import sharedViews from './sharedViews';
 import savedView from './savedView';
 
 const rootReducer = combineReducers({
@@ -16,6 +17,7 @@ const rootReducer = combineReducers({
 	tableHeadState,
 	tableBodyState,
 	savedViews,
+	sharedViews,
 	savedView,
 });
 

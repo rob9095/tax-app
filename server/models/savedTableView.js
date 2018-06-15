@@ -28,6 +28,10 @@ const SavedTableViewSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.Mixed,
     required: true,
   },
+  isShared: {
+    type: Boolean,
+    default: false,
+  }
 });
 
 SavedTableViewSchema.pre('remove', async function(next) {

@@ -304,10 +304,9 @@ ul.invite-list li span {
 /* Saved Views Modal List */
 
 ul.view-list {
-    list-style: none;
     margin-top: -10px;
-    margin-left: -40px;
-    max-width: 97%;
+    margin-left: -60px;
+    width: 300px;;
 }
 
 ul.view-list li {
@@ -315,10 +314,59 @@ ul.view-list li {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    min-height: 35px;
 }
 
 ul.view-list li:hover {
     background: #f0e6e7;
     cursor: pointer;
     border-radius: 5px;
+}
+
+ul.view-list li span.share {
+  margin-left: auto;
+}
+
+ul.view-list li.title {
+  font-weight: bold;
+}
+
+ul.view-list li.username {
+  font-weight: bold;
+}
+
+.shared-view-container {
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-left: -24px;
+}
+
+.shared-view-container span.title {
+    font-size: 12px;
+    font-weight: bold;
+    width: 65px;
+    margin-bottom: 5px;
+}
+
+.shared-view-container span.title.share {
+    margin-left: auto;
+    text-align: center;
+}
+
+.shared-view-container span.title.name {
+    margin-left: 25px;
+}
+
+.shared-view-container span.title.username {
+    margin-right: -20px;
+}
+
+.shared-view-container span.title.trash {
+    margin-right: -25px;
+}
+
+svg.share.filled {
+    color: #6c0e0f;
 }

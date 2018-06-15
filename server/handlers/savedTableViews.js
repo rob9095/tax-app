@@ -24,10 +24,13 @@ exports.addSavedTableView = async (req, res, next) => {
   }
 }
 
-// return all saved views for a user
+// return all saved views for a user or shared views
 exports.getSavedTableViews = async (req, res, next) => {
   try {
-    let foundViews = await db.SavedTableView.find({user: req.params.user_id})
+    const foundViews = req.params.user_id === 'shared' ?
+      await db.SavedTableView.find({isShared: true})
+      :
+      await db.SavedTableView.find({user: req.params.user_id})
     return res.status(200).json(foundViews)
   } catch(err) {
     return next(err);

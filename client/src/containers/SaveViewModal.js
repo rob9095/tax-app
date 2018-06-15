@@ -13,6 +13,7 @@ import Modal from 'material-ui/Modal';
 import Button from 'material-ui/Button';
 import Input from 'material-ui/Input';
 import SavedViewListItem from '../components/SavedViewListItem';
+import SavedViewTabs from './SavedViewTabs';
 
 function rand() {
   return Math.round(Math.random() * 20) - 10;
@@ -39,11 +40,18 @@ const styles = theme => ({
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
+    maxHeight: 800,
+    overflowY: 'auto',
+  },
+  formContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    width: 400,
+    margin: '0 auto',
   },
   button: {
     margin: theme.spacing.unit,
-    marginTop: 20,
-  }
+  },
 });
 
 class SaveViewModal extends Component {
@@ -54,12 +62,24 @@ class SaveViewModal extends Component {
       title: '',
       inputErrors: false,
       errMessage: '',
+      isLoading: true,
     };
   }
 
   componentDidMount() {
-    this.props.getSavedTableViews(this.props.currentUser.user.id);
-    this.setState({ open: true });
+    this.setState({
+      open: true,
+    })
+    this.props.getSavedTableViews('shared')
+    this.props.getSavedTableViews(this.props.currentUser.user.id)
+    .then(()=>{
+      this.setState({
+        isLoading: false,
+      })
+    })
+    .catch(err => {
+      this.props.addError(err)
+    })
   }
 
   componentWillReceiveProps(newProps){
@@ -117,6 +137,13 @@ class SaveViewModal extends Component {
       bodyState: tableBodyState,
     }
     this.props.addSavedTableView(viewData)
+    .then(()=>{
+      this.setState({
+        inputErrors: false,
+        errMessage: '',
+        title: '',
+      })
+    })
   }
 
   closeErrors = () => {
@@ -128,13 +155,7 @@ class SaveViewModal extends Component {
   }
 
   render() {
-    const { classes, currentUser, errors, savedViews } = this.props;
-    let views = savedViews.map(v => (
-      <SavedViewListItem
-        key={v._id}
-        view={v}
-      />
-    ))
+    const { classes, currentUser, errors, savedViews, sharedViews } = this.props;
     return (
       <div>
         <Modal
@@ -150,31 +171,38 @@ class SaveViewModal extends Component {
                 <CloseIcon onClick={this.closeErrors} color="primary" className="alert-close" />
               </Paper>
             )}
-            <FormControl>
-              <Input
-                error={this.state.inputErrors}
-                autoComplete="off"
-                id="title"
-                type="text"
-                name="title"
-                onChange={this.handleChange}
-                value={this.state.title}
-                className={classes.input}
-                placeholder="View Name"
-              />
-            </FormControl>
-            <Button
-              onClick={this.handleSubmit}
-              className={classes.button}
-              variant="raised"
-              type="submit"
-              color="primary">
-              Save View
-            </Button>
-            <h4>Saved Views</h4>
-            <ul className="view-list">
+            <div className={classes.formContainer}>
+              <FormControl>
+                <Input
+                  error={this.state.inputErrors}
+                  autoComplete="off"
+                  id="title"
+                  type="text"
+                  name="title"
+                  onChange={this.handleChange}
+                  value={this.state.title}
+                  className="centered"
+                  placeholder="View Name"
+                />
+              </FormControl>
+              <Button
+                onClick={this.handleSubmit}
+                className={classes.button}
+                variant="raised"
+                type="submit"
+                color="primary">
+                Save Current View
+              </Button>
+            </div>
+            <SavedViewTabs
+              isLoading={this.state.isLoading}
+              savedViews={savedViews}
+              sharedViews={sharedViews}
+            />
+            {/* <h4>Saved Views</h4> */}
+            {/* <ul className="view-list">
               {views}
-            </ul>
+            </ul> */}
           </div>
         </Modal>
       </div>
@@ -192,6 +220,7 @@ function mapStateToProps(state) {
     errors: state.errors,
     tableState: state.tableState,
     savedViews: state.savedViews,
+    sharedViews: state.sharedViews,
 	};
 }
 
