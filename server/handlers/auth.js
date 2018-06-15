@@ -42,39 +42,70 @@ exports.signin = async function(req, res, next) {
 
 exports.signup = async function(req, res, next){
 	try {
-		let invitationCheck = await db.Invitation.findOne({email: req.body.email})
-		if (invitationCheck === null) {
-			return next({
-				status: 400,
-				message: 'To create an account you must be invited',
-			})
-		}
 		if (req.body.password.length <= 6) {
 			return next({
 				status: 400,
 				message: 'Choose a password longer than 6 characters',
 			})
 		}
-		let user = await db.User.create(req.body);
-		let { id, username, profileImageUrl, email, apiKey, savedViews } = user;
-		let token = jwt.sign(
-		{
-			id,
-			username,
-			profileImageUrl,
-		},
-		process.env.SECRET_KEY
-		);
-		await invitationCheck.remove();
-		return res.status(200).json({
-			id,
-			username,
-			profileImageUrl,
-			email,
-			apiKey,
-			savedViews,
-			token
-		});
+		const userCheck = await db.User.find()
+		if (userCheck.length > 0) {
+			// normal signup
+			let invitationCheck = await db.Invitation.findOne({email: req.body.email})
+			if (invitationCheck === null) {
+				return next({
+					status: 400,
+					message: 'To create an account you must be invited',
+				})
+			}
+			let user = await db.User.create(req.body);
+			let { id, username, profileImageUrl, email, apiKey, savedViews } = user;
+			let token = jwt.sign(
+			{
+				id,
+				username,
+				profileImageUrl,
+			},
+			process.env.SECRET_KEY
+			);
+			await invitationCheck.remove();
+			return res.status(200).json({
+				id,
+				username,
+				profileImageUrl,
+				email,
+				apiKey,
+				savedViews,
+				token
+			});
+		} else {
+			//super admin signup
+			let userData = {
+				...req.body,
+				setupComplete: false,
+				isSuperAdmin: true,
+			}
+			let user = await db.User.create(userData);
+			let { id, username, profileImageUrl, email, apiKey, savedViews } = user;
+			let token = jwt.sign(
+			{
+				id,
+				username,
+				profileImageUrl,
+			},
+			process.env.SECRET_KEY
+			);
+			await invitationCheck.remove();
+			return res.status(200).json({
+				id,
+				username,
+				profileImageUrl,
+				email,
+				apiKey,
+				savedViews,
+				token
+			});
+		}
 	} catch(err) {
 		if(err.code === 11000) {
 			err.message = 'Sorry, that username and/or email has been taken.'
