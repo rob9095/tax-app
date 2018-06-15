@@ -11,6 +11,13 @@ exports.addInvitation = async(req, res, next) => {
         message: 'Please login to create invites',
       })
     }
+    let foundInvitedUser = await db.User.findOne({email: req.body.email})
+    if (foundInvitedUser !== null) {
+      return next({
+        status: 400,
+        message: 'This email is already signed up',
+      })
+    }
     let invitation = await db.Invitation.create(req.body);
     let foundInvitation = await db.Invitation.findById(invitation.id);
     return res.status(200).json(foundInvitation)

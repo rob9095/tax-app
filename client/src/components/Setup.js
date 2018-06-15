@@ -24,7 +24,7 @@ class Setup extends Component {
 
     buildProjectData = () => {
       this.props.updateProjectsDB(this.props.currentUser.user);
-      this.props.currentUser.user.profileImageUrl ? null : this.props.getUserProfileImage(this.props.currentUser.user);
+      this.props.currentUser.user.profileImageUrl ? null : this.props.getUserProfileImage(this.props.currentUser.user, this.props.currentUser.user.email, true);
     }
 
     updateCompletedDates = () => {

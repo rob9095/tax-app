@@ -43,7 +43,7 @@ export function fetchDBProjects() {
 	}
 }
 
-export function getUserProfileImage(currentUser) {
+export function getUserProfileImage(currentUser, email, updateCurrentUser) {
 	// we know the company id so just hard coding it here
 	// todo in future -> send request to get all companies, return list to show user, ask which company they want to link, use that id
 	const url = `https://taxsamaritan.teamwork.com/companies/31966/people.json`;
@@ -52,8 +52,8 @@ export function getUserProfileImage(currentUser) {
 		return new Promise((resolve,reject) => {
 			return teamworkApiCall('get', url, key)
 			.then(async (data) => {
-				const user = data.people.filter((person) => person['email-address'] === currentUser.email)
-				if (user.length > 0) {
+				const user = data.people.filter((person) => person['email-address'] === email)
+				if (user.length > 0 && updateCurrentUser) {
 					const formattedUser = {
 						email: currentUser.email,
 						profileImageUrl: user[0]['avatar-url']
@@ -72,8 +72,10 @@ export function getUserProfileImage(currentUser) {
 							reject();
 						})
 					})
+				} else if (user.length > 0 && !updateCurrentUser) {
+					resolve(user[0]['avatar-url'])
 				} else {
-					dispatch(addError(`No Teamwork users found with email ${currentUser.email}`))
+					dispatch(addError(`No Teamwork users found with email ${email}`))
 					reject();
 				}
 			})

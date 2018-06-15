@@ -9,6 +9,9 @@ const invitationSchema = new mongoose.Schema({
   invitedByEmail: {
     type: String,
     required: true,
+  },
+  profileImageUrl: {
+    type: String,
   }
 });
 

@@ -58,7 +58,11 @@ exports.signup = async function(req, res, next){
 					message: 'To create an account you must be invited',
 				})
 			}
-			let user = await db.User.create(req.body);
+			const userData = {
+				...req.body,
+				profileImageUrl: invitationCheck.profileImageUrl,
+			}
+			let user = await db.User.create(userData);
 			let { id, username, profileImageUrl, email, apiKey, savedViews } = user;
 			let token = jwt.sign(
 			{
@@ -80,7 +84,7 @@ exports.signup = async function(req, res, next){
 			});
 		} else {
 			//super admin signup
-			let userData = {
+			const userData = {
 				...req.body,
 				setupComplete: false,
 				isSuperAdmin: true,
@@ -95,7 +99,6 @@ exports.signup = async function(req, res, next){
 			},
 			process.env.SECRET_KEY
 			);
-			await invitationCheck.remove();
 			return res.status(200).json({
 				id,
 				username,
