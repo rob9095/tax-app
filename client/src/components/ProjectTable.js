@@ -27,8 +27,7 @@ import TasklistMenu from '../containers/TasklistMenu';
 import ProjectTableToolbar from './ProjectTableToolbar';
 import ProjectTableHead from './ProjectTableHead';
 import ProjectNotes from './ProjectNotes';
-import { saveTableState } from '../store/actions/savedTableViews';
-import { SAVE_TABLE_BODY_STATE } from '../store/actionTypes';
+import { CircularProgress } from 'material-ui/Progress';
 
 const styles = theme => ({
   root: {
@@ -65,6 +64,7 @@ class EnhancedTable extends React.Component {
       savedViewTitle: '',
       headState: {},
       searchOpen: false,
+      checkboxLoading: false,
     };
     this.sanitizeName = this.sanitizeName.bind(this);
     this.handleShowPopover = this.handleShowPopover.bind(this)
@@ -548,7 +548,7 @@ class EnhancedTable extends React.Component {
     this.setState({ selected: [] });
   };
 
-  handleClick = (event, id) => {
+  handleSelectUpdate = (id, load) => {
     const { selected } = this.state;
     const selectedIndex = selected.indexOf(id);
     let newSelected = [];
@@ -565,8 +565,24 @@ class EnhancedTable extends React.Component {
         selected.slice(selectedIndex + 1),
       );
     }
+    this.setState({ selected: newSelected, checkboxLoading: load });
+  }
 
-    this.setState({ selected: newSelected });
+  handleClick = (event, id) => {
+    if (this.state.rowsPerPage > 200) {
+        this.setState({
+          checkboxLoading: true,
+          checkboxClicked: id,
+        })
+        setTimeout(()=>{
+          this.handleSelectUpdate(id, true);
+        },100)
+        setTimeout(()=>{
+          this.setState({ checkboxLoading: false });
+        }, 500)
+    } else {
+        this.handleSelectUpdate(id, false);
+    }
   };
 
   handleChangePage = (event, page) => {
@@ -718,6 +734,7 @@ class EnhancedTable extends React.Component {
           tableState={this.state}
           toggleSearchView={this.handleSearchViewToggle}
           searchViewOpen={this.state.searchOpen}
+          rowsPerPage={this.state.rowsPerPage}
         />
         <div className={classes.tableWrapper}>
           <Table className={classes.table}>
@@ -740,6 +757,7 @@ class EnhancedTable extends React.Component {
               tableData={dataCopy}
               onTableSearch={this.handleTableSearch}
               currentFilters={this.state.currentFilters}
+              rowsPerPage={this.state.rowsPerPage}
             />
             <TableBody>
               {data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(n => {
@@ -754,11 +772,15 @@ class EnhancedTable extends React.Component {
                     selected={isSelected}
                   >
                     <TableCell padding="checkbox">
-                      <Checkbox
-                        disableRipple={true}
-                        checked={isSelected}
-                        onClick={event => this.handleClick(event, n.id)}
-                      />
+                      {this.state.checkboxLoading && this.state.checkboxClicked === n.id ?
+                        <CircularProgress color="secondary" size={20} className="select-all-loader" />
+                        :
+                        <Checkbox
+                         disableRipple={true}
+                         checked={isSelected}
+                         onClick={event => this.handleClick(event, n.id)}
+                        />
+                      }
                     </TableCell>
                     <TableCell className="table-cell">{n.projectName}</TableCell>
                     <TableCell className="table-cell" padding="none">{n.preparer}</TableCell>
@@ -1057,4 +1079,4 @@ function mapStateToProps(state) {
 	};
 }
 
-export default compose(withStyles(styles), connect(mapStateToProps, { saveTableState }), )(EnhancedTable);
+export default compose(withStyles(styles), connect(mapStateToProps, { }), )(EnhancedTable);

@@ -132,7 +132,7 @@ class ProjectTableToolbar extends Component {
                   aria-label="Save View"
                   onClick={this.handleSaveView}
                   >
-                    {this.state.isLoading ?
+                    {this.state.isLoading && this.props.rowsPerPage > 200 ?
                       <CircularProgress size={24} />
                       :
                       <SaveIcon />
@@ -145,7 +145,7 @@ class ProjectTableToolbar extends Component {
                   aria-label="Search"
                   onClick={this.toggleSearch}
                   >
-                  {this.state.searchLoading ?
+                  {this.state.searchLoading && this.props.rowsPerPage > 200 ?
                     <CircularProgress size={24} />
                     :
                     <SearchIcon />

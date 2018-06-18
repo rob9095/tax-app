@@ -18,6 +18,7 @@ import Checkbox from 'material-ui/Checkbox';
 import { saveTableState } from '../store/actions/savedTableViews';
 import { SAVE_TABLE_HEAD_STATE } from '../store/actionTypes';
 import { handleSavedViewDisplay, clearSavedViewDisplay } from '../store/actions/savedTableView';
+import { CircularProgress } from 'material-ui/Progress';
 
 const columnData = [
   {
@@ -409,6 +410,7 @@ class ProjectTableHead extends Component {
       currentColumnIsTask: false,
       currentColumnLabel: '',
       searchOpen: true,
+      selectAllLoading: false,
     }
     this.handleTasklistMenuSelect = this.handleTasklistMenuSelect.bind(this);
   }
@@ -548,6 +550,24 @@ class ProjectTableHead extends Component {
     this.props.onTableSearch(searchArr, removeFilter);
   }
 
+  handleSelectAllClick = (event,checked) => {
+    if (this.props.rowsPerPage > 200) {
+      this.setState({
+        selectAllLoading: true,
+      })
+      setTimeout(()=>{
+        this.props.onSelectAllClick(event,checked);
+      }, 100)
+      setTimeout(()=>{
+        this.setState({
+          selectAllLoading: false,
+        })
+      }, 1000)
+    } else {
+      this.props.onSelectAllClick(event,checked);
+    }
+  }
+
   componentDidMount() {
     this.setState({
       columnData: columnData,
@@ -561,12 +581,16 @@ class ProjectTableHead extends Component {
       <TableHead>
         <TableRow>
           <TableCell padding="checkbox">
-            <Checkbox
-              disableRipple={true}
-              indeterminate={numSelected > 0 && numSelected < rowCount}
-              checked={numSelected === rowCount}
-              onChange={onSelectAllClick}
-            />
+            {this.state.selectAllLoading ?
+                <CircularProgress color="secondary" size={20} className="select-all-loader" />
+               :
+               <Checkbox
+                 disableRipple={true}
+                 indeterminate={numSelected > 0 && numSelected < rowCount}
+                 checked={numSelected === rowCount}
+                 onChange={this.handleSelectAllClick}
+               />
+            }
           </TableCell>
           {this.state.columnData.map(column => {
             {if (column.hidden !== true){
