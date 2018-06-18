@@ -12,6 +12,7 @@ import FilterListIcon from '@material-ui/icons/FilterList';
 import SearchIcon from '@material-ui/icons/Search';
 import SaveIcon from '@material-ui/icons/Save';
 import SaveViewModal from '../containers/SaveViewModal';
+import { CircularProgress } from 'material-ui/Progress';
 
 const toolbarStyles = theme => ({
   root: {
@@ -42,6 +43,8 @@ class ProjectTableToolbar extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      searchLoading: false,
+      isLoading: false,
       showSaveModal: false,
       searchOpen: false,
     };
@@ -51,16 +54,30 @@ class ProjectTableToolbar extends Component {
     if (newProps.openSaveModal === true && this.props.openSaveModal === false) {
       this.setState({
         showSaveModal: true,
+        isLoading: false,
       })
       this.props.toggleSaveModel();
+    }
+    if (newProps.searchViewOpen === true && this.props.searchViewOpen === false){
+      this.setState({
+        searchLoading: false,
+      })
+    }
+    if (newProps.searchViewOpen === false && this.state.searchOpen === false){
+      this.setState({
+        searchLoading: false,
+      })
     }
   }
 
   toggleSearch = () => {
     this.setState({
-      searchOpen: !this.state.searchOpen
+      searchOpen: !this.state.searchOpen,
+      searchLoading: true,
     })
-    this.props.toggleSearchView();
+    setTimeout(()=>{
+      this.props.toggleSearchView();
+    },100)
   }
 
   toggleSaveViewModal = () => {
@@ -70,7 +87,13 @@ class ProjectTableToolbar extends Component {
   }
 
   handleSaveView = () => {
-    this.props.toggleGetHeadState();
+    this.setState({
+      isLoading: true,
+    })
+    setTimeout(()=>{
+      this.props.toggleGetHeadState();
+    },100)
+
   }
 
   render() {
@@ -105,18 +128,29 @@ class ProjectTableToolbar extends Component {
             <div className="toolbar-container">
               <Tooltip title="Save View">
                 <IconButton
+                  disableRipple={true}
                   aria-label="Save View"
                   onClick={this.handleSaveView}
                   >
-                  <SaveIcon />
+                    {this.state.isLoading ?
+                      <CircularProgress size={24} />
+                      :
+                      <SaveIcon />
+                    }
                 </IconButton>
               </Tooltip>
               <Tooltip title="Search">
                 <IconButton
+                  disableRipple={true}
                   aria-label="Search"
                   onClick={this.toggleSearch}
                   >
-                  <SearchIcon />
+                  {this.state.searchLoading ?
+                    <CircularProgress size={24} />
+                    :
+                    <SearchIcon />
+                  }
+
                 </IconButton>
               </Tooltip>
             </div>

@@ -483,6 +483,7 @@ class EnhancedTable extends React.Component {
   }
 
   handleShowTasklistTask = (task) => {
+
     let updatedData = this.state.data
     updatedData.forEach(p => {
       p[task].hidden = !p[task].hidden
@@ -498,7 +499,6 @@ class EnhancedTable extends React.Component {
     // });
     this.setState({
       data: updatedData,
-      dataCopy: updatedData,
       lastCheckedTask: task,
     })
   }
@@ -535,7 +535,6 @@ class EnhancedTable extends React.Component {
     //   console.log(a[orderBy])
     // })
     this.setState({
-      dataCopy: data,
       data,
       order,
       orderBy });
@@ -582,7 +581,7 @@ class EnhancedTable extends React.Component {
   };
 
   isSelected = id => this.state.selected.indexOf(id) !== -1;
-  
+
 
   handleShowSaveModal = () => {
     this.setState({
@@ -646,6 +645,8 @@ class EnhancedTable extends React.Component {
       this.setState({
         data: this.state.dataCopy,
         currentFilters: [],
+        rowsPerPage: 25,
+        page: 0,
       })
       return
     } else if (searchArr.length === 0 && filters.length > 0) {
@@ -680,6 +681,7 @@ class EnhancedTable extends React.Component {
     if (results.length > 0) {
       this.setState({
         data: results,
+        rowsPerPage: results.length,
       })
     } else {
       alert(`No results`)
@@ -715,6 +717,7 @@ class EnhancedTable extends React.Component {
           toggleSaveModel={this.handleShowSaveModal}
           tableState={this.state}
           toggleSearchView={this.handleSearchViewToggle}
+          searchViewOpen={this.state.searchOpen}
         />
         <div className={classes.tableWrapper}>
           <Table className={classes.table}>
@@ -752,6 +755,7 @@ class EnhancedTable extends React.Component {
                   >
                     <TableCell padding="checkbox">
                       <Checkbox
+                        disableRipple={true}
                         checked={isSelected}
                         onClick={event => this.handleClick(event, n.id)}
                       />

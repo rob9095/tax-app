@@ -1,21 +1,20 @@
 import React, { Component } from 'react';
-import {  FormControlLabel } from 'material-ui/Form';
+import { FormControlLabel } from 'material-ui/Form';
 import Checkbox from 'material-ui/Checkbox';
+import Switch from 'material-ui/Switch';
 
-class PrimaryCheckbox extends Component {
+class TaskCheckbox extends Component {
   constructor(props) {
     super(props)
     this.state = {
       checked: false,
+      isLoading: false,
     };
   }
 
   handleChange = name => event => {
-    if (this.state.checked === true) {
-      console.log('i just got unchecked!')
-    }
-    this.setState({ [name]: event.target.checked });
     this.props.handleToggle(this.props.label);
+    this.setState({ [name]: event.target.checked });
   };
 
   componentDidMount() {
@@ -32,7 +31,8 @@ class PrimaryCheckbox extends Component {
       <div>
         <FormControlLabel
           control={
-            <Checkbox
+            <Switch
+              disableRipple={true}
               checked={this.state.checked}
               onChange={this.handleChange('checked')}
               value={this.props.label}
@@ -46,4 +46,4 @@ class PrimaryCheckbox extends Component {
   }
 }
 
-export default PrimaryCheckbox;
+export default TaskCheckbox;

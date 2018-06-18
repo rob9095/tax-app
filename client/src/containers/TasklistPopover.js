@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import Paper from 'material-ui/Paper';
 import Typography from 'material-ui/Typography';
-import PrimaryCheckbox from './Checkbox';
+import TaskCheckbox from './TaskCheckbox';
 import CloseIcon from '@material-ui/icons/Close';
 
 const styles = theme => ({
@@ -50,7 +50,7 @@ class TasklistPopover extends Component {
         )
     }
     let checkboxes = this.state.tasks.map(t=>(
-      <PrimaryCheckbox
+      <TaskCheckbox
         key={t}
         label={t}
         handleToggle={this.handleCheckmarkToggle}

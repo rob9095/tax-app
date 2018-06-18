@@ -562,6 +562,7 @@ class ProjectTableHead extends Component {
         <TableRow>
           <TableCell padding="checkbox">
             <Checkbox
+              disableRipple={true}
               indeterminate={numSelected > 0 && numSelected < rowCount}
               checked={numSelected === rowCount}
               onChange={onSelectAllClick}

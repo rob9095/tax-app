@@ -109,13 +109,13 @@ class Dashboard extends Component {
               />
             </div>
           )}
-          {/* <EnhancedTable
+          <EnhancedTable
             projectData={projects}
             onTogglePopover={this.togglePopover}
             lastCheckedTask={this.state.currentTaskName}
             removeTask={this.state.removeTask}
-          /> */}
-          <ProjectTablev2 projectData={projects} />
+          />
+          {/* <ProjectTablev2 projectData={projects} /> */}
     		</div>
     	);
     }

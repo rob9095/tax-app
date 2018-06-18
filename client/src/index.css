@@ -311,7 +311,7 @@ ul.invite-list li span {
 ul.view-list {
     margin-top: -10px;
     margin-left: -60px;
-    width: 300px;;
+    min-width: 300px;
 }
 
 ul.view-list li {

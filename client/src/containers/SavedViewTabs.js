@@ -29,7 +29,7 @@ const styles = theme => ({
     maxHeight: 700,
   },
   container: {
-    margin: '0 auto 0 40px',
+    margin: '0 auto',
   },
   noResults: {
     display: 'flex',
@@ -80,7 +80,7 @@ class SavedViewTabs extends React.Component {
         <div className={classes.root}>
           <Paper className={classes.root} elevation={0}>
             <AppBar color="inherit" position="static" elevation={0}>
-              <Tabs value={value} onChange={this.handleChange}>
+              <Tabs fullWidth={true} value={value} onChange={this.handleChange}>
                 <Tab label="My Views" />
                 <Tab label="Shared Views" />
               </Tabs>
