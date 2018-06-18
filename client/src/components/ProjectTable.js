@@ -118,9 +118,9 @@ class EnhancedTable extends React.Component {
     // generate the data and save it to state
     let projects = this.props.projects.projectsInDB;
     //console.log(projects)
-    let formattedProjectData = [];
+    //let formattedProjectData = [];
 
-    projects.forEach(p => {
+    let formattedProjectData = projects.map(p => {
       let clientNames = this.sanitizeName(p.name)
       let ipTaskDate, piTaskDate, fpTaskDate, pTaskDate, feTaskDate, crTaskDate = false;
       let ipInitialPaymentDate, ipInitialPaymentCompleted, ipInitialPaymentRecievedDate, ipInitialPaymentRecievedCompleted, piGettingStartedDate, piGettingStartedCompleted, piTaxOrganizerDate, piTaxOrganizerCompleted, piQTravelWorksheetDate, piQTravelWorksheetCompleted, piQFbarDate, piQFbarCompleted, piQForm5471Date, piQForm5471Completed, piQScheduleADate, piQScheduleACompleted, piQScheduleCDate, piQScheduleCCompleted, piQScheduleDDate, piQScheduleDCompleted, piQScheduleEDate, piQScheduleECompleted, pClientWelcomeCallDate, pClientWelcomeCallCompleted, pAuditProtectionDate, pAuditProtectionCompleted,pWorkPaperPrepDate, pWorkPaperPrepCompleted, pDataEntryDate, pDataEntryCompleted, pDataEntryReviewDate, pDataEntryReviewCompleted = false;
@@ -328,7 +328,7 @@ class EnhancedTable extends React.Component {
         }
 
       }
-      let formattedProject = {
+      return {
         id: p.teamwork_id,
         projectName: p.name,
         preparer: p.preparer ? p.preparer : 'N/A',
@@ -469,7 +469,7 @@ class EnhancedTable extends React.Component {
           completed: feCloseEngagementCompleted,
         },
       }
-      formattedProjectData.push(formattedProject);
+      //formattedProjectData.push(formattedProject);
     })
     console.log(formattedProjectData)
     this.setState({
@@ -582,6 +582,7 @@ class EnhancedTable extends React.Component {
   };
 
   isSelected = id => this.state.selected.indexOf(id) !== -1;
+  
 
   handleShowSaveModal = () => {
     this.setState({

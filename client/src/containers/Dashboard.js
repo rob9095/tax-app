@@ -7,6 +7,7 @@ import EnhancedTable from '../components/ProjectTable';
 import ProjectChart from '../components/ProjectChart';
 import TasklistPopover from '../containers/TasklistPopover';
 import OnBoardingTabs from '../containers/OnBoardingTabs';
+import ProjectTablev2 from '../components/ProjectTablev2'
 
 class Dashboard extends Component {
     constructor(props) {
@@ -108,12 +109,13 @@ class Dashboard extends Component {
               />
             </div>
           )}
-          <EnhancedTable
+          {/* <EnhancedTable
             projectData={projects}
             onTogglePopover={this.togglePopover}
             lastCheckedTask={this.state.currentTaskName}
             removeTask={this.state.removeTask}
-          />
+          /> */}
+          <ProjectTablev2 projectData={projects} />
     		</div>
     	);
     }

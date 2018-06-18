@@ -9,6 +9,7 @@ import { FormControl, FormHelperText } from 'material-ui/Form';
 import Paper from 'material-ui/Paper';
 import Input from 'material-ui/Input';
 import Button from 'material-ui/Button';
+import Avatar from 'material-ui/Avatar';
 import CloseIcon from '@material-ui/icons/Close';
 import OnBoardingTabs from '../containers/OnBoardingTabs';
 import InviteUserModal from '../containers/InviteUserModal';
@@ -20,6 +21,11 @@ const styles = theme => ({
   button: {
     margin: theme.spacing.unit,
     marginTop: 20,
+  },
+  avatar: {
+    width: 100,
+    height: 100,
+    margin: '0 auto',
   }
 });
 
@@ -35,6 +41,10 @@ class AccountPage extends Component {
         passwordCheck: '',
         modalOpen: false,
       };
+    }
+
+    componentDidMount() {
+      this.closeErrors()
     }
 
     handleChange = e => {
@@ -114,6 +124,11 @@ class AccountPage extends Component {
                   <CloseIcon onClick={this.closeErrors} color="primary" className="alert-close" />
                 </Paper>
               )}
+              <Avatar
+                alt={currentUser.user.username}
+                src={currentUser.user.profileImageUrl}
+                className={classes.avatar}
+              />
               <FormControl>
                 <FormHelperText id="email-helper">Email</FormHelperText>
                 <Input

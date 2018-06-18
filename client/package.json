@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@material-ui/icons": "^1.0.0-beta.43",
+    "antd": "^3.6.2",
     "axios": "^0.18.0",
     "chart.js": "^2.7.2",
     "chartjs-plugin-datalabels": "^0.3.0",
