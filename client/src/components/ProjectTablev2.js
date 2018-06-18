@@ -4,7 +4,9 @@
   var moment = require('moment');
   moment().format();
 
-  const columns = [ { dataIndex: 'projectName',
+  const columns = [ {
+      dataIndex: 'projectName',
+      className: 'project-table-head',
       key: 'projectName',
       hdataIndexden: false,
       numeric: false,

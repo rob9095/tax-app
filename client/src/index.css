@@ -28,8 +28,8 @@ input:disabled, textarea:disabled {
 
 /* Dashboard & Project Table */
 
-.ant-table-thead > tr > th, .ant-table-tbody > tr > td {
-  word-break: inherit;
+.th.project-table-head {
+  min-width: 80px;
 }
 
 .chart-container {
