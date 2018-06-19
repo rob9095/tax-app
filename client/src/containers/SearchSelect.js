@@ -64,6 +64,13 @@ class SearchSelect extends React.Component {
     this.props.onSearchMenuItemSelect(searchArr, event.nativeEvent.target.firstChild.data, this.props.column);
   };
 
+  componentWillReceiveProps(newProps) {
+    if (newProps.currentFilters.length === 0 && this.props.currentFilters.length > 1) {}
+    this.setState({
+      val: [],
+    })
+  }
+
   componentDidMount(){
     if (this.props.currentFilters.length > 0) {
       let vals = this.props.currentFilters.map(f => (f.value))

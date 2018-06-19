@@ -484,7 +484,7 @@ class EnhancedTable extends React.Component {
 
   handleShowTasklistTask = (task) => {
 
-    let updatedData = this.state.data
+    let updatedData = this.state.dataCopy
     updatedData.forEach(p => {
       p[task].hidden = !p[task].hidden
       // console.log(p[task].hidden)
@@ -499,6 +499,7 @@ class EnhancedTable extends React.Component {
     // });
     this.setState({
       data: updatedData,
+      dataCopy: updatedData,
       lastCheckedTask: task,
     })
   }
@@ -536,6 +537,7 @@ class EnhancedTable extends React.Component {
     // })
     this.setState({
       data,
+      dataCopy: data,
       order,
       orderBy });
   };
@@ -643,6 +645,13 @@ class EnhancedTable extends React.Component {
         this.handleRequestSort(null, view.headerState.currentColumn, false, view)
       }
     }
+    if (view.bodyState.currentFilters.length > 0) {
+      console.log('we need to filter!')
+      this.handleTableSearch(view.bodyState.currentFilters);
+    } else {
+      console.log('we need to remove filters and requery fresh data')
+      this.handleTableSearch([], 'clearFilters');
+    }
   }
 
   handleTableSearch = (searchArr, removeFilter) => {
@@ -650,10 +659,12 @@ class EnhancedTable extends React.Component {
     console.log(searchArr)
     let results = [];
     let filters = this.state.currentFilters.filter(f => f.value !== removeFilter);
+    removeFilter === 'clearFilters' ? filters = [] : null
     console.log(`the current filters are`)
     console.log(filters)
     if (searchArr.length === 0 && filters.length === 0) {
       console.log(`we have no search items or filters, resetting data!`)
+      console.log(this.state.dataCopy)
       this.setState({
         data: this.state.dataCopy,
         currentFilters: [],

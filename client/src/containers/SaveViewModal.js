@@ -121,6 +121,7 @@ class SaveViewModal extends Component {
     delete tableHeadState.currentEvent;
     delete tableHeadState.columnData;
     delete tableBodyState.data;
+    delete tableBodyState.dataCopy;
     delete tableBodyState.getHeaderState;
     delete tableBodyState.showSaveModal;
     delete tableBodyState.headState;
