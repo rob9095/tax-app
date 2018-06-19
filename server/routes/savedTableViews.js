@@ -1,9 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const { getSavedTableViews, addSavedTableView, removeSavedTableView, toggleSharedView } = require('../handlers/savedTableViews');
+const { getSavedTableViews, addSavedTableView, removeSavedTableView, toggleSharedView, setDefaultView } = require('../handlers/savedTableViews');
 
 // add saved table view -> /api/saved-views
 router.post('/', addSavedTableView);
+
+// set a default view -> /api/saved-views/default
+router.post('/default', setDefaultView)
 
 // toggle isShared value for view -> /api/saved-views/share
 router.post('/share', toggleSharedView);

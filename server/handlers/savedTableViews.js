@@ -46,6 +46,11 @@ exports.removeSavedTableView = async (req, res, next) => {
         message: 'View not found',
       })
     }
+    let foundUserDefaultView = await db.User.find({defaultView: req.params.view_id})
+    if (foundUserDefaultView !== null) {
+      foundUserDefaultView.defaultView = null;
+      await foundUserDefaultView.save();
+    }
     await foundView.remove();
     return res.status(200).json(foundView)
   } catch(err) {
@@ -70,6 +75,30 @@ exports.toggleSharedView = async (req, res, next) => {
     }
     foundView.isShared = !foundView.isShared;
     await foundView.save();
+    return res.status(200).json(foundView)
+  } catch(err) {
+    return next(err);
+  }
+}
+
+exports.setDefaultView = async (req, res, next) => {
+  try {
+    let foundView = await db.SavedTableView.findById(req.body.viewId);
+    if (foundView === null) {
+      return next({
+        status: 400,
+        message: 'View not found',
+      })
+    }
+    let foundUser = await db.User.findById(req.body.userId);
+    if (foundUser === null) {
+      return next({
+        status: 400,
+        message: 'Unable to save default view',
+      })
+    }
+    foundUser.defaultView = foundView._id
+    await foundUser.save();
     return res.status(200).json(foundView)
   } catch(err) {
     return next(err);

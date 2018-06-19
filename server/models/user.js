@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const SavedTableView = require('./savedTableView');
+const bcrypt = require('bcrypt');
 
 const userSchema = new mongoose.Schema({
 	email: {
@@ -34,6 +35,10 @@ const userSchema = new mongoose.Schema({
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'SavedTableView',
 	}],
+	defaultView: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: 'SavedTableView',
+	},
 });
 
 userSchema.pre('save', async function(next) {

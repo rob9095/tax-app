@@ -326,6 +326,7 @@ ul.view-list li {
     align-items: center;
     justify-content: space-between;
     min-height: 35px;
+    min-width: 400px;
 }
 
 ul.view-list li:hover {
@@ -334,7 +335,7 @@ ul.view-list li:hover {
     border-radius: 5px;
 }
 
-ul.view-list li span.share {
+ul.view-list li span.default {
   margin-left: auto;
 }
 
@@ -362,6 +363,10 @@ ul.view-list li.username {
 }
 
 .shared-view-container span.title.share {
+    margin-right: -18px;
+}
+
+.shared-view-container span.title.default {
     margin-left: auto;
     text-align: center;
 }
@@ -380,4 +385,8 @@ ul.view-list li.username {
 
 svg.share.filled {
     color: #6c0e0f;
+}
+
+svg.star.filled {
+    color: #ffa500;
 }

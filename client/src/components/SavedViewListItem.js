@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { handleSavedViewDisplay, clearSavedViewDisplay } from '../store/actions/savedTableView';
+import { handleSavedViewDisplay, clearSavedViewDisplay, setDefaultView } from '../store/actions/savedTableView';
 import { deleteSavedTableView, toggleSharedView } from '../store/actions/savedTableViews';
 import IconButton from 'material-ui/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
 import FavoriteIcon from '@material-ui/icons/Favorite';
+import StarIcon from '@material-ui/icons/Star';
 import Tooltip from 'material-ui/Tooltip';
 
 class SavedViewListItem extends Component {
@@ -35,15 +36,39 @@ class SavedViewListItem extends Component {
     this.props.handleSavedViewDisplay(this.props.view);
   }
 
+  handleSetDefaultView = (e) => {
+    const userId = this.props.currentUser.user.id
+    const viewId = this.props.view._id
+    this.props.setDefaultView({
+      userId,
+      viewId,
+    })
+    e.stopPropagation();
+  }
+
   render() {
     const { view, sharedView, isShared } = this.props;
+    const isDefault = this.props.currentUser.user.defaultView === view._id
     return(
       <li
         onClick={this.handleClick}
       >
         <span className="title">{view.title}</span>
-        {sharedView ?
+        {sharedView && (
           <span className="username">{view.username}</span>
+        )}
+        <span className="default">
+          <Tooltip title={isDefault ? 'Remove Default View' : 'Set Default View'}>
+            <IconButton
+              onClick={this.handleSetDefaultView}
+              aria-label={isDefault ? 'Remove Default View' : 'Set Default View'}
+              >
+              {isDefault ? <StarIcon className="star filled" /> : <StarIcon /> }
+            </IconButton>
+          </Tooltip>
+        </span>
+        {sharedView ?
+          null
           :
           <span className="share">
           <Tooltip title={isShared ? 'Un Share' : 'Share'}>
@@ -87,4 +112,4 @@ function mapStateToProps(state) {
 	};
 }
 
-export default connect(mapStateToProps, { handleSavedViewDisplay, clearSavedViewDisplay, deleteSavedTableView, toggleSharedView })(SavedViewListItem);
+export default connect(mapStateToProps, { handleSavedViewDisplay, clearSavedViewDisplay, deleteSavedTableView, toggleSharedView, setDefaultView })(SavedViewListItem);

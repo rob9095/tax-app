@@ -90,6 +90,7 @@ class SavedViewTabs extends React.Component {
                 <ul className="view-list">
                   <div className="shared-view-container">
                     <span className="title name">Title</span>
+                    <span className="title default">Default</span>
                     <span className="title share">Share</span>
                     <span className="title trash">Trash</span>
                   </div>
@@ -102,6 +103,7 @@ class SavedViewTabs extends React.Component {
                 <div className="shared-view-container">
                   <span className="title">Title</span>
                   <span className="title username">Saved By</span>
+                  <span className="title default">Default</span>
                 </div>
                 <ul className="view-list">
                   {views.length > 0 ? views : <span className={classes.noResults}>No views found</span>}

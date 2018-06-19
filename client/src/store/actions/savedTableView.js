@@ -1,5 +1,6 @@
 import { addError, removeError } from './errors';
-import { LOAD_SAVED_VIEW, CLEAR_SAVED_VIEW } from '../actionTypes';
+import { apiCall } from '../../services/api';
+import { LOAD_SAVED_VIEW, CLEAR_SAVED_VIEW, LOAD_DEFAULT_VIEW } from '../actionTypes';
 
 export const clearDisplayView = (id) => ({
   type: CLEAR_SAVED_VIEW,
@@ -9,6 +10,11 @@ export const clearDisplayView = (id) => ({
 export const displayView = (view) => ({
   type: LOAD_SAVED_VIEW,
   view
+})
+
+export const loadDefaultView = (id) => ({
+  type: LOAD_DEFAULT_VIEW,
+  id
 })
 
 export function clearSavedViewDisplay(view) {
@@ -36,6 +42,22 @@ export function handleSavedViewDisplay(view) {
         dispatch(addError('Please try again'))
         reject();
       }
+    })
+  }
+}
+
+export function setDefaultView(data) {
+  return dispatch => {
+    return new Promise((resolve,reject) => {
+      return apiCall('post', `/api/saved-views/default`, data)
+      .then((view)=>{
+        dispatch(loadDefaultView(view._id))
+        resolve(view)
+      })
+      .catch((err)=>{
+        dispatch(addError(err.message))
+        reject(err);
+      })
     })
   }
 }
