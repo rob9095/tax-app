@@ -9,7 +9,6 @@ import Paper from 'material-ui/Paper';
 import Tabs, { Tab } from 'material-ui/Tabs';
 import Typography from 'material-ui/Typography';
 import SavedViewListItem from '../components/SavedViewListItem';
-import ListDemo from './ListDemo';
 import List, { ListItem, ListItemText } from 'material-ui/List';
 
 function TabContainer(props) {
@@ -60,7 +59,7 @@ class SavedViewTabs extends React.Component {
     }}
     let views = value === 0 ?
       savedViews.map(v => (
-        <ListDemo
+        <SavedViewListItem
           key={v._id}
           view={v}
           sharedView={false}
@@ -70,7 +69,7 @@ class SavedViewTabs extends React.Component {
       :
       sharedViews.filter(v => v.username !== this.props.currentUser.user.username)
       .map(v => (
-        <ListDemo
+        <SavedViewListItem
           key={v._id}
           view={v}
           sharedView={true}

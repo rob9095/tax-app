@@ -12,7 +12,6 @@ import Typography from 'material-ui/Typography';
 import Modal from 'material-ui/Modal';
 import Button from 'material-ui/Button';
 import Input from 'material-ui/Input';
-import SavedViewListItem from '../components/SavedViewListItem';
 import SavedViewTabs from './SavedViewTabs';
 
 function rand() {
@@ -36,7 +35,6 @@ const styles = theme => ({
     width: theme.spacing.unit * 50,
     minWidth: 500,
     backgroundColor: theme.palette.background.paper,
-    boxShadow: theme.shadows[5],
     padding: theme.spacing.unit * 4,
     maxHeight: 800,
     overflowY: 'auto',

@@ -1,19 +1,29 @@
-import React, { Component } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
+import { withStyles } from 'material-ui/styles';
 import { connect } from 'react-redux';
 import { handleSavedViewDisplay, clearSavedViewDisplay, setDefaultView } from '../store/actions/savedTableView';
 import { deleteSavedTableView, toggleSharedView } from '../store/actions/savedTableViews';
+import List, { ListItem, ListItemSecondaryAction, ListItemText } from 'material-ui/List';
+import Avatar from 'material-ui/Avatar';
 import IconButton from 'material-ui/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import StarIcon from '@material-ui/icons/Star';
 import Tooltip from 'material-ui/Tooltip';
 
-class SavedViewListItem extends Component {
+const styles = theme => ({
+  root: {
+    width: '100%',
+    maxWidth: 360,
+    backgroundColor: theme.palette.background.paper,
+  },
+});
+
+class SavedViewListItem extends React.Component {
   constructor(props) {
     super(props)
-    this.state = {
-      deleteClicked: false,
-    };
+    this.state = {};
     this.handleClick = this.handleClick.bind(this);
   }
 
@@ -49,15 +59,20 @@ class SavedViewListItem extends Component {
   render() {
     const { view, sharedView, isShared } = this.props;
     const isDefault = this.props.currentUser.user.defaultView === view._id
-    return(
-      <li
+    return (
+      <ListItem
+        className="view-item"
         onClick={this.handleClick}
-      >
-        <span className="title">{view.title}</span>
-        {sharedView && (
-          <span className="username">{view.username}</span>
-        )}
-        <span className="default">
+        key={view._id}
+        disableGutters={true}
+        dense
+        button
+        >
+          {sharedView && (<Avatar alt={view.username} src={view.profileImageUrl} />)}
+          <ListItemText
+            primary={view.title}
+            secondary={sharedView && (view.username)}
+          />
           <Tooltip title={isDefault ? 'Remove Default View' : 'Set Default View'}>
             <IconButton
               onClick={this.handleSetDefaultView}
@@ -66,39 +81,30 @@ class SavedViewListItem extends Component {
               {isDefault ? <StarIcon className="star filled" /> : <StarIcon /> }
             </IconButton>
           </Tooltip>
-        </span>
-        {sharedView ?
-          null
-          :
-          <span className="share">
-          <Tooltip title={isShared ? 'Un Share' : 'Share'}>
-            <IconButton
-              onClick={this.handleShareClick}
-              aria-label={isShared ? 'Un Share' : 'Share'}
-              >
-              <FavoriteIcon
-                className={isShared ? 'share filled' : null}
-              />
-            </IconButton>
-          </Tooltip>
-          </span>
-        }
-        {sharedView ?
-          null
-          :
-          <span className="delete">
-          <Tooltip title="Delete">
-            <IconButton
-              onClick={this.handleDelete}
-              aria-label="Delete"
-              >
-              <DeleteIcon />
-            </IconButton>
-          </Tooltip>
-          </span>
-        }
-      </li>
-    )
+          {!sharedView && (
+              <Tooltip title={isShared ? 'Un Share' : 'Share'}>
+                <IconButton
+                  onClick={this.handleShareClick}
+                  aria-label={isShared ? 'Un Share' : 'Share'}
+                  >
+                  <FavoriteIcon
+                    className={isShared ? 'share filled' : null}
+                  />
+                </IconButton>
+              </Tooltip>
+            )}
+            {!sharedView && (
+              <Tooltip title="Delete">
+                <IconButton
+                  onClick={this.handleDelete}
+                  aria-label="Delete"
+                  >
+                  <DeleteIcon />
+                </IconButton>
+              </Tooltip>
+            )}
+      </ListItem>
+    );
   }
 }
 

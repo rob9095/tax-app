@@ -643,10 +643,6 @@ class EnhancedTable extends React.Component {
         this.handleRequestSort(null, view.headerState.currentColumn, false, view)
       }
     }
-    if (view.bodyState.currentFilters.length > 0) {
-      console.log('we need to filter!')
-      this.handleTableSearch(view.bodyState.currentFilters);
-    }
   }
 
   handleTableSearch = (searchArr, removeFilter) => {
