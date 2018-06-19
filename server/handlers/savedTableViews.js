@@ -46,11 +46,7 @@ exports.removeSavedTableView = async (req, res, next) => {
         message: 'View not found',
       })
     }
-    let foundUserDefaultView = await db.User.find({defaultView: req.params.view_id})
-    if (foundUserDefaultView !== null) {
-      foundUserDefaultView.defaultView = null;
-      await foundUserDefaultView.save();
-    }
+    // need way to remove any default view from users here
     await foundView.remove();
     return res.status(200).json(foundView)
   } catch(err) {

@@ -20,6 +20,9 @@ const SavedTableViewSchema = new mongoose.Schema({
   username: {
     type: String,
   },
+  profileImageUrl: {
+		type: String,
+	},
   headerState: {
     type: mongoose.Schema.Types.Mixed,
     required: true,

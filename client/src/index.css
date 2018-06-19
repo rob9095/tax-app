@@ -314,6 +314,17 @@ ul.invite-list li span {
 
 /* Saved Views Modal List */
 
+span.view-header {
+  font-size: small;
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+.view-header h3 {
+  font-size: small;
+  font-weight: bold;
+}
+
 ul.view-list {
     margin-top: -10px;
     margin-left: -60px;

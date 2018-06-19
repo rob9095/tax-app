@@ -9,6 +9,8 @@ import Paper from 'material-ui/Paper';
 import Tabs, { Tab } from 'material-ui/Tabs';
 import Typography from 'material-ui/Typography';
 import SavedViewListItem from '../components/SavedViewListItem';
+import ListDemo from './ListDemo';
+import List, { ListItem, ListItemText } from 'material-ui/List';
 
 function TabContainer(props) {
   return (
@@ -58,7 +60,7 @@ class SavedViewTabs extends React.Component {
     }}
     let views = value === 0 ?
       savedViews.map(v => (
-        <SavedViewListItem
+        <ListDemo
           key={v._id}
           view={v}
           sharedView={false}
@@ -68,7 +70,7 @@ class SavedViewTabs extends React.Component {
       :
       sharedViews.filter(v => v.username !== this.props.currentUser.user.username)
       .map(v => (
-        <SavedViewListItem
+        <ListDemo
           key={v._id}
           view={v}
           sharedView={true}
@@ -87,27 +89,34 @@ class SavedViewTabs extends React.Component {
             </AppBar>
             {value === 0 &&
               <TabContainer>
-                <ul className="view-list">
-                  <div className="shared-view-container">
-                    <span className="title name">Title</span>
-                    <span className="title default">Default</span>
-                    <span className="title share">Share</span>
-                    <span className="title trash">Trash</span>
-                  </div>
+                <List>
+                  <ListItem
+                    key="header"
+                    disableGutters={true}
+                    dense
+                    >
+                    <ListItemText className="view-header" primary="Title" />
+                    <span className="view-header">Default</span>
+                    <span className="view-header">Share</span>
+                    <span className="view-header">Trash</span>
+                  </ListItem>
                   {views.length > 0 ? views : <span className={classes.noResults}>No views found</span>}
-                </ul>
+                </List>
               </TabContainer>
             }
             {value === 1 &&
               <TabContainer>
-                <div className="shared-view-container">
-                  <span className="title">Title</span>
-                  <span className="title username">Saved By</span>
-                  <span className="title default">Default</span>
-                </div>
-                <ul className="view-list">
+                <List>
+                  <ListItem
+                    key="header"
+                    disableGutters={true}
+                    dense
+                    >
+                    <ListItemText className="view-header" primary="Saved By" />
+                    <span className="view-header">Default</span>
+                  </ListItem>
                   {views.length > 0 ? views : <span className={classes.noResults}>No views found</span>}
-                </ul>
+                </List>
               </TabContainer>
             }
           </Paper>

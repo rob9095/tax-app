@@ -134,6 +134,7 @@ class SaveViewModal extends Component {
       title: this.state.title,
       user: this.props.currentUser.user.id,
       username: this.props.currentUser.user.username,
+      profileImageUrl: this.props.currentUser.user.profileImageUrl,
       headerState: tableHeadState,
       bodyState: tableBodyState,
     }
