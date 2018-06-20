@@ -24,6 +24,20 @@ exports.addSavedTableView = async (req, res, next) => {
   }
 }
 
+// return a users default view
+exports.getUserDefaultView = async (req, res, next) => {
+  try {
+    const user = await db.User.findById(req.params.user_id)
+    let view = {};
+    if (user !== null) {
+      view = await db.SavedTableView.findById(user.defaultView)
+    }
+    return res.status(200).json(view)
+  } catch(err) {
+    return next(err);
+  }
+}
+
 // return all saved views for a user or shared views
 exports.getSavedTableViews = async (req, res, next) => {
   try {

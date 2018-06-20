@@ -1,6 +1,6 @@
 import { addError, removeError } from './errors';
 import { apiCall } from '../../services/api';
-import { LOAD_SAVED_VIEW, CLEAR_SAVED_VIEW, LOAD_DEFAULT_VIEW } from '../actionTypes';
+import { LOAD_SAVED_VIEW, CLEAR_SAVED_VIEW, LOAD_DEFAULT_VIEW, LOAD_FULL_DEFAULT_VIEW } from '../actionTypes';
 
 export const clearDisplayView = (id) => ({
   type: CLEAR_SAVED_VIEW,
@@ -15,6 +15,11 @@ export const displayView = (view) => ({
 export const loadDefaultView = (id) => ({
   type: LOAD_DEFAULT_VIEW,
   id
+})
+
+export const loadFullDefaultView = (view) => ({
+  type: LOAD_FULL_DEFAULT_VIEW,
+  view
 })
 
 export function clearSavedViewDisplay(view) {
@@ -51,7 +56,24 @@ export function setDefaultView(data) {
     return new Promise((resolve,reject) => {
       return apiCall('post', `/api/saved-views/default`, data)
       .then((view)=>{
-        dispatch(loadDefaultView(view._id))
+        //dispatch(loadDefaultView(view._id))
+        dispatch(loadFullDefaultView(view))
+        resolve(view)
+      })
+      .catch((err)=>{
+        dispatch(addError(err.message))
+        reject(err);
+      })
+    })
+  }
+}
+
+export function fetchDefaultView(user_id) {
+  return dispatch => {
+    return new Promise((resolve,reject) => {
+      return apiCall('get', `/api/saved-views/default/${user_id}`)
+      .then((view)=>{
+        dispatch(loadFullDefaultView(view))
         resolve(view)
       })
       .catch((err)=>{

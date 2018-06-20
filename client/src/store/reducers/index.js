@@ -8,6 +8,7 @@ import tableHeadState from './tableHeadState';
 import savedViews from './savedViews';
 import sharedViews from './sharedViews';
 import savedView from './savedView';
+import defaultView from './defaultView';
 
 const rootReducer = combineReducers({
 	currentUser,
@@ -19,6 +20,7 @@ const rootReducer = combineReducers({
 	savedViews,
 	sharedViews,
 	savedView,
+	defaultView,
 });
 
 export default rootReducer;

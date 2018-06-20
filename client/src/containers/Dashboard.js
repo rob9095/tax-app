@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { logout } from '../store/actions/auth';
 import { fetchDBProjects } from '../store/actions/teamworkApi';
+import { fetchDefaultView } from '../store/actions/savedTableView';
 import EnhancedTable from '../components/ProjectTable';
 import ProjectChart from '../components/ProjectChart';
 import TasklistPopover from '../containers/TasklistPopover';
@@ -19,6 +20,7 @@ class Dashboard extends Component {
         removeTask: false,
         toggleCount: 0,
         isLoading: true,
+        loadDefaultView: true,
       };
     }
 
@@ -29,6 +31,14 @@ class Dashboard extends Component {
           this.setState({
             isLoading: false,
           })
+        })
+        this.props.fetchDefaultView(this.props.currentUser.user.id)
+        .then((view)=>{
+          if (view !== null || view !== undefined) {
+            this.setState({
+              loadDefaultView: true,
+            })
+          }
         })
       }
     }
@@ -114,6 +124,7 @@ class Dashboard extends Component {
             onTogglePopover={this.togglePopover}
             lastCheckedTask={this.state.currentTaskName}
             removeTask={this.state.removeTask}
+            loadDefaultView={this.state.loadDefaultView}
           />
           {/* <ProjectTablev2 projectData={projects} /> */}
     		</div>
@@ -129,4 +140,4 @@ function mapStateToProps(state) {
 	};
 }
 
-export default connect(mapStateToProps, { logout, fetchDBProjects })(Dashboard);
+export default connect(mapStateToProps, { logout, fetchDBProjects, fetchDefaultView })(Dashboard);

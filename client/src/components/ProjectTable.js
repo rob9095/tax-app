@@ -765,6 +765,7 @@ class EnhancedTable extends React.Component {
               onTableSearch={this.handleTableSearch}
               currentFilters={this.state.currentFilters}
               rowsPerPage={this.state.rowsPerPage}
+              loadDefaultView={this.props.loadDefaultView}
             />
             <TableBody>
               {data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(n => {

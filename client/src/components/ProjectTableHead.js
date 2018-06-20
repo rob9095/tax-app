@@ -430,6 +430,26 @@ class ProjectTableHead extends Component {
     this.props.onShowShowTasklistTasks(lastCheckedTask)
   }
 
+  handleViewUpdate = (view, viewTitle) => {
+    console.log(`we confirmed that the new title: ${viewTitle} is different from the last one: ${this.state.savedViewTitle}`)
+    // then clear any tasks if they exist
+    this.state.columnData.forEach(c => {
+      if (c.hidden === false && c.isTask === true) {
+          this.updateColumnData(c.label);
+      }
+    })
+    // show new tasks
+    for (let t of view.headerState.tasks) {
+      this.updateColumnData(t)
+    }
+    this.setState({
+      ...view.headerState,
+      savedViewTitle: viewTitle,
+    })
+    console.log('we updated the view in the header because the title was different')
+    this.props.triggerViewUpdate(view)
+  }
+
   componentWillReceiveProps(newProps) {
     if (newProps.lastCheckedTask !== this.props.lastCheckedTask || newProps.removeTask !== this.props.removeTask) {
       this.updateColumnData(newProps.lastCheckedTask)
@@ -474,23 +494,7 @@ class ProjectTableHead extends Component {
       console.log('we have a saved view(s) available in table header')
       // console.log(newProps.savedView[0].title)
       if (viewTitle !== this.state.savedViewTitle && viewTitle !== undefined) {
-        console.log(`we confirmed that the new title: ${viewTitle} is different from the last one: ${this.state.savedViewTitle}`)
-        // then clear any tasks if they exist
-        this.state.columnData.forEach(c => {
-          if (c.hidden === false && c.isTask === true) {
-              this.updateColumnData(c.label);
-          }
-        })
-        // show new tasks
-        for (let t of view.headerState.tasks) {
-          this.updateColumnData(t)
-        }
-        this.setState({
-          ...view.headerState,
-          savedViewTitle: viewTitle,
-        })
-        console.log('we updated the view in the header because the title was different')
-        this.props.triggerViewUpdate(view)
+        this.handleViewUpdate(view, viewTitle)
       }
     }
   }
@@ -572,6 +576,10 @@ class ProjectTableHead extends Component {
     this.setState({
       columnData: columnData,
     })
+    if (this.props.loadDefaultView) {
+      //display it
+      //this.handleViewUpdate(this.props.defaultView[0], this.props.defaultView[0].title)
+    }
   }
 
   render() {
@@ -663,6 +671,7 @@ function mapStateToProps(state) {
     projects: state.projects,
     tableState: state.tableState,
     savedView: state.savedView,
+    defaultView: state.defaultView,
 	};
 }
 

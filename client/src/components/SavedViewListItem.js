@@ -58,7 +58,7 @@ class SavedViewListItem extends React.Component {
 
   render() {
     const { view, sharedView, isShared } = this.props;
-    const isDefault = this.props.currentUser.user.defaultView === view._id
+    const isDefault = this.props.defaultView ? this.props.defaultView[0].title === view.title : false
     return (
       <ListItem
         className="view-item"
