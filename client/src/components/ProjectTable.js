@@ -499,7 +499,6 @@ class EnhancedTable extends React.Component {
     // });
     this.setState({
       data: updatedData,
-      dataCopy: updatedData,
       lastCheckedTask: task,
     })
   }
@@ -537,7 +536,6 @@ class EnhancedTable extends React.Component {
     // })
     this.setState({
       data,
-      dataCopy: data,
       order,
       orderBy });
   };
@@ -648,7 +646,8 @@ class EnhancedTable extends React.Component {
     if (view.bodyState.currentFilters.length > 0) {
       console.log('we need to filter!')
       this.handleTableSearch(view.bodyState.currentFilters);
-    } else {
+    }
+    else {
       console.log('we need to remove filters and requery fresh data')
       this.handleTableSearch([], 'clearFilters');
     }
