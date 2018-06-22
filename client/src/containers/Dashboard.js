@@ -6,6 +6,7 @@ import { fetchDBProjects } from '../store/actions/teamworkApi';
 import { fetchDefaultView } from '../store/actions/savedTableView';
 import EnhancedTable from '../components/ProjectTable';
 import ProjectChart from '../components/ProjectChart';
+import PreparerPieChart from '../containers/PreparerPieChart';
 import TasklistPopover from '../containers/TasklistPopover';
 import OnBoardingTabs from '../containers/OnBoardingTabs';
 import ProjectTablev2 from '../components/ProjectTablev2'
@@ -108,6 +109,9 @@ class Dashboard extends Component {
             <ProjectChart
               projectData={projects}
              />
+             {/* <PreparerPieChart
+               projectData={projects.projectsInDB}
+             /> */}
           </div>
           {this.state.showPopover && (
             <div className="tasklist-popover">
