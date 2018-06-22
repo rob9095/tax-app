@@ -65,10 +65,11 @@ class SearchSelect extends React.Component {
   };
 
   componentWillReceiveProps(newProps) {
-    if (newProps.currentFilters.length === 0 && this.props.currentFilters.length > 1) {}
-    this.setState({
-      val: [],
-    })
+    if (newProps.currentFilters.length === 0 && this.props.currentFilters.length > 1) {
+      this.setState({
+        val: [],
+      })
+    }
   }
 
   componentDidMount(){

@@ -35,7 +35,7 @@ class Dashboard extends Component {
         })
         this.props.fetchDefaultView(this.props.currentUser.user.id)
         .then((view)=>{
-          if (view !== null || view !== undefined) {
+          if (view !== null && view !== undefined) {
             this.setState({
               loadDefaultView: true,
             })

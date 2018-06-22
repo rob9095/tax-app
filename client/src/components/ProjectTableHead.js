@@ -578,7 +578,9 @@ class ProjectTableHead extends Component {
     })
     if (this.props.loadDefaultView) {
       //display it
-      //this.handleViewUpdate(this.props.defaultView[0], this.props.defaultView[0].title)
+      setTimeout(()=>{
+        this.handleViewUpdate(this.props.defaultView[0], this.props.defaultView[0].title)
+      },250)
     }
   }
 

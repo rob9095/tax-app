@@ -115,6 +115,7 @@ function mapStateToProps(state) {
     tableState: state.tableState,
     savedViews: state.savedViews,
     savedView: state.savedView,
+    defaultView: state.defaultView,
 	};
 }
 
