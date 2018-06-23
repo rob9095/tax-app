@@ -23,8 +23,40 @@ const styles = theme => ({
 class SavedViewListItem extends React.Component {
   constructor(props) {
     super(props)
-    this.state = {};
+    this.state = {
+      isDefault: false,
+      defaultTitle: null,
+    };
     this.handleClick = this.handleClick.bind(this);
+  }
+
+  componentDidMount() {
+    const isDefault = this.props.defaultView[0] !== null ? this.props.defaultView[0].title === this.props.view.title : false
+    if (isDefault) {
+      this.setState({
+        isDefault,
+        defaultTitle: this.props.view.title
+      })
+    }
+  }
+
+  componentWillReceiveProps(newProps) {
+    if (!this.state.isDefault && newProps.defaultView[0] !== null){
+      const isDefault = newProps.defaultView[0].title === this.props.view.title
+      if (isDefault){
+        this.setState({
+          isDefault,
+        })
+      }
+    }
+    if (this.state.isDefault){
+      if (newProps.defaultView[0].title !== this.state.defaultTitle){
+        this.setState({
+          isDefault: false,
+          defaultTitle: null,
+        })
+      }
+    }
   }
 
   handleShareClick = (e) => {
@@ -58,7 +90,7 @@ class SavedViewListItem extends React.Component {
 
   render() {
     const { view, sharedView, isShared } = this.props;
-    const isDefault = this.props.defaultView ? this.props.defaultView[0].title === view.title : false
+    const { isDefault } = this.state;
     return (
       <ListItem
         className="view-item"

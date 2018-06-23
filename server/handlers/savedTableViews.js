@@ -107,7 +107,7 @@ exports.setDefaultView = async (req, res, next) => {
         message: 'Unable to save default view',
       })
     }
-    foundUser.defaultView = foundView._id
+    req.body.remove === true ? foundUser.defaultView = null : foundUser.defaultView = foundView._id
     await foundUser.save();
     return res.status(200).json(foundView)
   } catch(err) {

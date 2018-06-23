@@ -21,7 +21,7 @@ class Dashboard extends Component {
         removeTask: false,
         toggleCount: 0,
         isLoading: true,
-        loadDefaultView: true,
+        loadDefaultView: false,
       };
     }
 
@@ -40,6 +40,7 @@ class Dashboard extends Component {
               loadDefaultView: true,
             })
           }
+          console.log(view)
         })
       }
     }

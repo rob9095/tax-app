@@ -1,6 +1,6 @@
 import { addError, removeError } from './errors';
 import { apiCall } from '../../services/api';
-import { LOAD_SAVED_VIEW, CLEAR_SAVED_VIEW, LOAD_DEFAULT_VIEW, LOAD_FULL_DEFAULT_VIEW } from '../actionTypes';
+import { LOAD_SAVED_VIEW, CLEAR_SAVED_VIEW, LOAD_DEFAULT_VIEW, LOAD_FULL_DEFAULT_VIEW, CLEAR_FULL_DEFAULT_VIEW } from '../actionTypes';
 
 export const clearDisplayView = (id) => ({
   type: CLEAR_SAVED_VIEW,
@@ -20,6 +20,11 @@ export const loadDefaultView = (id) => ({
 export const loadFullDefaultView = (view) => ({
   type: LOAD_FULL_DEFAULT_VIEW,
   view
+})
+
+export const clearFullDefaultView = (id) => ({
+  type: CLEAR_FULL_DEFAULT_VIEW,
+  id
 })
 
 export function clearSavedViewDisplay(view) {
@@ -57,7 +62,7 @@ export function setDefaultView(data) {
       return apiCall('post', `/api/saved-views/default`, data)
       .then((view)=>{
         //dispatch(loadDefaultView(view._id))
-        dispatch(loadFullDefaultView(view))
+        data.remove === true ? dispatch(clearFullDefaultView(view._id)) : dispatch(loadFullDefaultView(view))
         resolve(view)
       })
       .catch((err)=>{
