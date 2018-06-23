@@ -30,34 +30,6 @@ class SavedViewListItem extends React.Component {
     this.handleClick = this.handleClick.bind(this);
   }
 
-  componentDidMount() {
-    const isDefault = this.props.defaultView[0] !== null ? this.props.defaultView[0].title === this.props.view.title : false
-    if (isDefault) {
-      this.setState({
-        isDefault,
-        defaultTitle: this.props.view.title
-      })
-    }
-  }
-
-  componentWillReceiveProps(newProps) {
-    if (!this.state.isDefault && newProps.defaultView[0] !== null){
-      const isDefault = newProps.defaultView[0].title === this.props.view.title
-      if (isDefault){
-        this.setState({
-          isDefault,
-        })
-      }
-    }
-    if (this.state.isDefault){
-      if (newProps.defaultView[0].title !== this.state.defaultTitle){
-        this.setState({
-          isDefault: false,
-          defaultTitle: null,
-        })
-      }
-    }
-  }
 
   handleShareClick = (e) => {
     const viewData = {
@@ -90,7 +62,7 @@ class SavedViewListItem extends React.Component {
 
   render() {
     const { view, sharedView, isShared } = this.props;
-    const { isDefault } = this.state;
+    const isDefault = this.props.defaultView[0] !== null ? this.props.defaultView[0].title === this.props.view.title : false
     return (
       <ListItem
         className="view-item"
