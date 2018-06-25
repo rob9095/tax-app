@@ -77,10 +77,10 @@ class SavedViewListItem extends React.Component {
             primary={view.title}
             secondary={sharedView && (view.username)}
           />
-          <Tooltip title={isDefault ? 'Remove Default View' : 'Set Default View'}>
+          <Tooltip title={isDefault ? '' : 'Set Default View'}>
             <IconButton
               onClick={this.handleSetDefaultView}
-              aria-label={isDefault ? 'Remove Default View' : 'Set Default View'}
+              aria-label={isDefault ? '' : 'Set Default View'}
               >
               {isDefault ? <StarIcon className="star filled" /> : <StarIcon /> }
             </IconButton>

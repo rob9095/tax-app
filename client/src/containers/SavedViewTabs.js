@@ -90,6 +90,7 @@ class SavedViewTabs extends React.Component {
               <TabContainer>
                 <List>
                   <ListItem
+                    className="view-item"
                     key="header"
                     disableGutters={true}
                     dense
@@ -107,6 +108,7 @@ class SavedViewTabs extends React.Component {
               <TabContainer>
                 <List>
                   <ListItem
+                    className="view-item"
                     key="header"
                     disableGutters={true}
                     dense
