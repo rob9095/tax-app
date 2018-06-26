@@ -60,9 +60,40 @@ exports.removeSavedTableView = async (req, res, next) => {
         message: 'View not found',
       })
     }
-    // need way to remove any default view from users here
-    await foundView.remove();
+    let foundUsers = await db.User.find({defaultView: req.params.view_id})
+    if (foundUsers) {
+      for (let user of foundUsers){
+        user.defaultView = null
+        await user.save();
+      }
+      await foundView.remove();
+    }
     return res.status(200).json(foundView)
+  } catch(err) {
+    return next(err);
+  }
+}
+
+exports.checkDefaultBeforeDelete = async (req, res, next) => {
+  try {
+    let foundUsers = await db.User.find({defaultView: req.body.viewId})
+    let users = foundUsers.filter(u=>u.username !== req.body.username)
+    if (users.length === 0) {
+      return next({
+        status: 200,
+        message: 'no users found'
+      })
+    } else {
+      const userData = users.map(u=>({
+        username: u.username,
+        email: u.mail,
+        profileImageUrl: u.profileImageUrl,
+      }))
+      return res.status(200).json({
+        message: 'users found',
+        userData,
+      })
+    }
   } catch(err) {
     return next(err);
   }

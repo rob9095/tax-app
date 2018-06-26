@@ -364,6 +364,27 @@ ul.view-list li.username {
   padding-right: 10px !important;
 }
 
+.delete-confirm {
+  padding: 10px;
+  margin: 10px auto;
+  text-align: center;
+}
+
+.delete-confirm h4 {
+  font-weight: bold;
+}
+
+.delete-confirm .confirm-option {
+  padding: 5px;
+  margin: 5px;
+  min-width: 45px;
+}
+
+.delete-confirm .confirm-option:hover {
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0.08);
+}
+
 .shared-view-container {
     padding: 5px;
     display: flex;

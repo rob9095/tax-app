@@ -109,3 +109,18 @@ export function toggleSharedView(viewData) {
 		})
 	}
 }
+
+export function checkDefaultViewBeforeDelete(viewData) {
+	return dispatch => {
+		return new Promise((resolve, reject) => {
+			return apiCall('post', `/api/saved-views/check-default`, viewData)
+			.then((res) => {
+				resolve(res);
+			})
+			.catch(err => {
+				dispatch(addError(err.message));
+				reject(err);
+			})
+		})
+	}
+}
