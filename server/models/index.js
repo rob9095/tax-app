@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 mongoose.set('debug', true);
 mongoose.Promise = Promise;
 
-mongoose.connect('mongodb://localhost/tax-app', {
+mongoose.connect('mongodb://localhost/tax-app-testing', {
 	keepAlive: true
 });
 

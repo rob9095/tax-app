@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
-import { logout } from '../store/actions/auth';
 import { fetchAndUpdateCompletedMilestones, fetchAndUpdateTasklists , fetchDBProjects , fetchTeamworkProjectData, updateProjectsDB, getUserProfileImage } from '../store/actions/teamworkApi';
 import { requestAndUpdateTasks } from '../store/actions/tasks';
 import { getMessages, getMessageReplies } from '../store/actions/messages';
@@ -15,11 +13,6 @@ class Setup extends Component {
     constructor(props) {
       super(props);
       this.state = {};
-    }
-
-    logout = e => {
-      e.preventDefault();
-      this.props.logout();
     }
 
     buildProjectData = () => {
@@ -141,4 +134,4 @@ function mapStateToProps(state) {
 	};
 }
 
-export default connect(mapStateToProps, { logout, requestAndUpdateTasks, fetchAndUpdateCompletedMilestones, fetchTeamworkProjectData, updateProjectsDB, fetchDBProjects, fetchAndUpdateTasklists, getMessages, getMessageReplies, getUserProfileImage })(Setup);
+export default connect(mapStateToProps, { requestAndUpdateTasks, fetchAndUpdateCompletedMilestones, fetchTeamworkProjectData, updateProjectsDB, fetchDBProjects, fetchAndUpdateTasklists, getMessages, getMessageReplies, getUserProfileImage })(Setup);

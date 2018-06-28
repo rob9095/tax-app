@@ -26,7 +26,12 @@ class Dashboard extends Component {
     }
 
     componentDidMount() {
-      if(this.props.currentUser.isAuthenticated) {
+      // un-authed user send to root
+      if (!this.props.currentUser.isAuthenticated) {
+        this.props.history.push('/');
+      }
+      // user is authed and setup is complete
+      if(this.props.currentUser.isAuthenticated && this.props.currentUser.user.setupComplete) {
         this.props.fetchDBProjects()
         .then(()=> {
           this.setState({
@@ -42,6 +47,15 @@ class Dashboard extends Component {
           }
           console.log(view)
         })
+      }
+      // user is authed, and super admin and setup is incomplete
+      if (this.props.currentUser.isAuthenticated && !this.props.currentUser.user.setupComplete && this.props.currentUser.user.isSuperAdmin) {
+        this.props.history.push('/setup');
+      }
+      // user is authed, setup is incomplete, they are not super admin
+      if (this.props.currentUser.isAuthenticated && !this.props.currentUser.user.setupComplete && !this.props.currentUser.user.isSuperAdmin) {
+        // send home for now, possibly send to custom page
+        this.props.history.push('/');
       }
     }
 
@@ -98,11 +112,6 @@ class Dashboard extends Component {
           <div>loading...</div>
         )
       }}
-      if(!currentUser.isAuthenticated){
-    		return (
-    			<OnBoardingTabs errors={errors} />
-    		);
-    	}
     	return (
     		<div>
           <h2>Project Dashboard</h2>

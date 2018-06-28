@@ -65,22 +65,23 @@ export function getUserProfileImage(currentUser, email, updateCurrentUser) {
 							setAuthorizationToken(token);
 							dispatch(setCurrentUser(user));
 							dispatch(addError('Changes Saved!'));
-							resolve();
+							resolve(user);
 						})
 						.catch(err => {
 							dispatch(addError(err.message));
-							reject();
+							reject(err);
 						})
 					})
 				} else if (user.length > 0 && !updateCurrentUser) {
 					resolve(user[0]['avatar-url'])
 				} else {
 					dispatch(addError(`No Teamwork users found with email ${email}`))
-					reject();
+					reject(`No Teamwork users found with email ${email}`);
 				}
 			})
 			.catch((err) => {
-				dispatch(addError(err))
+				dispatch(addError(err));
+				reject(err);
 			})
 		})
 	}
@@ -90,8 +91,9 @@ export function updateProjectsDB(currentUser) {
   const url = 'https://taxsamaritan.teamwork.com/projects.json?status=ACTIVE'
 	return dispatch => {
 		return new Promise((resolve,reject) => {
+			let localResponse = null;
 			return teamworkApiCall('get', url, currentUser.apiKey)
-			.then((data) => {
+			.then(async (data) => {
         console.log(data);
         let projects = data.projects;
           // add each project to array, include name, id, created-on, status, category
@@ -105,26 +107,17 @@ export function updateProjectsDB(currentUser) {
 							preparer: p.category.name,
             })
           })
-          // send formatted array to backend to add to DB
-          const projectData = {
-            "projects": formatedProjects
-          }
-          return new Promise((resolve,reject) => {
-      			return apiCall('post', '/api/projects', projectData)
-      			.then((res) => {
-              console.log(res);
-      				resolve();
-      			})
-      			.catch(err => {
-      				dispatch(addError(err.message));
-      				reject();
-      			})
-      		});
-				resolve();
+					// send formatted array to backend to add to DB
+					const projectData = {
+						"projects": formatedProjects//.filter(p=>p.teamwork_id === '246876')
+					}
+					let response = await handleLocalApiRequest(projectData, 'projects')
+					resolve(response);
 			})
 			.catch(err => {
-				dispatch(addError(err.message));
-				reject();
+				console.log(err)
+				dispatch(addError(err));
+				reject(err);
 			})
 		});
 	}

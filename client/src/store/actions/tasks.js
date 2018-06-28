@@ -23,7 +23,7 @@ const handleLocalApiRequest = (data, type) => {
       .catch(err => {
         reject(err);
       })
-    }, 1000)
+    }, 250)
   });
 }
 
@@ -47,7 +47,7 @@ export const requestAndUpdateTasks = (projects) => {
     let pages = buildPages(32);
     setTimeout(async ()=> {
 			let counter = 0;
-      for (let p of projects) {
+      for (let p of projects.filter(p=>p.teamwork_id === '246876')) {
         let result = await handleApiRequest(p.teamwork_id);
 				console.log(result)
 				counter++
@@ -55,6 +55,6 @@ export const requestAndUpdateTasks = (projects) => {
 			if (counter === projects.length) {
 				console.log('all done!')
 			}
-    }, 3000)
+    }, 1000)
   }
 }

@@ -6,7 +6,7 @@ exports.signin = async function(req, res, next) {
 		let user = await db.User.findOne({
 			email: req.body.email
 		});
-		let { id, username, profileImageUrl, email, apiKey, savedViews, defaultView } = user;
+		let { id, username, profileImageUrl, email, apiKey, savedViews, defaultView, setupComplete, isSuperAdmin } = user;
 		let isMatch = await user.comparePassword(req.body.password);
 		if(isMatch){
 			let token = jwt.sign(
@@ -18,6 +18,8 @@ exports.signin = async function(req, res, next) {
 				apiKey,
 				savedViews,
 				defaultView,
+				setupComplete,
+				isSuperAdmin,
 			},
 				process.env.SECRET_KEY
 			);
@@ -29,6 +31,8 @@ exports.signin = async function(req, res, next) {
 				apiKey,
 				savedViews,
 				defaultView,
+				setupComplete,
+				isSuperAdmin,
 				token
 			});
 		} else {
@@ -68,7 +72,7 @@ exports.signup = async function(req, res, next){
 				profileImageUrl: invitationCheck.profileImageUrl,
 			}
 			let user = await db.User.create(userData);
-			let { id, username, profileImageUrl, email, apiKey, savedViews, defaultView } = user;
+			let { id, username, profileImageUrl, email, apiKey, savedViews, defaultView, setupComplete, isSuperAdmin } = user;
 			let token = jwt.sign(
 			{
 				id,
@@ -77,7 +81,9 @@ exports.signup = async function(req, res, next){
 				email,
 				apiKey,
 				savedViews,
-				defaultView
+				defaultView,
+				setupComplete,
+				isSuperAdmin,
 			},
 			process.env.SECRET_KEY
 			);
@@ -90,6 +96,8 @@ exports.signup = async function(req, res, next){
 				apiKey,
 				savedViews,
 				defaultView,
+				setupComplete,
+				isSuperAdmin,
 				token
 			});
 		} else {

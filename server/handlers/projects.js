@@ -8,7 +8,7 @@ const addProject = (project) => {
     try {
       let check = project.name.split('-');
       if (check[0] !== 'Tax') {
-        resolve();
+        resolve('skip');
       }
       let foundProject = await db.Project.findOne({teamwork_id: project.teamwork_id});
       if (foundProject) {
@@ -40,9 +40,9 @@ exports.proccesProjects = async (req, res, next) => {
             preparer: p.preparer,
       }
       let result = await addProject(project);
-      resultsArr.push(result);
+      result === 'skip' ? null : resultsArr.push(result);
     }
-    return res.status(200).json({projectsAdded: [resultsArr], message: `${resultsArr.length} projects were added to the database`})
+    return res.status(200).json({projectsAdded: [...resultsArr], message: `${resultsArr.length} projects were added to the database`})
   } catch(err) {
     return next(err);
   }

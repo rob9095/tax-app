@@ -428,3 +428,70 @@ svg.share.filled {
 svg.star.filled {
     color: #ffa500;
 }
+
+
+/* Setup Page */
+
+.setup-steps {
+  width: 90%;
+}
+
+.setup-steps .action-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.setup-steps span.error {
+  color: #d32f2f;
+  margin-top:10px;
+}
+
+/* API Step 1*/
+.api-form {
+  margin-bottom: 10px !important;
+  display: flex !important;
+  max-width: 300px;
+  align-content: flex-start;
+}
+
+.api-form input {
+  min-width: 300px;
+}
+
+.api-form span {
+    margin-bottom: 10px;
+}
+
+.api-form span.error {
+    color: #d32f2f;
+}
+
+/* Import Projects Step 2*/
+span.error {
+    color: #d32f2f;
+}
+
+/* Setup Page Log */
+.setup-log {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.setup-log ul li.log-item .message {
+  margin-left: -15px;
+}
+
+.setup-log ul li.log-item:nth-child(even) {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+svg.success {
+  color: #43a047;
+}
+
+svg.error {
+  color: #d32f2f;
+}
+
+svg.warning {
+  color: #ffa000;
+}

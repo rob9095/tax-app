@@ -3,6 +3,7 @@ import { Switch, Route, withRouter, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import Dashboard from './Dashboard'
 import Setup from '../components/Setup';
+import SetupSteps from './SetupSteps';
 import AuthForm from '../components/AuthForm';
 import { authUser } from '../store/actions/auth';
 import { removeError } from '../store/actions/errors';
@@ -17,7 +18,7 @@ const Main = props => {
 				<div>
 					<Switch>
 						<Route exact path="/account" render={props => <AccountPage currentUser={currentUser} {...props} />} />
-						<Route exact path="/setup" render={props => <Setup currentUser={currentUser} {...props} />} />
+						<Route exact path="/setup" render={props => <SetupSteps currentUser={currentUser} {...props} />} />
 						<Route exact path="/" render={props => <Dashboard currentUser={currentUser} {...props} />} />
 						<Route exact path="/dashboard" render={props => <Dashboard currentUser={currentUser} {...props} />} />
 						<Route

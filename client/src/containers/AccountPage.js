@@ -45,6 +45,23 @@ class AccountPage extends Component {
 
     componentDidMount() {
       this.closeErrors()
+
+      // un-authed user send to root
+      if (!this.props.currentUser.isAuthenticated) {
+        this.props.history.push('/');
+      }
+
+      // user is authed, and super admin and setup is incomplete
+      if (this.props.currentUser.isAuthenticated && !this.props.currentUser.user.setupComplete && this.props.currentUser.user.isSuperAdmin) {
+        this.props.history.push('/setup');
+      }
+
+      // user is authed, setup is incomplete, they are not super admin
+      if (this.props.currentUser.isAuthenticated && !this.props.currentUser.user.setupComplete && !this.props.currentUser.user.isSuperAdmin) {
+        // send home for now, possibly send to custom page
+        this.props.history.push('/');
+      }
+
     }
 
     handleChange = e => {
@@ -107,11 +124,6 @@ class AccountPage extends Component {
     render() {
       const { editProfile, updatePasswords, username, email, apiKey, password, passwordCheck } = this.state;
       const { classes, currentUser, projects, errors } = this.props;
-      if(!currentUser.isAuthenticated){
-    		return (
-    			<OnBoardingTabs errors={errors} />
-    		);
-    	}
     	return (
         <div>
           <h1>My Account</h1>
