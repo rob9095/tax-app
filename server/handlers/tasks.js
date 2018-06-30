@@ -45,7 +45,7 @@ exports.processTasks = async(req, res, next) => {
       let result = await createTask(formattedTask);
       resultsArr.push(result);
     }
-    return res.status(200).json({tasksAdded: [resultsArr], message: `${resultsArr.length} tasks were added to the Database`})
+    return res.status(200).json({tasksAdded: [...resultsArr], message: `${resultsArr.length} tasks were added to the Database`})
   } catch(err) {
     return next(err);
   }

@@ -123,12 +123,12 @@ export function updateProjectsDB(currentUser) {
 	}
 };
 
-export const fetchAndUpdateTasklists = (id) => {
+export const fetchAndUpdateTasklists = (id, apiKey) => {
     const url = `https://taxsamaritan.teamwork.com/projects/${id}/tasklists.json?status=all`
   	return dispatch => {
   		return new Promise((resolve,reject) => {
-  			return teamworkApiCall('get', url)
-  			.then((data) => {
+  			return teamworkApiCall('get', url, apiKey)
+  			.then(async (data) => {
           let tasklists = data.tasklists;
             let formattedTaskLists = [];
             tasklists.forEach(t => {
@@ -146,22 +146,12 @@ export const fetchAndUpdateTasklists = (id) => {
             const taskListData = {
               "tasklists": formattedTaskLists
             }
-            return new Promise((resolve,reject) => {
-        			return apiCall('post', '/api/tasklists', taskListData)
-        			.then((res) => {
-                console.log(res);
-        				resolve();
-        			})
-        			.catch(err => {
-        				dispatch(addError(err.message));
-        				reject();
-        			})
-        		});
-  				resolve();
+						let response = await handleLocalApiRequest(taskListData, 'tasklists')
+  					resolve(response);
   			})
   			.catch(err => {
   				dispatch(addError(err.message));
-  				reject();
+  				reject(err);
   			})
   		});
   	}

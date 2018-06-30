@@ -37,7 +37,7 @@ exports.processMessageReplies = async (req,res,next) => {
       foundProject.messageReplies = resultsArr;
       foundProject.save();
     }
-    return res.status(200).json({messageRepliesAdded: [resultsArr]})
+    return res.status(200).json({messageRepliesAdded: [...resultsArr]})
   } catch(err) {
     return next(err);
   }

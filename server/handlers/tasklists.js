@@ -37,7 +37,7 @@ exports.proccessTasklists = async (req, res, next) => {
       let result = await addTaskList(tasklist);
       resultsArr.push(result);
     }
-    return res.status(200).json({tasklistsAdded: [resultsArr], message: `${resultsArr.length} tasklists were added to the database`})
+    return res.status(200).json({tasklistsAdded: [...resultsArr], message: `${resultsArr.length} tasklists were added to the database`})
   } catch(err) {
     return next(err);
   }

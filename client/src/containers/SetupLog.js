@@ -10,25 +10,20 @@ import WarningIcon from '@material-ui/icons/Warning';
 class SetupLog extends Component {
   constructor(props){
     super(props);
-    this.state = {
-      results: [],
-    }
+    this.state = {}
   }
 
   render() {
     const { results, activeStep } = this.props
-    if (results.length > 0) {
-      let test = results.map(r=>(
-        r
-      ))
-      console.log(test)
-    }
     let logs = results.map(r=>(
-      <ListItem key={r.teamwork_id} className="log-item">
+      <ListItem key={r.id} className="log-item">
         <ListItemIcon>
           <CheckCircleIcon className="success" />
         </ListItemIcon>
-        <ListItemText className="message" primary={`Project: ${r.name} added succesfully`} secondary={`${r.teamwork_id}`} />
+        <ListItemText
+          className="message"
+          primary={`${r.resultType}: ${r.name} added succesfully ${activeStep >= 4 ? `to ${r.projectName}` : '' }`}
+          secondary={`Teamwork Project ID: ${r.project_id}`} />
       </ListItem>
     ))
     return (

@@ -42,7 +42,7 @@ const handleApiRequest = (project_id,key) => {
 export function getMessages(project_id,key) {
   return async (dispatch) => {
     let result = await handleApiRequest(project_id,key);
-    console.log(result)
+    return result
   }
 }
 
@@ -85,6 +85,6 @@ const handleMessageReplyApiRequest = (project_id,message_id,key) => {
 export function getMessageReplies(project_id,message_id,key) {
   return async (dispatch) => {
     let result = await handleMessageReplyApiRequest(project_id,message_id,key)
-    console.log(result);
+    return result;
   }
 }

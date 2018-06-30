@@ -55,7 +55,7 @@ class Dashboard extends Component {
       // user is authed, setup is incomplete, they are not super admin
       if (this.props.currentUser.isAuthenticated && !this.props.currentUser.user.setupComplete && !this.props.currentUser.user.isSuperAdmin) {
         // send home for now, possibly send to custom page
-        this.props.history.push('/');
+        this.props.history.push('/setup');
       }
     }
 
@@ -110,6 +110,11 @@ class Dashboard extends Component {
       {if (this.state.isLoading && currentUser.isAuthenticated){
         return(
           <div>loading...</div>
+        )
+      }}
+      {if (!currentUser.isAuthenticated){
+        return(
+          <OnBoardingTabs />
         )
       }}
     	return (

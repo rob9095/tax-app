@@ -27,34 +27,18 @@ const handleLocalApiRequest = (data, type) => {
   });
 }
 
-const handleApiRequest = (project_id) => {
+export const requestAndUpdateTasks = (project_id, apiKey) => {
   const url = `https://taxsamaritan.teamwork.com/projects/${project_id}/tasks.json?includeCompletedTasks=true&pageSize=250`
-	return new Promise((resolve,reject) => {
-		return teamworkApiCall('get', url)
-		.then(async (data) => {
-      let result = await handleLocalApiRequest(data, 'tasks');
-      resolve(result);
-		})
-		.catch(err => {
-			reject(err);
-		})
-	});
-}
-
-export const requestAndUpdateTasks = (projects) => {
-  return dispatch => {
-    let results = [];
-    let pages = buildPages(32);
-    setTimeout(async ()=> {
-			let counter = 0;
-      for (let p of projects.filter(p=>p.teamwork_id === '246876')) {
-        let result = await handleApiRequest(p.teamwork_id);
-				console.log(result)
-				counter++
-			}
-			if (counter === projects.length) {
-				console.log('all done!')
-			}
-    }, 1000)
-  }
+	return dispatch => {
+		return new Promise((resolve,reject) => {
+			return teamworkApiCall('get', url, apiKey)
+			.then(async (data) => {
+	      let result = await handleLocalApiRequest(data, 'tasks');
+	      resolve(result);
+			})
+			.catch(err => {
+				reject(err);
+			})
+		});
+	}
 }

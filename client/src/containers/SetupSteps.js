@@ -36,7 +36,7 @@ const styles = theme => ({
 });
 
 function getSteps() {
-  return ['Add Api Key', 'Import Projects', 'Import Tasklists', 'Import Tasks', 'Import Messages & Replies'];
+  return ['Add Api Key', 'Import Projects', 'Import Tasklists', 'Import Tasks', 'Import Messages', 'Import Message Replies'];
 }
 
 class SetupSteps extends React.Component {
@@ -54,6 +54,7 @@ class SetupSteps extends React.Component {
       resultsArr: [],
       showLog: false,
       projectCount: 0,
+      setupComplete: false,
     }
   }
 
@@ -81,11 +82,15 @@ class SetupSteps extends React.Component {
       case 1:
         return 'Import the Teamwork Projects. This might take a few seconds.';
       case 2:
-        return `Import the Teamwork Tasklists for each Project. This will take about ${minutes.toFixed(1)} minutes.`;
+        return `Import the Teamwork Tasklists for each Project. This should take around ${minutes.toFixed(1)} minutes.`;
       case 3:
         // 1.25 seconds for each api call
         minutes = this.state.projectCount / 45
-        return `Import the Teamwork Tasks for each Tasklist/Project. This will take about ${minutes.toFixed(1)} minutes.`
+        return `Import the Teamwork Tasks for each Tasklist/Project. This should take around ${minutes.toFixed(1)} minutes.`
+      case 4:
+        return `Import the Teamwork Message ID's for each Project. This should take around ${minutes.toFixed(1)} minutes.`
+      case 5:
+        return `Import the Replies for each Teamwork Message. This should take around ${minutes.toFixed(1)} minutes.`
       default:
         return 'Unknown step';
     }
@@ -111,7 +116,10 @@ class SetupSteps extends React.Component {
     .then((res)=>{
       // update the account
       this.props.updateUser(user)
-      return res
+      return {
+        res,
+        isComplete: true,
+      }
     })
     .catch((err)=>{
       return {
@@ -125,15 +133,23 @@ class SetupSteps extends React.Component {
   buildProjectData = () => {
     return this.props.updateProjectsDB(this.props.currentUser.user)
     .then((res)=>{
+      const results = res.projectsAdded.map(p=>({
+        resultType: 'Project',
+        name: p.name,
+        project_id: p.teamwork_id,
+        id: p.teamwork_id,
+      }))
       this.setState({
         showLog: true,
-        resultsArr: res.projectsAdded,
+        resultsArr: results,
         projectCount: res.projectsAdded.length,
       })
-      return res
+      return {
+        ...res,
+        isComplete: true,
+      }
     })
     .catch((err)=>{
-      console.log('the .catch got hit')
       return err
     })
 
@@ -145,67 +161,183 @@ class SetupSteps extends React.Component {
     this.props.fetchAndUpdateCompletedMilestones();
   }
 
-  fetchAndUpdateTasks = () => {
-    this.props.requestAndUpdateTasks(this.props.projects.projectsInDB);
+  triggerTaskRequest = (id) => {
+    return new Promise((resolve, reject) => {
+      return setTimeout(()=>{
+        return this.props.requestAndUpdateTasks(id,this.props.currentUser.user.apiKey)
+        .then((data)=>{
+          resolve(data)
+          const results = data.tasksAdded.map(t=>({
+            resultType: 'Task',
+            name: t.content,
+            project_id: t.teamworkProject_id,
+            projectName: t.projectName,
+            id: t.teamwork_id,
+          }))
+          if (this.state.resultsArr.length > 0) {
+            this.setState({
+              resultsArr: [...this.state.resultsArr, ...results],
+            })
+          } else {
+            this.setState({
+              showLog: true,
+              resultsArr: results,
+            })
+          }
+        })
+        .catch((err)=>{
+          reject(err)
+        })
+      }, 1000)
+    })
+  }
+
+  fetchAndUpdateTasks = async() => {
+  	let counter = 0;
+    for (let p of this.props.projects.projectsInDB) {
+      let result = await this.triggerTaskRequest(p.teamwork_id)
+      counter++
+  	}
+    if (counter === this.props.projects.projectsInDB.length) {
+      return {
+        results: this.state.resultsArr,
+        isComplete: true,
+      }
+    }
   }
 
   triggerTaskListRequest = (id) => {
     return new Promise(async (resolve, reject) => {
-      try{
-        setTimeout(() => {
-          this.props.fetchAndUpdateTasklists(id);
-          resolve(id);
-        }, 1000)
-      }catch(err) {
-        reject(err);
-      }
+      return setTimeout(() => {
+        return this.props.fetchAndUpdateTasklists(id, this.props.currentUser.user.apiKey)
+        .then((data)=>{
+          resolve(data)
+          const results = data.tasklistsAdded.map(t=>({
+            resultType: 'Tasklist',
+            name: t.taskName,
+            project_id: t.teamworkProject_id,
+            projectName: t.projectName,
+            id: t.teamwork_id,
+          }))
+          if (this.state.resultsArr.length > 0) {
+            this.setState({
+              resultsArr: [...this.state.resultsArr, ...results],
+            })
+          } else {
+            this.setState({
+              showLog: true,
+              resultsArr: results,
+            })
+          }
+        })
+        .catch((err)=>{
+          reject(err)
+        })
+      }, 1000)
     })
   }
 
-  buildTasklistData = async () => {
+  buildTasklistData = async() => {
+    let counter = 0;
     for (let p of this.props.projects.projectsInDB) {
-      let result = await this.triggerTaskListRequest(p.teamwork_id);
-      console.log(result);
+      let result = await this.triggerTaskListRequest(p.teamwork_id)
+      counter++
+    }
+    if (counter === this.props.projects.projectsInDB.length) {
+      return {
+        results: this.state.resultsArr,
+        isComplete: true,
+      }
     }
   }
 
   triggerGetMessages = (id) => {
     return new Promise(async (resolve, reject) => {
-      try {
-        setTimeout(() => {
-          this.props.getMessages(id,this.props.currentUser.user.apiKey)
-          resolve(id)
-        }, 1000)
-      } catch(err) {
-        reject(err);
-      }
+      return setTimeout(() => {
+        return this.props.getMessages(id,this.props.currentUser.user.apiKey)
+        .then((data)=>{
+          resolve(data)
+          let result = {
+            resultType: 'Message ID',
+            name: data.internalProjectMessageId,
+            project_id: data.teamwork_id,
+            projectName: data.name,
+            id: data.teamwork_id,
+          }
+          if (this.state.resultsArr.length > 0) {
+            this.setState({
+              resultsArr: [...this.state.resultsArr, result],
+            })
+          } else {
+            this.setState({
+              showLog: true,
+              resultsArr: [result],
+            })
+          }
+        })
+        .catch((err)=>{
+          reject(err);
+        })
+      }, 1000)
     })
   }
 
   fetchProjectMessages = async () => {
+    let counter = 0;
     for (let p of this.props.projects.projectsInDB) {
       let result = await this.triggerGetMessages(p.teamwork_id)
-      console.log(result)
+      counter++
+    }
+    if (counter === this.props.projects.projectsInDB.length) {
+      return {
+        results: this.state.resultsArr,
+        isComplete: true,
+      }
     }
   }
 
-  triggerGetMessageReplies = (project_id,message_id) => {
+  triggerGetMessageReplies = (project_id,message_id,projectName) => {
     return new Promise(async (resolve,reject) => {
-      try {
-        setTimeout(() => {
-          this.props.getMessageReplies(project_id,message_id,this.props.currentUser.user.apiKey)
-          resolve(project_id);
-        }, 1000)
-      } catch(err) {
-        reject(err);
-      }
+      return setTimeout(() => {
+        return this.props.getMessageReplies(project_id,message_id,this.props.currentUser.user.apiKey)
+        .then((data)=>{
+          resolve(data);
+          const results = data.messageRepliesAdded.map(m=>({
+            resultType: 'Message Reply',
+            name: m.body.length > 45 ? m.body.substring(0, 45) + '...' : m.body,
+            project_id: m.projectId,
+            projectName,
+            id: m.teamwork_id,
+          }))
+          if (this.state.resultsArr.length > 0) {
+            this.setState({
+              resultsArr: [...this.state.resultsArr, ...results],
+            })
+          } else {
+            this.setState({
+              showLog: true,
+              resultsArr: results,
+            })
+          }
+        })
+        .catch((err)=>{
+          reject(err)
+        })
+      }, 1000)
     })
   }
 
   fetchMessageReplies = async () => {
+    let counter = 0;
     for (let p of this.props.projects.projectsInDB) {
-      let result = await this.triggerGetMessageReplies(p.teamwork_id,p.internalProjectMessageId)
-      console.log(result)
+      let result = await this.triggerGetMessageReplies(p.teamwork_id,p.internalProjectMessageId,p.name)
+      counter++
+    }
+    if (counter === this.props.projects.projectsInDB.length) {
+      return {
+        results: this.state.resultsArr,
+        isComplete: true,
+      }
     }
   }
 
@@ -219,6 +351,25 @@ class SetupSteps extends React.Component {
       case 1:
         console.log('step two was hit!')
         return this.buildProjectData()
+      case 2:
+        console.log('step three was hit!')
+        return this.buildTasklistData()
+      case 3:
+        console.log('step four was hit')
+        return this.fetchAndUpdateTasks()
+      case 4:
+        console.log('step five was hit!')
+        return this.fetchProjectMessages()
+      case 5:
+        console.log('step six was hit!')
+        return this.fetchMessageReplies()
+      case 6:
+        console.log('step seven was hit! were done!')
+        this.setState({
+          isLoading: false,
+          buttonDisabled: false,
+          buttonText: 'Finish Setup',
+        });
       default:
         return `Unknown Step`
     }
@@ -231,16 +382,18 @@ class SetupSteps extends React.Component {
       isLoading: true,
       resultsArr: [],
       showLog: false,
+      buttonDisabled: true,
     })
     let response = await this.handleStepAction(this.state.activeStep);
     console.log('the response is')
     console.log(response)
     response === undefined || response === null ? response = {status: 'error', message: 'Unable to connect to server, please try again'} : null
     setTimeout(()=>{
-      if (response.status !== 'error') {
+      if (response.status !== 'error' && response.isComplete === true) {
         this.setState({
           activeStep: this.state.activeStep + 1,
           isLoading: false,
+          buttonDisabled: false,
         });
       } else {
         this.setState({
@@ -267,7 +420,7 @@ class SetupSteps extends React.Component {
   render() {
     const { classes } = this.props;
     const steps = getSteps();
-    const { activeStep } = this.state;
+    const { activeStep, setupComplete } = this.state;
 
     return (
       <div className="setup-steps">
@@ -329,7 +482,7 @@ class SetupSteps extends React.Component {
                             activeStep === 0 ?
                               'Verify'
                               :
-                              activeStep === steps.length - 1 ?
+                              activeStep === steps.length - 1 && setupComplete ?
                                 'Finish'
                                 :
                                 'Start Import'
