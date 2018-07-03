@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Redirect } from 'react-router-dom';
 import { updateUser } from '../store/actions/account';
 import { addError, removeError } from '../store/actions/errors';
 import { withStyles } from 'material-ui/styles';
@@ -40,6 +41,7 @@ class AccountPage extends Component {
         password: '',
         passwordCheck: '',
         modalOpen: false,
+        redirect: false,
       };
     }
 
@@ -48,7 +50,9 @@ class AccountPage extends Component {
 
       // un-authed user send to root
       if (!this.props.currentUser.isAuthenticated) {
-        this.props.history.push('/');
+        this.setState({
+          redirect: true,
+        })
       }
 
       // user is authed, and super admin and setup is incomplete
@@ -126,6 +130,7 @@ class AccountPage extends Component {
       const { classes, currentUser, projects, errors } = this.props;
     	return (
         <div>
+          {this.state.redirect && (<Redirect to='/signin' />)}
           <h1>My Account</h1>
       		<Paper elevation={4} className="account-container">
             <h3>Profile</h3>

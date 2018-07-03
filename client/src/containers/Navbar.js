@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import { Redirect } from 'react-router-dom'
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import PropTypes from 'prop-types';
@@ -23,18 +24,24 @@ const styles = {
 class Navbar extends Component {
   constructor(props) {
     super(props);
-    this.state = {}
+    this.state = {
+      redirect: false,
+    }
   }
 
   logout = e => {
     e.preventDefault();
     this.props.logout();
+    this.setState({
+      redirect: true,
+    })
   }
 
   render() {
     const { classes, errors, currentUser } = this.props;
     return(
       <div className={classes.root}>
+        {this.state.redirect && (<Redirect to='/signin' />)}
         <AppBar position="static">
           <Toolbar>
             <NavbarDrawer currentUser={currentUser} />

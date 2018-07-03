@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Switch, Route, withRouter, Redirect } from 'react-router-dom';
+import { Switch, Route, withRouter, Redirect, Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { authUser } from '../store/actions/auth';
@@ -157,6 +157,11 @@ class AuthForm extends Component {
 								/>
 						)}
 						<Button className={classes.button} variant="raised" type="submit" color="primary">{buttonText}</Button>
+            {signUp ?
+              <Link className="plain-a text" to="/signin">Already have an account? Sign In</Link>
+              :
+              <Link className="plain-a text" to="/signup">Create an Account</Link>
+            }
 						{/* <button type="submit" className="btn btn-primary btn-block btn-lg">
 							{buttonText}
 						</button> */}

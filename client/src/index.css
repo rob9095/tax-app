@@ -128,6 +128,10 @@ a.plain-a {
   text-decoration: inherit;
 }
 
+a.plain-a.text:hover {
+  color: rgba(0, 0, 0, 0.95);
+}
+
 /* Navbar Drawer */
 
 .menu-header {

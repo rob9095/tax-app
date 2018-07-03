@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Redirect } from 'react-router-dom'
 import { logout } from '../store/actions/auth';
+import { removeError } from '../store/actions/errors';
 import { fetchDBProjects } from '../store/actions/teamworkApi';
 import { fetchDefaultView } from '../store/actions/savedTableView';
 import EnhancedTable from '../components/ProjectTable';
@@ -10,7 +11,7 @@ import ProjectChart from '../components/ProjectChart';
 import PreparerPieChart from '../containers/PreparerPieChart';
 import TasklistPopover from '../containers/TasklistPopover';
 import OnBoardingTabs from '../containers/OnBoardingTabs';
-import ProjectTablev2 from '../components/ProjectTablev2'
+import ProjectTablev2 from '../components/ProjectTablev2';
 
 class Dashboard extends Component {
     constructor(props) {
@@ -29,12 +30,14 @@ class Dashboard extends Component {
     }
 
     componentDidMount() {
+      //clear any errors from redux
+      this.props.removeError();
       // un-authed user send to root
       if (!this.props.currentUser.isAuthenticated) {
         this.setState({
           redirect: true,
+          isLoading: false,
         })
-        return
       }
       // user is authed and setup is complete
       if(this.props.currentUser.isAuthenticated && this.props.currentUser.user.setupComplete) {
@@ -119,7 +122,7 @@ class Dashboard extends Component {
 
     render() {
       const { currentUser, projects, errors } = this.props;
-      {if (this.state.isLoading && currentUser.isAuthenticated){
+      {if (this.state.isLoading){
         return(
           <div>loading...</div>
         )
@@ -178,4 +181,4 @@ function mapStateToProps(state) {
 	};
 }
 
-export default connect(mapStateToProps, { logout, fetchDBProjects, fetchDefaultView })(Dashboard);
+export default connect(mapStateToProps, { logout, fetchDBProjects, fetchDefaultView, removeError })(Dashboard);
