@@ -57,7 +57,7 @@ class SetupSteps extends React.Component {
       isLoading: false,
       resultsArr: [],
       showLog: false,
-      projectCount: 273,
+      projectCount: 0,
       setupComplete: false,
       counter: 0,
     }
@@ -66,7 +66,15 @@ class SetupSteps extends React.Component {
   componentDidMount() {
     if (this.props.currentUser.isAuthenticated) {
       //this.props.fetchTeamworkProjectData();
-      this.props.fetchDBProjects();
+      this.props.fetchDBProjects()
+      .then((data)=>{
+        this.setState({
+          projectCount: data.length,
+        })
+      })
+      .catch(()=>{
+        this.props.addError('Unable to reach local server')
+      })
       if (this.props.currentUser.user.apiKey){
         this.setState({
           apiKey: this.props.currentUser.user.apiKey,
@@ -204,7 +212,7 @@ class SetupSteps extends React.Component {
         counter
       })
   	}
-    if (counter === this.props.projects.projectsInDB.length) {
+    if (counter === this.props.projects.projectsInDB.length) {          
       return {
         results: this.state.resultsArr,
         isComplete: true,
