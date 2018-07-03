@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { Redirect } from 'react-router-dom'
 import { logout } from '../store/actions/auth';
 import { fetchDBProjects } from '../store/actions/teamworkApi';
 import { fetchDefaultView } from '../store/actions/savedTableView';
@@ -22,19 +23,30 @@ class Dashboard extends Component {
         toggleCount: 0,
         isLoading: true,
         loadDefaultView: false,
+        redirect: false,
+        errorMessage: '',
       };
     }
 
     componentDidMount() {
       // un-authed user send to root
       if (!this.props.currentUser.isAuthenticated) {
-        this.props.history.push('/');
+        this.setState({
+          redirect: true,
+        })
+        return
       }
       // user is authed and setup is complete
       if(this.props.currentUser.isAuthenticated && this.props.currentUser.user.setupComplete) {
         this.props.fetchDBProjects()
         .then(()=> {
           this.setState({
+            isLoading: false,
+          })
+        })
+        .catch((err)=>{
+          this.setState({
+            errorMessage: 'Unable to connect to server, please try again',
             isLoading: false,
           })
         })
@@ -112,9 +124,16 @@ class Dashboard extends Component {
           <div>loading...</div>
         )
       }}
-      {if (!currentUser.isAuthenticated){
+      {if (this.state.redirect){
         return(
-          <OnBoardingTabs />
+          <Redirect to='/signin' />
+        )
+      }}
+      {if (this.state.errorMessage) {
+        return (
+          <span className="error">
+            {this.state.errorMessage}
+          </span>
         )
       }}
     	return (

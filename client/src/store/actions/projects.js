@@ -1,4 +1,5 @@
 import { apiCall, teamworkApiCall } from '../../services/api';
+import { addError } from './errors';
 
 export function getDetailedProjects() {
   return dispatch => {
@@ -15,10 +16,10 @@ export function getDetailedProjects() {
 	}
 }
 
-export function mapTasksToProjects() {
+export function mapTasksToProjects(data) {
   return dispatch => {
 		return new Promise((resolve,reject) => {
-			return apiCall('post', '/api/projects/map-projects')
+			return apiCall('post', '/api/projects/map-projects', data)
 			.then((data) => {
 				resolve(data);
 			})

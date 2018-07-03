@@ -15,17 +15,21 @@ class SetupLog extends Component {
 
   render() {
     const { results, activeStep } = this.props
-    let logs = results.map(r=>(
+    let logs = results.map(r=>
       <ListItem key={r.id} className="log-item">
         <ListItemIcon>
-          <CheckCircleIcon className="success" />
+          {r.status === 'warning' ? <WarningIcon className="warning" /> : <CheckCircleIcon className="success" /> }
         </ListItemIcon>
         <ListItemText
           className="message"
-          primary={`${r.resultType}: ${r.name} added succesfully ${activeStep >= 4 ? `to ${r.projectName}` : '' }`}
+          primary={r.status === 'warning' ?
+          `${r.resultType}: ${r.name}`
+           :
+           `${r.resultType}: ${r.name} added succesfully ${activeStep >= 4 ? `to ${r.projectName}` : '' }`
+          }
           secondary={`Teamwork Project ID: ${r.project_id}`} />
       </ListItem>
-    ))
+    )
     return (
       <div className="setup-log">
         <List dense={true}>

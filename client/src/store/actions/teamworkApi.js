@@ -33,11 +33,11 @@ export function fetchDBProjects() {
 			return apiCall('get', '/api/projects')
 			.then((projects) => {
         dispatch(loadDBProjects(projects));
-				resolve();
+				resolve(projects);
 			})
 			.catch(err => {
-				dispatch(addError(err.message));
-				reject();
+				dispatch(addError(err ? err.message : err));
+				reject(err ? err.message : err);
 			})
 		});
 	}

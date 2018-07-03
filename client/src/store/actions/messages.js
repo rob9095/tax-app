@@ -30,7 +30,10 @@ const handleApiRequest = (project_id,key) => {
         let result = await handleLocalApiRequest(messageData, 'projects/update-message-id');
         resolve(result);
       } else {
-        resolve(`No Internal Project Status Notes for ${project_id}`)
+        resolve({
+          status: 'No Messages',
+          teamwork_id: project_id,
+        })
       }
   	})
   	.catch(err => {
@@ -49,6 +52,10 @@ export function getMessages(project_id,key) {
 const handleMessageReplyApiRequest = (project_id,message_id,key) => {
   const url = `https://taxsamaritan.teamwork.com/messages/${message_id}/replies.json`;
   return new Promise((resolve,reject) => {
+    if (message_id === undefined) {
+      resolve(`No Messages Found for Project ID: ${project_id}`)
+      return
+    }
     return teamworkApiCall('get',url,key)
     .then(async(res) => {
       const formattedMessageReplies = [];

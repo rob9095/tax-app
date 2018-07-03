@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
+import { Redirect } from 'react-router-dom';
 import { addError, removeError } from '../store/actions/errors';
 import { updateUser } from '../store/actions/account';
 import {
@@ -12,6 +13,7 @@ import {
   updateProjectsDB,
   getUserProfileImage
 } from '../store/actions/teamworkApi';
+import { getDetailedProjects, mapTasksToProjects } from '../store/actions/projects';
 import { requestAndUpdateTasks } from '../store/actions/tasks';
 import { getMessages, getMessageReplies } from '../store/actions/messages';
 import { withStyles } from 'material-ui/styles';
@@ -33,6 +35,7 @@ const styles = theme => ({
   },
   resetContainer: {
     padding: theme.spacing.unit * 3,
+    backgroundColor: 'transparent',
   },
   stepContainer: {
     backgroundColor: 'transparent',
@@ -47,7 +50,7 @@ class SetupSteps extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      activeStep: 3,
+      activeStep: 4,
       showNext: true,
       showBack: false,
       buttonDisabled: true,
@@ -212,7 +215,7 @@ class SetupSteps extends React.Component {
         counter
       })
   	}
-    if (counter === this.props.projects.projectsInDB.length) {          
+    if (counter === this.props.projects.projectsInDB.length) {
       return {
         results: this.state.resultsArr,
         isComplete: true,
@@ -273,13 +276,25 @@ class SetupSteps extends React.Component {
       return setTimeout(() => {
         return this.props.getMessages(id,this.props.currentUser.user.apiKey)
         .then((data)=>{
-          resolve(data)
           let result = {
             resultType: 'Message ID',
             name: data.internalProjectMessageId,
             project_id: data.teamwork_id,
             projectName: data.name,
             id: data.teamwork_id,
+          }
+          if (data.status === 'No Messages') {
+            result = {
+              resultType: 'Message ID',
+              status: 'warning',
+              name: 'No Messages Found',
+              project_id: id,
+              projectName: '',
+              id,
+            }
+            resolve(result)
+          } else {
+            resolve(data)
           }
           if (this.state.resultsArr.length > 0) {
             this.setState({
@@ -391,7 +406,6 @@ class SetupSteps extends React.Component {
         this.setState({
           isLoading: false,
           buttonDisabled: false,
-          buttonText: 'Finish Setup',
         });
       default:
         return `Unknown Step`
@@ -438,10 +452,34 @@ class SetupSteps extends React.Component {
     });
   };
 
-  handleReset = () => {
+  handleFinish = async() => {
     this.setState({
-      activeStep: 0,
-    });
+      inputError: false,
+      errorMessage: null,
+      isLoading: true,
+      resultsArr: [],
+      showLog: false,
+      buttonDisabled: true,
+    })
+    const projects = await this.props.getDetailedProjects();
+    this.props.mapTasksToProjects(projects)
+    .then(async(res)=>{
+      const user = {
+        email: this.props.currentUser.user.email,
+        setupComplete: true,
+      }
+      await this.props.updateUser(user)
+      this.setState({
+        setupComplete: true,
+        isLoading: false,
+      })
+    })
+    .catch((err)=>{
+      console.log(err)
+      this.setState({
+        errorMessage: 'Unable to connect to server, please try again'
+      })
+    })
   };
 
   render() {
@@ -515,10 +553,7 @@ class SetupSteps extends React.Component {
                           activeStep === 0 ?
                             'Verify'
                             :
-                            activeStep === steps.length - 1 && setupComplete ?
-                              'Finish'
-                              :
-                              'Start Import'
+                            'Start Import'
                         }
                         </Button>
                       )}
@@ -531,10 +566,23 @@ class SetupSteps extends React.Component {
         </Stepper>
         {activeStep === steps.length && (
           <Paper square elevation={0} className={classes.resetContainer}>
-            <Typography>All steps completed - you&quot;re finished</Typography>
-            <Button onClick={this.handleReset} className={classes.button}>
-              Reset
-            </Button>
+            {this.state.setupComplete && (
+              <Redirect to='/dashboard' />
+            )}
+            <Typography>{`Please finish the setup process to view the Project Dashboard`}</Typography>
+              <Button
+                variant="raised"
+                color="primary"
+                disabled={activeStep === 0}
+                onClick={this.handleFinish}
+                className={classes.button}
+              >
+                {this.state.isLoading ?
+                  <CircularProgress size={24} color="inherit" />
+                :
+                  'Finish'
+                }
+              </Button>
           </Paper>
         )}
         {this.state.showLog && (
@@ -571,6 +619,8 @@ export default compose(withStyles(styles), connect(mapStateToProps, {
   getMessageReplies,
   getUserProfileImage,
   updateUser,
+  getDetailedProjects,
+  mapTasksToProjects,
   removeError,
   addError,
  }))(SetupSteps);
