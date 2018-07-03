@@ -168,7 +168,7 @@ const handleLocalApiRequest = (data, type) => {
       .catch(err => {
         reject(err);
       })
-    }, 1000)
+    }, 100)
   });
 }
 

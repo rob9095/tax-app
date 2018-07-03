@@ -9,6 +9,7 @@ const addProject = (project) => {
       let check = project.name.split('-');
       if (check[0] !== 'Tax') {
         resolve('skip');
+        return;
       }
       let foundProject = await db.Project.findOne({teamwork_id: project.teamwork_id});
       if (foundProject) {

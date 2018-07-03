@@ -12,7 +12,7 @@ const handleLocalApiRequest = (data, endpoint) => {
         .catch(err => {
           reject(err);
         })
-      }, 1000)
+      }, 500)
     });
 }
 

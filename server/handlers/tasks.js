@@ -9,7 +9,7 @@ const createTask = (task) => {
       if (foundTask) {
         foundTask.set(task)
         await foundTask.save();
-        resolve();
+        resolve(foundTask);
       } else {
         let createdTask = await db.Task.create(task);
         resolve(createdTask);

@@ -16,6 +16,7 @@ import { requestAndUpdateTasks } from '../store/actions/tasks';
 import { getMessages, getMessageReplies } from '../store/actions/messages';
 import { withStyles } from 'material-ui/styles';
 import SetupLog from './SetupLog';
+import ProgressBar from './ProgressBar';
 import Stepper, { Step, StepLabel, StepContent } from 'material-ui/Stepper';
 import Button from 'material-ui/Button';
 import Paper from 'material-ui/Paper';
@@ -33,6 +34,9 @@ const styles = theme => ({
   resetContainer: {
     padding: theme.spacing.unit * 3,
   },
+  stepContainer: {
+    backgroundColor: 'transparent',
+  }
 });
 
 function getSteps() {
@@ -43,7 +47,7 @@ class SetupSteps extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      activeStep: 0,
+      activeStep: 3,
       showNext: true,
       showBack: false,
       buttonDisabled: true,
@@ -53,8 +57,9 @@ class SetupSteps extends React.Component {
       isLoading: false,
       resultsArr: [],
       showLog: false,
-      projectCount: 0,
+      projectCount: 273,
       setupComplete: false,
+      counter: 0,
     }
   }
 
@@ -74,23 +79,21 @@ class SetupSteps extends React.Component {
   }
 
   getStepContent = (step) => {
-    // 1 second for each api call
-    let minutes = this.state.projectCount / 60
+    // about 5 seconds for each api call, teamwork api is slow sometimes...
+    let minutes = this.state.projectCount * .05
     switch (step) {
       case 0:
         return null;
       case 1:
         return 'Import the Teamwork Projects. This might take a few seconds.';
       case 2:
-        return `Import the Teamwork Tasklists for each Project. This should take around ${minutes.toFixed(1)} minutes.`;
+        return `Import the Teamwork Tasklists for each Project. This will take around ${minutes.toFixed(1)} minutes.`;
       case 3:
-        // 1.25 seconds for each api call
-        minutes = this.state.projectCount / 45
-        return `Import the Teamwork Tasks for each Tasklist/Project. This should take around ${minutes.toFixed(1)} minutes.`
+        return `Import the Teamwork Tasks for each Tasklist/Project. This will take around ${minutes.toFixed(1)} minutes.`
       case 4:
-        return `Import the Teamwork Message ID's for each Project. This should take around ${minutes.toFixed(1)} minutes.`
+        return `Import the Teamwork Message ID's for each Project. This will take around ${minutes.toFixed(1)} minutes.`
       case 5:
-        return `Import the Replies for each Teamwork Message. This should take around ${minutes.toFixed(1)} minutes.`
+        return `Import the Replies for each Teamwork Message. This will take around ${minutes.toFixed(1)} minutes.`
       default:
         return 'Unknown step';
     }
@@ -188,7 +191,7 @@ class SetupSteps extends React.Component {
         .catch((err)=>{
           reject(err)
         })
-      }, 1000)
+      }, 500)
     })
   }
 
@@ -197,6 +200,9 @@ class SetupSteps extends React.Component {
     for (let p of this.props.projects.projectsInDB) {
       let result = await this.triggerTaskRequest(p.teamwork_id)
       counter++
+      this.setState({
+        counter
+      })
   	}
     if (counter === this.props.projects.projectsInDB.length) {
       return {
@@ -233,7 +239,7 @@ class SetupSteps extends React.Component {
         .catch((err)=>{
           reject(err)
         })
-      }, 1000)
+      }, 500)
     })
   }
 
@@ -242,6 +248,9 @@ class SetupSteps extends React.Component {
     for (let p of this.props.projects.projectsInDB) {
       let result = await this.triggerTaskListRequest(p.teamwork_id)
       counter++
+      this.setState({
+        counter
+      })
     }
     if (counter === this.props.projects.projectsInDB.length) {
       return {
@@ -278,7 +287,7 @@ class SetupSteps extends React.Component {
         .catch((err)=>{
           reject(err);
         })
-      }, 1000)
+      }, 500)
     })
   }
 
@@ -287,6 +296,9 @@ class SetupSteps extends React.Component {
     for (let p of this.props.projects.projectsInDB) {
       let result = await this.triggerGetMessages(p.teamwork_id)
       counter++
+      this.setState({
+        counter
+      })
     }
     if (counter === this.props.projects.projectsInDB.length) {
       return {
@@ -323,7 +335,7 @@ class SetupSteps extends React.Component {
         .catch((err)=>{
           reject(err)
         })
-      }, 1000)
+      }, 500)
     })
   }
 
@@ -332,6 +344,9 @@ class SetupSteps extends React.Component {
     for (let p of this.props.projects.projectsInDB) {
       let result = await this.triggerGetMessageReplies(p.teamwork_id,p.internalProjectMessageId,p.name)
       counter++
+      this.setState({
+        counter
+      })
     }
     if (counter === this.props.projects.projectsInDB.length) {
       return {
@@ -394,15 +409,19 @@ class SetupSteps extends React.Component {
           activeStep: this.state.activeStep + 1,
           isLoading: false,
           buttonDisabled: false,
+          counter: 0,
         });
       } else {
         this.setState({
           inputError: true,
           errorMessage: response.message,
           isLoading: false,
+          counter: 0,
         })
       }
     },500)
+    // get fresh project data
+    this.props.fetchDBProjects();
   };
 
   handleBack = () => {
@@ -425,7 +444,7 @@ class SetupSteps extends React.Component {
     return (
       <div className="setup-steps">
         <h1>Setup</h1>
-        <Stepper activeStep={activeStep} orientation="vertical">
+        <Stepper activeStep={activeStep} orientation="vertical" className={classes.stepContainer}>
           {steps.map((label, index) => {
             return (
               <Step key={label}>
@@ -433,6 +452,12 @@ class SetupSteps extends React.Component {
                 <StepContent>
                   <Typography>{this.getStepContent(index)}</Typography>
                   <div className="action-container">
+                    {this.state.isLoading && activeStep > 1 && (
+                      <ProgressBar
+                        projectCount={this.state.projectCount}
+                        completed={this.state.counter}
+                      />
+                    )}
                     {activeStep !== 0 && (
                       <span className="error">
                         {this.state.errorMessage && (this.state.errorMessage)}
@@ -476,17 +501,17 @@ class SetupSteps extends React.Component {
                           onClick={this.handleNext}
                           className={classes.button}
                         >
-                          {this.state.isLoading ?
-                            <CircularProgress size={24} color="inherit" />
+                        {this.state.isLoading ?
+                          <CircularProgress size={24} color="inherit" />
+                          :
+                          activeStep === 0 ?
+                            'Verify'
                             :
-                            activeStep === 0 ?
-                              'Verify'
+                            activeStep === steps.length - 1 && setupComplete ?
+                              'Finish'
                               :
-                              activeStep === steps.length - 1 && setupComplete ?
-                                'Finish'
-                                :
-                                'Start Import'
-                            }
+                              'Start Import'
+                        }
                         </Button>
                       )}
                     </div>
