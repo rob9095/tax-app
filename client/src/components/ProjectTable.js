@@ -114,6 +114,10 @@ class EnhancedTable extends React.Component {
 
   }
 
+  componentWillUnmount(){
+    console.log('im gone!')
+  }
+
   componentDidMount(){
     // generate the data and save it to state
     let projects = this.props.projects.projectsInDB;
@@ -646,8 +650,7 @@ class EnhancedTable extends React.Component {
     if (view.bodyState.currentFilters.length > 0) {
       console.log('we need to filter!')
       this.handleTableSearch(view.bodyState.currentFilters);
-    }
-    else {
+    } else {
       console.log('we need to remove filters and requery fresh data')
       this.handleTableSearch([], 'clearFilters');
     }

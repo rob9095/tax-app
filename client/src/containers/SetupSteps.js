@@ -50,7 +50,7 @@ class SetupSteps extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      activeStep: 4,
+      activeStep: 0,
       showNext: true,
       showBack: false,
       buttonDisabled: true,
@@ -63,6 +63,7 @@ class SetupSteps extends React.Component {
       projectCount: 0,
       setupComplete: false,
       counter: 0,
+      redirect: false,
     }
   }
 
@@ -85,7 +86,9 @@ class SetupSteps extends React.Component {
         })
       }
     } else {
-      this.props.history.push('/');
+      this.setState({
+        redirect: true,
+      })
     }
   }
 
@@ -128,7 +131,9 @@ class SetupSteps extends React.Component {
     // first check if the api key works, will return the profile image url
     return this.props.getUserProfileImage(user, user.email, false)
     .then((res)=>{
-      // update the account
+      // update the users profile image
+      this.props.getUserProfileImage(user, user.email, true)
+      // update the account with api key
       this.props.updateUser(user)
       return {
         res,
@@ -590,6 +595,9 @@ class SetupSteps extends React.Component {
             results={this.state.resultsArr}
             activeStep={this.state.activeStep}
           />
+        )}
+        {this.state.redirect && (
+          <Redirect to='/' />
         )}
       </div>
     );
