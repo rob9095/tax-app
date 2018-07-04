@@ -680,13 +680,24 @@ class EnhancedTable extends React.Component {
       console.log(filters)
       searchArr = filters;
     } else if (searchArr.length > 0 && filters.length > 0) {
-      searchArr = [...searchArr, ...filters]
+      let arr = [...searchArr, ...filters];
+      searchArr =[];
+      let searchItems = {};
+      for (let item of arr) {
+        if (searchItems[item.value]) {
+          console.log(`duplicate found: ${item.value}`)
+        } else {
+          searchItems[item.value] = true;
+          searchArr.push(item)
+        }
+      }
     }
     console.log(`We are about to search the searchArr which is now:`)
     console.log(searchArr)
+    let cols = {}
     for (let searchItem of searchArr) {
       console.log(`the searchItem is ${searchItem.value}`)
-      let result = results.length > 0 ?
+      let result = results.length > 0 && !cols[searchItem.column.id] ?
         results.filter(p => p[searchItem.column.id].search(searchItem.value) !== -1)
         :
         this.state.dataCopy.filter(p => p[searchItem.column.id].search(searchItem.value) !== -1)
@@ -697,9 +708,10 @@ class EnhancedTable extends React.Component {
         console.log('pushing filter')
         filters.push({column: searchItem.column, value: searchItem.value})
       }
-      results.length > 0 ? results = [...result] : results.push(...result)
+      results.length > 0 && !cols[searchItem.column.id] ? results = [...result] : results.push(...result)
       console.log(`result for ${searchItem.value} is`)
       console.log(result)
+      cols[searchItem.column.id] = true
     }
     console.log(`the complied results are:`)
     console.log(results)
