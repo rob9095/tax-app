@@ -172,6 +172,7 @@ class SaveViewModal extends Component {
             <div className={classes.formContainer}>
               <FormControl>
                 <Input
+                  autoFocus
                   error={this.state.inputErrors}
                   autoComplete="off"
                   id="title"

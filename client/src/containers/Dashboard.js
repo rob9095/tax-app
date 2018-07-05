@@ -12,6 +12,7 @@ import PreparerPieChart from '../containers/PreparerPieChart';
 import TasklistPopover from '../containers/TasklistPopover';
 import OnBoardingTabs from '../containers/OnBoardingTabs';
 import ProjectTablev2 from '../components/ProjectTablev2';
+import { LinearProgress } from 'material-ui/Progress';
 
 class Dashboard extends Component {
     constructor(props) {
@@ -124,7 +125,9 @@ class Dashboard extends Component {
       const { currentUser, projects, errors } = this.props;
       {if (this.state.isLoading){
         return(
-          <div>loading...</div>
+          <div className="dashboard-loader">
+            <LinearProgress />
+          </div>
         )
       }}
       {if (this.state.redirect){

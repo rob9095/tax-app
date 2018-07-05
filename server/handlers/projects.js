@@ -158,3 +158,22 @@ exports.updateProjectInternalMessage = async (req, res, next) => {
     return next(err);
   }
 }
+
+exports.removeProject = async (req, res, next) => {
+  try {
+    let foundProject = await db.Project.findOne({teamwork_id: req.params.teamwork_project_id})
+    if (foundProject === null) {
+      return next({
+        status: 400,
+        message: `Project ID: ${req.projectId} not found`
+      })
+    }
+    await foundProject.remove();
+    await db.Tasklist.deleteMany({teamworkProject_id: req.params.teamwork_project_id})
+    await db.Task.deleteMany({teamworkProject_id: req.params.teamwork_project_id})
+    await db.MessageReply.deleteMany({projectId: req.params.teamwork_project_id})
+    return res.status(200).json(foundProject)
+  } catch(err) {
+    return next(err);
+  }
+}

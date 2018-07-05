@@ -28,11 +28,28 @@ input:disabled, textarea:disabled {
 
 /* Dashboard & Project Table */
 
+.dashboard-loader {
+    width: 400px;
+    margin: 0 auto;
+}
+
 /* ANTD table */
 .th.project-table-head {
   min-width: 80px;
 }
 /* ANTD table end */
+
+.table-container.loading {
+  opacity: .3;
+}
+
+.table-loader {
+    width: 400px;
+    margin: 0 auto;
+    text-align: center;
+    padding-top: 20px;
+    margin-bottom: -20px;
+}
 
 .select-all-loader {
   margin: 12px;

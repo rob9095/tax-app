@@ -28,6 +28,7 @@ import ProjectTableToolbar from './ProjectTableToolbar';
 import ProjectTableHead from './ProjectTableHead';
 import ProjectNotes from './ProjectNotes';
 import { CircularProgress } from 'material-ui/Progress';
+import { LinearProgress } from 'material-ui/Progress';
 
 const styles = theme => ({
   root: {
@@ -65,6 +66,7 @@ class EnhancedTable extends React.Component {
       headState: {},
       searchOpen: false,
       checkboxLoading: false,
+      isLoading: true,
     };
     this.sanitizeName = this.sanitizeName.bind(this);
     this.handleShowPopover = this.handleShowPopover.bind(this)
@@ -479,6 +481,7 @@ class EnhancedTable extends React.Component {
     this.setState({
       data: formattedProjectData,
       dataCopy: formattedProjectData,
+      isLoading: this.props.loadDefaultView ? true : false,
     })
   }
 
@@ -594,10 +597,16 @@ class EnhancedTable extends React.Component {
   };
 
   handleChangeRowsPerPage = event => {
-      this.setState({page: 0})
-      setTimeout(()=> {
-        this.setState({ rowsPerPage: event.target.value });
-      },250)
+    if (event.target.value > 200) {
+      this.handleToggleLoad()
+      setTimeout(()=>{
+        this.handleToggleLoad()
+      },1000)
+    }
+    this.setState({page: 0})
+    setTimeout(()=> {
+      this.setState({ rowsPerPage: event.target.value });
+    },250)
   };
 
   isSelected = id => this.state.selected.indexOf(id) !== -1;
@@ -654,6 +663,11 @@ class EnhancedTable extends React.Component {
       console.log('we need to remove filters and requery fresh data')
       this.handleTableSearch([], 'clearFilters');
     }
+    setTimeout(()=>{
+      this.setState({
+        isLoading: false,
+      })
+    },300)
   }
 
   handleTableSearch = (searchArr, removeFilter) => {
@@ -728,6 +742,12 @@ class EnhancedTable extends React.Component {
     })
   }
 
+  handleToggleLoad = () => {
+    this.setState({
+      isLoading: !this.state.isLoading,
+    })
+  }
+
   render() {
     const { classes, projectData, lastCheckedTask, removeTask } = this.props;
     const { data, order, orderBy, selected, rowsPerPage, page, dataCopy } = this.state;
@@ -744,347 +764,356 @@ class EnhancedTable extends React.Component {
       }
     }
     return (
-      <Paper className={classes.root}>
-        <ProjectTableToolbar
-          bodyState={this.state}
-          currentTasks={currentTasks}
-          numSelected={selected.length}
-          toggleGetHeadState={this.handleGetHeadState}
-          openSaveModal={this.state.showSaveModal}
-          toggleSaveModel={this.handleShowSaveModal}
-          tableState={this.state}
-          toggleSearchView={this.handleSearchViewToggle}
-          searchViewOpen={this.state.searchOpen}
-          rowsPerPage={this.state.rowsPerPage}
-        />
-        <div className={classes.tableWrapper}>
-          <Table className={classes.table}>
-            <ProjectTableHead
-              numSelected={selected.length}
-              order={order}
-              orderBy={orderBy}
-              onSelectAllClick={this.handleSelectAllClick}
-              onRequestSort={this.handleRequestSort}
-              rowCount={data.length}
-              projects={projectData}
-              onShowShowTasklistTasks={this.handleShowTasklistTask}
-              onShowPopOver={this.handleShowPopover}
-              lastCheckedTask={lastCheckedTask}
-              removeTask={removeTask}
-              saveState={this.state.getHeaderState}
-              toggleGetHeadState={this.handleGetHeadState}
-              triggerViewUpdate={this.handleViewUpdate}
-              searchViewOpen={this.state.searchOpen}
-              tableData={dataCopy}
-              onTableSearch={this.handleTableSearch}
-              currentFilters={this.state.currentFilters}
-              rowsPerPage={this.state.rowsPerPage}
-              loadDefaultView={this.props.loadDefaultView}
-            />
-            <TableBody>
-              {data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(n => {
-                const isSelected = this.isSelected(n.id);
-                return (
-                  <TableRow
-                    key={n.id}
-                    hover
-                    role="checkbox"
-                    aria-checked={isSelected}
-                    tabIndex={-1}
-                    selected={isSelected}
-                  >
-                    <TableCell padding="checkbox">
-                      {this.state.checkboxLoading && this.state.checkboxClicked === n.id ?
-                        <CircularProgress color="secondary" size={20} className="select-all-loader" />
-                        :
-                        <Checkbox
-                         disableRipple={true}
-                         checked={isSelected}
-                         onClick={event => this.handleClick(event, n.id)}
-                        />
-                      }
-                    </TableCell>
-                    <TableCell className="table-cell">{n.projectName}</TableCell>
-                    <TableCell className="table-cell" padding="none">{n.preparer}</TableCell>
-                    <TableCell className="table-cell" padding="none">{n.clientLastName}</TableCell>
-                    <TableCell className="table-cell" padding="none">{n.clientFirstName}</TableCell>
-                    <TableCell className="table-cell">{n.lastTasklistChanged}</TableCell>
-                    <TableCell className="table-cell" padding="none">
-                      <ProjectNotes notes={n.projectNotes} />
-                    </TableCell>
-                    <TableCell className="table-cell" padding="none">
-                      <Moment format="M/D/YY">{n.dateProjectCreated}</Moment>
-                    </TableCell>
-                    {!n['Initial Payment'].hidden && (
-                      <TableCell className="table-cell tasklist-task" padding="none">
-                        {n['Initial Payment'].completed ?
-                          <Moment format="M/D/YY">{n['Initial Payment'].lastChangedOn}</Moment>
+      <div className={this.state.isLoading ? 'table-container loading' : 'table-container'}>
+        <Paper className={classes.root}>
+          {this.state.isLoading && (
+            <div className="table-loader">
+              <CircularProgress />
+            </div>
+          )}
+          <ProjectTableToolbar
+            bodyState={this.state}
+            currentTasks={currentTasks}
+            numSelected={selected.length}
+            toggleGetHeadState={this.handleGetHeadState}
+            openSaveModal={this.state.showSaveModal}
+            toggleSaveModel={this.handleShowSaveModal}
+            tableState={this.state}
+            toggleSearchView={this.handleSearchViewToggle}
+            searchViewOpen={this.state.searchOpen}
+            rowsPerPage={this.state.rowsPerPage}
+            selectedProjects={this.state.selected}
+            toggleLoad={this.handleToggleLoad}
+          />
+          <div className={classes.tableWrapper}>
+            <Table className={classes.table}>
+              <ProjectTableHead
+                numSelected={selected.length}
+                order={order}
+                orderBy={orderBy}
+                onSelectAllClick={this.handleSelectAllClick}
+                onRequestSort={this.handleRequestSort}
+                rowCount={data.length}
+                projects={projectData}
+                onShowShowTasklistTasks={this.handleShowTasklistTask}
+                onShowPopOver={this.handleShowPopover}
+                lastCheckedTask={lastCheckedTask}
+                removeTask={removeTask}
+                saveState={this.state.getHeaderState}
+                toggleGetHeadState={this.handleGetHeadState}
+                triggerViewUpdate={this.handleViewUpdate}
+                searchViewOpen={this.state.searchOpen}
+                tableData={dataCopy}
+                onTableSearch={this.handleTableSearch}
+                currentFilters={this.state.currentFilters}
+                rowsPerPage={this.state.rowsPerPage}
+                loadDefaultView={this.props.loadDefaultView}
+              />
+              <TableBody>
+                {data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(n => {
+                  const isSelected = this.isSelected(n.id);
+                  return (
+                    <TableRow
+                      key={n.id}
+                      hover
+                      role="checkbox"
+                      aria-checked={isSelected}
+                      tabIndex={-1}
+                      selected={isSelected}
+                    >
+                      <TableCell padding="checkbox">
+                        {this.state.checkboxLoading && this.state.checkboxClicked === n.id ?
+                          <CircularProgress color="secondary" size={20} className="select-all-loader" />
                           :
-                          <Close className="incomplete-tasklist" />
+                          <Checkbox
+                           disableRipple={true}
+                           checked={isSelected}
+                           onClick={event => this.handleClick(event, n.id)}
+                          />
                         }
                       </TableCell>
-                    )}
-                    {!n['Initial Payment Recieved'].hidden && (
-                      <TableCell className="table-cell tasklist-task" padding="none">
-                        {n['Initial Payment Recieved'].completed ?
-                          <Moment format="M/D/YY">{n['Initial Payment Recieved'].lastChangedOn}</Moment>
-                          :
-                          <Close className="incomplete-tasklist" />
-                        }
+                      <TableCell className="table-cell">{n.projectName}</TableCell>
+                      <TableCell className="table-cell" padding="none">{n.preparer}</TableCell>
+                      <TableCell className="table-cell" padding="none">{n.clientLastName}</TableCell>
+                      <TableCell className="table-cell" padding="none">{n.clientFirstName}</TableCell>
+                      <TableCell className="table-cell">{n.lastTasklistChanged}</TableCell>
+                      <TableCell className="table-cell" padding="none">
+                        <ProjectNotes notes={n.projectNotes} />
                       </TableCell>
-                    )}
-                    <TableCell className="table-cell tasklist" padding="none">
-                      {n.initialPayment ? <Moment format="M/D/YY">{n.initialPayment}</Moment> : <Close className="incomplete-tasklist" />}
-                    </TableCell>
-                    {!n['Getting Started'].hidden && (
-                      <TableCell className="table-cell tasklist-task" padding="none">
-                        {n['Getting Started'].completed ?
-                          <Moment format="M/D/YY">{n['Getting Started'].lastChangedOn}</Moment>
-                          :
-                          <Close className="incomplete-tasklist" />
-                        }
+                      <TableCell className="table-cell" padding="none">
+                        <Moment format="M/D/YY">{n.dateProjectCreated}</Moment>
                       </TableCell>
-                    )}
-                    {!n['Tax Organizer'].hidden && (
-                      <TableCell className="table-cell tasklist-task" padding="none">
-                        {n['Tax Organizer'].completed ?
-                          <Moment format="M/D/YY">{n['Tax Organizer'].lastChangedOn}</Moment>
-                          :
-                          <Close className="incomplete-tasklist" />
-                        }
+                      {!n['Initial Payment'].hidden && (
+                        <TableCell className="table-cell tasklist-task" padding="none">
+                          {n['Initial Payment'].completed ?
+                            <Moment format="M/D/YY">{n['Initial Payment'].lastChangedOn}</Moment>
+                            :
+                            <Close className="incomplete-tasklist" />
+                          }
+                        </TableCell>
+                      )}
+                      {!n['Initial Payment Recieved'].hidden && (
+                        <TableCell className="table-cell tasklist-task" padding="none">
+                          {n['Initial Payment Recieved'].completed ?
+                            <Moment format="M/D/YY">{n['Initial Payment Recieved'].lastChangedOn}</Moment>
+                            :
+                            <Close className="incomplete-tasklist" />
+                          }
+                        </TableCell>
+                      )}
+                      <TableCell className="table-cell tasklist" padding="none">
+                        {n.initialPayment ? <Moment format="M/D/YY">{n.initialPayment}</Moment> : <Close className="incomplete-tasklist" />}
                       </TableCell>
-                    )}
-                    {!n['Questionnaire-Travel Worksheet'].hidden && (
-                      <TableCell className="table-cell tasklist-task" padding="none">
-                        {n['Questionnaire-Travel Worksheet'].completed ?
-                          <Moment format="M/D/YY">{n['Questionnaire-Travel Worksheet'].lastChangedOn}</Moment>
-                          :
-                          n['Questionnaire-Travel Worksheet'].completed === undefined ? <span>N/A</span> : <Close className="incomplete-tasklist" />
-                        }
+                      {!n['Getting Started'].hidden && (
+                        <TableCell className="table-cell tasklist-task" padding="none">
+                          {n['Getting Started'].completed ?
+                            <Moment format="M/D/YY">{n['Getting Started'].lastChangedOn}</Moment>
+                            :
+                            <Close className="incomplete-tasklist" />
+                          }
+                        </TableCell>
+                      )}
+                      {!n['Tax Organizer'].hidden && (
+                        <TableCell className="table-cell tasklist-task" padding="none">
+                          {n['Tax Organizer'].completed ?
+                            <Moment format="M/D/YY">{n['Tax Organizer'].lastChangedOn}</Moment>
+                            :
+                            <Close className="incomplete-tasklist" />
+                          }
+                        </TableCell>
+                      )}
+                      {!n['Questionnaire-Travel Worksheet'].hidden && (
+                        <TableCell className="table-cell tasklist-task" padding="none">
+                          {n['Questionnaire-Travel Worksheet'].completed ?
+                            <Moment format="M/D/YY">{n['Questionnaire-Travel Worksheet'].lastChangedOn}</Moment>
+                            :
+                            n['Questionnaire-Travel Worksheet'].completed === undefined ? <span>N/A</span> : <Close className="incomplete-tasklist" />
+                          }
+                        </TableCell>
+                      )}
+                      {!n['Questionnaire-FBAR and Form 8938'].hidden && (
+                        <TableCell className="table-cell tasklist-task" padding="none">
+                          {n['Questionnaire-FBAR and Form 8938'].completed ?
+                            <Moment format="M/D/YY">{n['Questionnaire-FBAR and Form 8938'].lastChangedOn}</Moment>
+                            :
+                            <Close className="incomplete-tasklist" />
+                          }
+                        </TableCell>
+                      )}
+                      {!n['Questionnaire-Form 5471 (Foreign Corporation)'].hidden && (
+                        <TableCell className="table-cell tasklist-task" padding="none">
+                          {n['Questionnaire-Form 5471 (Foreign Corporation)'].completed ?
+                            <Moment format="M/D/YY">{n['Questionnaire-Form 5471 (Foreign Corporation)'].lastChangedOn}</Moment>
+                            :
+                            <Close className="incomplete-tasklist" />
+                          }
+                        </TableCell>
+                      )}
+                      {!n['Questionnaire-Schedule A'].hidden && (
+                        <TableCell className="table-cell tasklist-task" padding="none">
+                          {n['Questionnaire-Schedule A'].completed ?
+                            <Moment format="M/D/YY">{n['Questionnaire-Schedule A'].lastChangedOn}</Moment>
+                            :
+                            <Close className="incomplete-tasklist" />
+                          }
+                        </TableCell>
+                      )}
+                      {!n['Questionnaire-Schedule C'].hidden && (
+                        <TableCell className="table-cell tasklist-task" padding="none">
+                          {n['Questionnaire-Schedule C'].completed ?
+                            <Moment format="M/D/YY">{n['Questionnaire-Schedule C'].lastChangedOn}</Moment>
+                            :
+                            <Close className="incomplete-tasklist" />
+                          }
+                        </TableCell>
+                      )}
+                      {!n['Questionnaire-Schedule D'].hidden && (
+                        <TableCell className="table-cell tasklist-task" padding="none">
+                          {n['Questionnaire-Schedule D'].completed ?
+                            <Moment format="M/D/YY">{n['Questionnaire-Schedule D'].lastChangedOn}</Moment>
+                            :
+                            <Close className="incomplete-tasklist" />
+                          }
+                        </TableCell>
+                      )}
+                      {!n['Questionnaire-Schedule E'].hidden && (
+                        <TableCell className="table-cell tasklist-task" padding="none">
+                          {n['Questionnaire-Schedule E'].completed ?
+                            <Moment format="M/D/YY">{n['Questionnaire-Schedule E'].lastChangedOn}</Moment>
+                            :
+                            <Close className="incomplete-tasklist" />
+                          }
+                        </TableCell>
+                      )}
+                      <TableCell className="table-cell tasklist" padding="none">
+                        {n.provideInformation ? <Moment format="M/D/YY">{n.provideInformation}</Moment> : <Close className="incomplete-tasklist" />}
                       </TableCell>
-                    )}
-                    {!n['Questionnaire-FBAR and Form 8938'].hidden && (
-                      <TableCell className="table-cell tasklist-task" padding="none">
-                        {n['Questionnaire-FBAR and Form 8938'].completed ?
-                          <Moment format="M/D/YY">{n['Questionnaire-FBAR and Form 8938'].lastChangedOn}</Moment>
-                          :
-                          <Close className="incomplete-tasklist" />
-                        }
+                      {!n['Client Welcome Call'].hidden && (
+                        <TableCell className="table-cell tasklist-task" padding="none">
+                          {n['Client Welcome Call'].completed ?
+                            <Moment format="M/D/YY">{n['Client Welcome Call'].lastChangedOn}</Moment>
+                            :
+                            <Close className="incomplete-tasklist" />
+                          }
+                        </TableCell>
+                      )}
+                      {!n['Audit Protection Plan - IRS Monitoring'].hidden && (
+                        <TableCell className="table-cell tasklist-task" padding="none">
+                          {n['Audit Protection Plan - IRS Monitoring'].completed ?
+                            <Moment format="M/D/YY">{n['Audit Protection Plan - IRS Monitoring'].lastChangedOn}</Moment>
+                            :
+                            <Close className="incomplete-tasklist" />
+                          }
+                        </TableCell>
+                      )}
+                      {!n['Workpaper Preparation'].hidden && (
+                        <TableCell className="table-cell tasklist-task" padding="none">
+                          {n['Workpaper Preparation'].completed ?
+                            <Moment format="M/D/YY">{n['Workpaper Preparation'].lastChangedOn}</Moment>
+                            :
+                            <Close className="incomplete-tasklist" />
+                          }
+                        </TableCell>
+                      )}
+                      {!n['Data Entry'].hidden && (
+                        <TableCell className="table-cell tasklist-task" padding="none">
+                          {n['Data Entry'].completed ?
+                            <Moment format="M/D/YY">{n['Data Entry'].lastChangedOn}</Moment>
+                            :
+                            <Close className="incomplete-tasklist" />
+                          }
+                        </TableCell>
+                      )}
+                      {!n['Data Entry Review'].hidden && (
+                        <TableCell className="table-cell tasklist-task" padding="none">
+                          {n['Data Entry Review'].completed ?
+                            <Moment format="M/D/YY">{n['Data Entry Review'].lastChangedOn}</Moment>
+                            :
+                            <Close className="incomplete-tasklist" />
+                          }
+                        </TableCell>
+                      )}
+                      {!n['Data Entry Corrections'].hidden && (
+                        <TableCell className="table-cell tasklist-task" padding="none">
+                          {n['Data Entry Corrections'].completed ?
+                            <Moment format="M/D/YY">{n['Data Entry Corrections'].lastChangedOn}</Moment>
+                            :
+                            <Close className="incomplete-tasklist" />
+                          }
+                        </TableCell>
+                      )}
+                      {!n['Final Review'].hidden && (
+                        <TableCell className="table-cell tasklist-task" padding="none">
+                          {n['Final Review'].completed ?
+                            <Moment format="M/D/YY">{n['Final Review'].lastChangedOn}</Moment>
+                            :
+                            <Close className="incomplete-tasklist" />
+                          }
+                        </TableCell>
+                      )}
+                      <TableCell className="table-cell tasklist" padding="none">
+                        {n.preparation ? <Moment format="M/D/YY">{n.preparation}</Moment> : <Close className="incomplete-tasklist" />}
                       </TableCell>
-                    )}
-                    {!n['Questionnaire-Form 5471 (Foreign Corporation)'].hidden && (
-                      <TableCell className="table-cell tasklist-task" padding="none">
-                        {n['Questionnaire-Form 5471 (Foreign Corporation)'].completed ?
-                          <Moment format="M/D/YY">{n['Questionnaire-Form 5471 (Foreign Corporation)'].lastChangedOn}</Moment>
-                          :
-                          <Close className="incomplete-tasklist" />
-                        }
+                      {!n['Final Payment Received'].hidden && (
+                        <TableCell className="table-cell tasklist-task" padding="none">
+                          {n['Final Payment Received'].completed ?
+                            <Moment format="M/D/YY">{n['Final Payment Received'].lastChangedOn}</Moment>
+                            :
+                            <Close className="incomplete-tasklist" />
+                          }
+                        </TableCell>
+                      )}
+                      {!n['Final Invoice Due'].hidden && (
+                        <TableCell className="table-cell tasklist-task" padding="none">
+                          {n['Final Invoice Due'].completed ?
+                            <Moment format="M/D/YY">{n['Final Invoice Due'].lastChangedOn}</Moment>
+                            :
+                            <Close className="incomplete-tasklist" />
+                          }
+                        </TableCell>
+                      )}
+                      <TableCell className="table-cell tasklist" padding="none">
+                        {n.finalizePayment ? <Moment format="M/D/YY">{n.finalizePayment}</Moment> : <Close className="incomplete-tasklist" />}
                       </TableCell>
-                    )}
-                    {!n['Questionnaire-Schedule A'].hidden && (
-                      <TableCell className="table-cell tasklist-task" padding="none">
-                        {n['Questionnaire-Schedule A'].completed ?
-                          <Moment format="M/D/YY">{n['Questionnaire-Schedule A'].lastChangedOn}</Moment>
-                          :
-                          <Close className="incomplete-tasklist" />
-                        }
+                      {!n['Return Review Instructions'].hidden && (
+                        <TableCell className="table-cell tasklist-task" padding="none">
+                          {n['Return Review Instructions'].completed ?
+                            <Moment format="M/D/YY">{n['Return Review Instructions'].lastChangedOn}</Moment>
+                            :
+                            <Close className="incomplete-tasklist" />
+                          }
+                        </TableCell>
+                      )}
+                      {!n['Streamlined Procedure Instructions'].hidden && (
+                        <TableCell className="table-cell tasklist-task" padding="none">
+                          {n['Streamlined Procedure Instructions'].completed ?
+                            <Moment format="M/D/YY">{n['Streamlined Procedure Instructions'].lastChangedOn}</Moment>
+                            :
+                            <Close className="incomplete-tasklist" />
+                          }
+                        </TableCell>
+                      )}
+                      {!n['Client Review Call'].hidden && (
+                        <TableCell className="table-cell tasklist-task" padding="none">
+                          {n['Client Review Call'].completed ?
+                            <Moment format="M/D/YY">{n['Client Review Call'].lastChangedOn}</Moment>
+                            :
+                            <Close className="incomplete-tasklist" />
+                          }
+                        </TableCell>
+                      )}
+                      <TableCell className="table-cell tasklist" padding="none">
+                        {n.clientReview ? <Moment format="M/D/YY">{n.clientReview}</Moment> : <Close className="incomplete-tasklist" />}
                       </TableCell>
-                    )}
-                    {!n['Questionnaire-Schedule C'].hidden && (
-                      <TableCell className="table-cell tasklist-task" padding="none">
-                        {n['Questionnaire-Schedule C'].completed ?
-                          <Moment format="M/D/YY">{n['Questionnaire-Schedule C'].lastChangedOn}</Moment>
-                          :
-                          <Close className="incomplete-tasklist" />
-                        }
+                      {!n['Closing Letter'].hidden && (
+                        <TableCell className="table-cell tasklist-task" padding="none">
+                          {n['Closing Letter'].completed ?
+                            <Moment format="M/D/YY">{n['Closing Letter'].lastChangedOn}</Moment>
+                            :
+                            <Close className="incomplete-tasklist" />
+                          }
+                        </TableCell>
+                      )}
+                      {!n['Close Engagement & Archive Teamwork Project'].hidden && (
+                        <TableCell className="table-cell tasklist-task" padding="none">
+                          {n['Close Engagement & Archive Teamwork Project'].completed ?
+                            <Moment format="M/D/YY">{n['Close Engagement & Archive Teamwork Project'].lastChangedOn}</Moment>
+                            :
+                            <Close className="incomplete-tasklist" />
+                          }
+                        </TableCell>
+                      )}
+                      <TableCell className="table-cell tasklist" padding="none">
+                        {n.finalizeEngagement ? <Moment format="M/D/YY">{n.finalizeEngagement}</Moment> : <Close className="incomplete-tasklist" />}
                       </TableCell>
-                    )}
-                    {!n['Questionnaire-Schedule D'].hidden && (
-                      <TableCell className="table-cell tasklist-task" padding="none">
-                        {n['Questionnaire-Schedule D'].completed ?
-                          <Moment format="M/D/YY">{n['Questionnaire-Schedule D'].lastChangedOn}</Moment>
-                          :
-                          <Close className="incomplete-tasklist" />
-                        }
-                      </TableCell>
-                    )}
-                    {!n['Questionnaire-Schedule E'].hidden && (
-                      <TableCell className="table-cell tasklist-task" padding="none">
-                        {n['Questionnaire-Schedule E'].completed ?
-                          <Moment format="M/D/YY">{n['Questionnaire-Schedule E'].lastChangedOn}</Moment>
-                          :
-                          <Close className="incomplete-tasklist" />
-                        }
-                      </TableCell>
-                    )}
-                    <TableCell className="table-cell tasklist" padding="none">
-                      {n.provideInformation ? <Moment format="M/D/YY">{n.provideInformation}</Moment> : <Close className="incomplete-tasklist" />}
-                    </TableCell>
-                    {!n['Client Welcome Call'].hidden && (
-                      <TableCell className="table-cell tasklist-task" padding="none">
-                        {n['Client Welcome Call'].completed ?
-                          <Moment format="M/D/YY">{n['Client Welcome Call'].lastChangedOn}</Moment>
-                          :
-                          <Close className="incomplete-tasklist" />
-                        }
-                      </TableCell>
-                    )}
-                    {!n['Audit Protection Plan - IRS Monitoring'].hidden && (
-                      <TableCell className="table-cell tasklist-task" padding="none">
-                        {n['Audit Protection Plan - IRS Monitoring'].completed ?
-                          <Moment format="M/D/YY">{n['Audit Protection Plan - IRS Monitoring'].lastChangedOn}</Moment>
-                          :
-                          <Close className="incomplete-tasklist" />
-                        }
-                      </TableCell>
-                    )}
-                    {!n['Workpaper Preparation'].hidden && (
-                      <TableCell className="table-cell tasklist-task" padding="none">
-                        {n['Workpaper Preparation'].completed ?
-                          <Moment format="M/D/YY">{n['Workpaper Preparation'].lastChangedOn}</Moment>
-                          :
-                          <Close className="incomplete-tasklist" />
-                        }
-                      </TableCell>
-                    )}
-                    {!n['Data Entry'].hidden && (
-                      <TableCell className="table-cell tasklist-task" padding="none">
-                        {n['Data Entry'].completed ?
-                          <Moment format="M/D/YY">{n['Data Entry'].lastChangedOn}</Moment>
-                          :
-                          <Close className="incomplete-tasklist" />
-                        }
-                      </TableCell>
-                    )}
-                    {!n['Data Entry Review'].hidden && (
-                      <TableCell className="table-cell tasklist-task" padding="none">
-                        {n['Data Entry Review'].completed ?
-                          <Moment format="M/D/YY">{n['Data Entry Review'].lastChangedOn}</Moment>
-                          :
-                          <Close className="incomplete-tasklist" />
-                        }
-                      </TableCell>
-                    )}
-                    {!n['Data Entry Corrections'].hidden && (
-                      <TableCell className="table-cell tasklist-task" padding="none">
-                        {n['Data Entry Corrections'].completed ?
-                          <Moment format="M/D/YY">{n['Data Entry Corrections'].lastChangedOn}</Moment>
-                          :
-                          <Close className="incomplete-tasklist" />
-                        }
-                      </TableCell>
-                    )}
-                    {!n['Final Review'].hidden && (
-                      <TableCell className="table-cell tasklist-task" padding="none">
-                        {n['Final Review'].completed ?
-                          <Moment format="M/D/YY">{n['Final Review'].lastChangedOn}</Moment>
-                          :
-                          <Close className="incomplete-tasklist" />
-                        }
-                      </TableCell>
-                    )}
-                    <TableCell className="table-cell tasklist" padding="none">
-                      {n.preparation ? <Moment format="M/D/YY">{n.preparation}</Moment> : <Close className="incomplete-tasklist" />}
-                    </TableCell>
-                    {!n['Final Payment Received'].hidden && (
-                      <TableCell className="table-cell tasklist-task" padding="none">
-                        {n['Final Payment Received'].completed ?
-                          <Moment format="M/D/YY">{n['Final Payment Received'].lastChangedOn}</Moment>
-                          :
-                          <Close className="incomplete-tasklist" />
-                        }
-                      </TableCell>
-                    )}
-                    {!n['Final Invoice Due'].hidden && (
-                      <TableCell className="table-cell tasklist-task" padding="none">
-                        {n['Final Invoice Due'].completed ?
-                          <Moment format="M/D/YY">{n['Final Invoice Due'].lastChangedOn}</Moment>
-                          :
-                          <Close className="incomplete-tasklist" />
-                        }
-                      </TableCell>
-                    )}
-                    <TableCell className="table-cell tasklist" padding="none">
-                      {n.finalizePayment ? <Moment format="M/D/YY">{n.finalizePayment}</Moment> : <Close className="incomplete-tasklist" />}
-                    </TableCell>
-                    {!n['Return Review Instructions'].hidden && (
-                      <TableCell className="table-cell tasklist-task" padding="none">
-                        {n['Return Review Instructions'].completed ?
-                          <Moment format="M/D/YY">{n['Return Review Instructions'].lastChangedOn}</Moment>
-                          :
-                          <Close className="incomplete-tasklist" />
-                        }
-                      </TableCell>
-                    )}
-                    {!n['Streamlined Procedure Instructions'].hidden && (
-                      <TableCell className="table-cell tasklist-task" padding="none">
-                        {n['Streamlined Procedure Instructions'].completed ?
-                          <Moment format="M/D/YY">{n['Streamlined Procedure Instructions'].lastChangedOn}</Moment>
-                          :
-                          <Close className="incomplete-tasklist" />
-                        }
-                      </TableCell>
-                    )}
-                    {!n['Client Review Call'].hidden && (
-                      <TableCell className="table-cell tasklist-task" padding="none">
-                        {n['Client Review Call'].completed ?
-                          <Moment format="M/D/YY">{n['Client Review Call'].lastChangedOn}</Moment>
-                          :
-                          <Close className="incomplete-tasklist" />
-                        }
-                      </TableCell>
-                    )}
-                    <TableCell className="table-cell tasklist" padding="none">
-                      {n.clientReview ? <Moment format="M/D/YY">{n.clientReview}</Moment> : <Close className="incomplete-tasklist" />}
-                    </TableCell>
-                    {!n['Closing Letter'].hidden && (
-                      <TableCell className="table-cell tasklist-task" padding="none">
-                        {n['Closing Letter'].completed ?
-                          <Moment format="M/D/YY">{n['Closing Letter'].lastChangedOn}</Moment>
-                          :
-                          <Close className="incomplete-tasklist" />
-                        }
-                      </TableCell>
-                    )}
-                    {!n['Close Engagement & Archive Teamwork Project'].hidden && (
-                      <TableCell className="table-cell tasklist-task" padding="none">
-                        {n['Close Engagement & Archive Teamwork Project'].completed ?
-                          <Moment format="M/D/YY">{n['Close Engagement & Archive Teamwork Project'].lastChangedOn}</Moment>
-                          :
-                          <Close className="incomplete-tasklist" />
-                        }
-                      </TableCell>
-                    )}
-                    <TableCell className="table-cell tasklist" padding="none">
-                      {n.finalizeEngagement ? <Moment format="M/D/YY">{n.finalizeEngagement}</Moment> : <Close className="incomplete-tasklist" />}
-                    </TableCell>
+                    </TableRow>
+                  );
+                })}
+                {emptyRows > 0 && (
+                  <TableRow style={{ height: 49 * emptyRows }}>
+                    <TableCell colSpan={13} />
                   </TableRow>
-                );
-              })}
-              {emptyRows > 0 && (
-                <TableRow style={{ height: 49 * emptyRows }}>
-                  <TableCell colSpan={13} />
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-        <TablePagination
-          rowsPerPageOptions={[25,50,100,250,this.state.data.length]}
-          component="div"
-          count={data.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          backIconButtonProps={{
-            'aria-label': 'Previous Page',
-          }}
-          nextIconButtonProps={{
-            'aria-label': 'Next Page',
-          }}
-          onChangePage={this.handleChangePage}
-          onChangeRowsPerPage={this.handleChangeRowsPerPage}
-        />
-      </Paper>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+          <TablePagination
+            rowsPerPageOptions={[25,50,100,250,this.state.data.length]}
+            component="div"
+            count={data.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            backIconButtonProps={{
+              'aria-label': 'Previous Page',
+            }}
+            nextIconButtonProps={{
+              'aria-label': 'Next Page',
+            }}
+            onChangePage={this.handleChangePage}
+            onChangeRowsPerPage={this.handleChangeRowsPerPage}
+          />
+        </Paper>
+      </div>
     );
   }
 }

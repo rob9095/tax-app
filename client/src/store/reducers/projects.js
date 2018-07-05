@@ -1,5 +1,5 @@
 
-import { LOAD_TEAMWORK_DATA, LOAD_PROJECTS_FROM_DB } from '../actionTypes';
+import { LOAD_TEAMWORK_DATA, LOAD_PROJECTS_FROM_DB, REMOVE_PROJECT } from '../actionTypes';
 
 export default (state = {}, action) => {
   switch (action.type) {
@@ -10,6 +10,10 @@ export default (state = {}, action) => {
     case LOAD_PROJECTS_FROM_DB:
       return {
         projectsInDB: action.projectsInDB
+      }
+    case REMOVE_PROJECT:
+      return {
+        projectsInDB: [...state.projectsInDB.filter(project => project._id !== action.id)]
       }
     default:
       return state;

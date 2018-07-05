@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
+import { deleteProject } from '../store/actions/projects';
 import { withStyles } from 'material-ui/styles';
+import { connect } from 'react-redux';
+import { compose } from 'redux';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { lighten } from 'material-ui/styles/colorManipulator';
 import Toolbar from 'material-ui/Toolbar';
@@ -96,6 +99,19 @@ class ProjectTableToolbar extends Component {
 
   }
 
+  handleDelete = async() => {
+    this.props.toggleLoad();
+    console.log(this.props.selectedProjects)
+    let counter = 0;
+    for (let id of this.props.selectedProjects) {
+      await this.props.deleteProject(id);
+      counter++
+    }
+    if (counter === this.props.selectedProjects.length) {
+      this.props.toggleLoad();
+    }
+  }
+
   render() {
     const { numSelected, classes, currentTasks, tableState } = this.props;
     return (
@@ -120,7 +136,7 @@ class ProjectTableToolbar extends Component {
         <div className={classes.actions}>
           {numSelected > 0 ? (
             <Tooltip title="Delete">
-              <IconButton aria-label="Delete">
+              <IconButton aria-label="Delete" onClick={this.handleDelete}>
                 <DeleteIcon />
               </IconButton>
             </Tooltip>
@@ -166,4 +182,14 @@ ProjectTableToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
 };
 
-export default withStyles(toolbarStyles)(ProjectTableToolbar);
+function mapStateToProps(state) {
+	return {
+		currentUser: state.currentUser,
+    projects: state.projects,
+    tableState: state.tableState,
+    savedView: state.savedView,
+    defaultView: state.defaultView,
+	};
+}
+
+export default compose(withStyles(toolbarStyles), connect(mapStateToProps, { deleteProject }), )(ProjectTableToolbar);

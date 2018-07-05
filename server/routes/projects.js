@@ -6,6 +6,7 @@ const {
   getAllProjects,
   proccesProjects,
   updateProjectInternalMessage,
+  removeProject,
  } = require('../handlers/projects');
 
 // prefixed with /api -> /api/projects
@@ -20,6 +21,9 @@ router.get('/detailed', getAllProjects)
 
 //post to map projectsInDB
 router.post('/map-projects', mapTasksToProjects)
+
+//delete project and related tasklists, tasks, message replies
+router.delete('/delete/:teamwork_project_id', removeProject)
 
 //post to update the internalProjectMessageId
 router.post('/update-message-id', updateProjectInternalMessage)
