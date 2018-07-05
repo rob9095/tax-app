@@ -14,6 +14,7 @@ import Avatar from 'material-ui/Avatar';
 import CloseIcon from '@material-ui/icons/Close';
 import OnBoardingTabs from '../containers/OnBoardingTabs';
 import InviteUserModal from '../containers/InviteUserModal';
+import defaultProfileImage from '../images/default-profile-img.png';
 
 const styles = theme => ({
   input: {
@@ -143,7 +144,7 @@ class AccountPage extends Component {
               )}
               <Avatar
                 alt={currentUser.user.username}
-                src={currentUser.user.profileImageUrl}
+                src={currentUser.user.profileImageUrl ? currentUser.user.profileImageUrl : defaultProfileImage}
                 className={classes.avatar}
               />
               <FormControl>
