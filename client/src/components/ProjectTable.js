@@ -70,6 +70,8 @@ class EnhancedTable extends React.Component {
       isLoading: true,
       showNoResults: false,
       resetTrigger: false,
+      rowsPerPageOptions: [25,50,100,250],
+      noResultValue: '',
     };
     this.sanitizeName = this.sanitizeName.bind(this);
     this.handleShowPopover = this.handleShowPopover.bind(this)
@@ -471,6 +473,7 @@ class EnhancedTable extends React.Component {
       data: formattedProjectData,
       dataCopy: formattedProjectData,
       isLoading: this.props.loadDefaultView ? true : false,
+      rowsPerPageOptions: [...this.state.rowsPerPageOptions, formattedProjectData.length]
     })
   }
 
@@ -683,7 +686,7 @@ class EnhancedTable extends React.Component {
       console.log(filters)
       searchArr = filters;
     } else if (searchArr.length > 0 && filters.length > 0) {
-      let arr = [...searchArr, ...filters];
+      let arr = [...filters, ...searchArr];
       searchArr =[];
       let searchItems = {};
       for (let item of arr) {
@@ -708,8 +711,10 @@ class EnhancedTable extends React.Component {
       if (check.length > 0) {
         console.log('dont push the filter')
       } else {
-        console.log('pushing filter')
-        filters.push({column: searchItem.column, value: searchItem.value})
+        if (result.length > 0) {
+          console.log('pushing filter')
+          filters.push({column: searchItem.column, value: searchItem.value})
+        }
       }
       results.length > 0 && !cols[searchItem.column.id] ? results = [...result] : results.push(...result)
       console.log(`result for ${searchItem.value} is`)
@@ -722,16 +727,15 @@ class EnhancedTable extends React.Component {
       this.setState({
         data: results,
         rowsPerPage: results.length,
+        currentFilters: filters,
       })
     } else {
       this.setState({
         showNoResults: true,
+        noResultValue: searchArr[searchArr.length-1].value,
       })
       //alert('no results')
     }
-    this.setState({
-      currentFilters: filters,
-    })
   }
 
   handleToggleLoad = () => {
@@ -758,12 +762,12 @@ class EnhancedTable extends React.Component {
   handleResetTriggerToggle = () => {
     this.setState({
       resetTrigger: !this.state.resetTrigger,
-      getHeaderState: false,
-      showSaveModal: false,
-      searchOpen: false,
-      checkboxLoading: false,
-      isLoading: true,
-      showNoResults: false,
+    })
+  }
+
+  handleShowNoResultsToggle = (clearFilter) => {
+    this.setState({
+      showNoResults: !this.state.showNoResults,
     })
   }
 
@@ -793,6 +797,7 @@ class EnhancedTable extends React.Component {
           {this.state.showNoResults && (
             <NoResultsModal
               onTableReset={this.handleTableReset}
+              toggleShowNoResults={this.handleShowNoResultsToggle}
             />
           )}
           <ProjectTableToolbar
@@ -835,6 +840,8 @@ class EnhancedTable extends React.Component {
                 loadDefaultView={this.props.loadDefaultView}
                 resetTrigger={this.state.resetTrigger}
                 toggleResetTrigger={this.handleResetTriggerToggle}
+                showNoResults={this.state.showNoResults}
+                noResultValue={this.state.noResultValue}
               />
               <TableBody>
                 {data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(n => {
@@ -1125,7 +1132,7 @@ class EnhancedTable extends React.Component {
             </Table>
           </div>
           <TablePagination
-            rowsPerPageOptions={[25,50,100,250,this.state.data.length]}
+            rowsPerPageOptions={this.state.rowsPerPageOptions}
             component="div"
             count={data.length}
             rowsPerPage={rowsPerPage}

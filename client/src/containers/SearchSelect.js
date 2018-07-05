@@ -70,6 +70,12 @@ class SearchSelect extends React.Component {
         val: [],
       })
     }
+
+    if (newProps.showNoResults === true && this.props.showNoResults === false) {
+      this.setState({
+        val: this.state.val.filter(v => v !== this.props.noResultValue),
+      })
+    }
   }
 
   componentDidMount(){
@@ -151,7 +157,12 @@ class SearchSelect extends React.Component {
 
   render() {
     const { classes, theme, column, tableData } = this.props;
-
+    setTimeout(()=>{
+      if (this.state.vals) {
+        console.log('the selected values are')
+        console.log(this.state.vals)
+      }
+    },5000)
     return (
       <div className={classes.container}>
         <FormControl className={classes.formControl}>

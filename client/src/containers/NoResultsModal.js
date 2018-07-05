@@ -75,8 +75,16 @@ class NoResultsModal extends Component {
   };
 
   handleTableReset = () => {
-    this.handleClose();
     this.props.onTableReset();
+    this.handleClose();
+    this.props.toggleShowNoResults();
+  }
+
+  handleNoReset = () => {
+    this.setState({
+      open: false,
+    })
+    this.props.toggleShowNoResults();
   }
 
   render() {
@@ -103,7 +111,7 @@ class NoResultsModal extends Component {
                   Yes
                 </Button>
                 <Button
-                  onClick={this.handleClose}
+                  onClick={this.handleNoReset}
                   className={classes.button}
                   variant="raised"
                   type="submit"

@@ -48,7 +48,7 @@ class ProjectTableHead extends Component {
     updatedColumnData.forEach(c => {
       if (c.label === lastCheckedTask && c.isTask === true) {
           c.hidden = !c.hidden
-          //console.log(c)
+          console.log(`${lastCheckedTask} was just ${c.hidden === true ? 'hidden' : 'displayed' }`)
       }
     })
     this.setState({
@@ -61,13 +61,16 @@ class ProjectTableHead extends Component {
   handleViewUpdate = (view, viewTitle) => {
     console.log(`we confirmed that the new title: ${viewTitle} is different from the last one: ${this.state.savedViewTitle}`)
     // then clear any tasks if they exist
-    this.state.columnData.forEach(c => {
-      if (c.hidden === false && c.isTask === true) {
+    let data = this.state.columnData
+    data.forEach(c => {
+    if (c.hidden === false && c.isTask === true) {
+          console.log(`clearing task ${c.label}`)
           this.updateColumnData(c.label);
-      }
+        }
     })
     // show new tasks
     for (let t of view.headerState.tasks) {
+      console.log(`showing task ${t}`)
       this.updateColumnData(t)
     }
     this.setState({
@@ -82,8 +85,8 @@ class ProjectTableHead extends Component {
 
     if (newProps.resetTrigger === true && this.props.resetTrigger === false) {
       console.log('reset from header hit')
+      this.generateColumnData(true);
       this.props.toggleResetTrigger();
-      this.generateColumnData();
     }
 
     if (newProps.lastCheckedTask !== this.props.lastCheckedTask || newProps.removeTask !== this.props.removeTask) {
@@ -207,7 +210,7 @@ class ProjectTableHead extends Component {
     }
   }
 
-  generateColumnData = () => {
+  generateColumnData = (reset) => {
     const columnData = [
       {
         id: 'projectName',
@@ -578,8 +581,9 @@ class ProjectTableHead extends Component {
         noSearch: true,
       },
     ];
+    // if we are restting we want to keep the columnData, otherwise use fresh columnData
     this.setState({
-      columnData: columnData,
+      columnData: reset === true ? this.state.columnData : columnData,
     })
     if (this.props.loadDefaultView) {
       //display it
@@ -631,6 +635,8 @@ class ProjectTableHead extends Component {
                           tableData={tableData}
                           onSearchMenuItemSelect={this.handleSearchMenuItemSelect}
                           currentFilters={this.props.currentFilters}
+                          showNoResults={this.props.showNoResults}
+                          noResultValue={this.props.noResultValue}
                          />
                       </div>
                     )}
