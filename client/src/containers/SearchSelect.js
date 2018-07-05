@@ -138,7 +138,7 @@ class SearchSelect extends React.Component {
       const displayData = isDate ?
         this.state.data.filter(v => moment(v.id, moment.ISO_8601).isSame(`${year}-${month}-${day}`, dateMatchType))
         :
-        this.state.data.filter(v => v.id.toLowerCase().search(input) !== -1)
+        this.state.data.filter(v => v.id.toLowerCase().indexOf(input) !== -1)
       this.setState({
         displayData,
       })

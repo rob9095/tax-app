@@ -74,20 +74,6 @@ class EnhancedTable extends React.Component {
     this.handleViewUpdate = this.handleViewUpdate.bind(this);
   }
 
-  // componentWillReceiveProps(newProps) {
-  //   console.log(this.props.savedView)
-  //   console.log(newProps.savedView)
-  //   if (newProps.savedView) {
-  //     console.log('view loaded in table body')
-  //     if (newProps.savedView.title !== this.props.savedView.title && newProps.savedView.title !== undefined) {
-  //       this.setState({
-  //         ...newProps.savedView.bodyState
-  //       })
-  //       console.log(this.state)
-  //     }
-  //   }
-  // }
-
   sanitizeName = (s) => {
     let check = s.split('').filter(s => s === '-')
     if (check.length === 0) {
@@ -116,11 +102,11 @@ class EnhancedTable extends React.Component {
 
   }
 
-  componentWillUnmount(){
-    console.log('im gone!')
+  componentDidMount(){
+    this.generateTableData();
   }
 
-  componentDidMount(){
+  generateTableData = () => {
     // generate the data and save it to state
     let projects = this.props.projects.projectsInDB;
     //console.log(projects)
@@ -712,9 +698,9 @@ class EnhancedTable extends React.Component {
     for (let searchItem of searchArr) {
       console.log(`the searchItem is ${searchItem.value}`)
       let result = results.length > 0 && !cols[searchItem.column.id] ?
-        results.filter(p => p[searchItem.column.id].search(searchItem.value) !== -1)
+        results.filter(p => p[searchItem.column.id].indexOf(searchItem.value) !== -1)
         :
-        this.state.dataCopy.filter(p => p[searchItem.column.id].search(searchItem.value) !== -1)
+        this.state.dataCopy.filter(p => p[searchItem.column.id].indexOf(searchItem.value) !== -1)
       const check = filters.filter(el => el.value === searchItem.value);
       if (check.length > 0) {
         console.log('dont push the filter')
@@ -745,6 +731,14 @@ class EnhancedTable extends React.Component {
   handleToggleLoad = () => {
     this.setState({
       isLoading: !this.state.isLoading,
+    })
+  }
+
+  handleProjectDelete = (id) => {
+    this.setState({
+      data: this.state.data.filter(p => p.id !== id),
+      dataCopy: this.state.dataCopy.filter(p => p.id !== id),
+      selected: [],
     })
   }
 
@@ -784,6 +778,7 @@ class EnhancedTable extends React.Component {
             rowsPerPage={this.state.rowsPerPage}
             selectedProjects={this.state.selected}
             toggleLoad={this.handleToggleLoad}
+            onProjectDelete={this.handleProjectDelete}
           />
           <div className={classes.tableWrapper}>
             <Table className={classes.table}>

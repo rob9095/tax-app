@@ -105,9 +105,10 @@ class ProjectTableToolbar extends Component {
     let counter = 0;
     for (let id of this.props.selectedProjects) {
       await this.props.deleteProject(id);
+      await this.props.onProjectDelete(id);
       counter++
     }
-    if (counter === this.props.selectedProjects.length) {
+    if (counter === this.props.selectedProjects.length || this.props.selectedProjects.length === 0) {
       this.props.toggleLoad();
     }
   }
