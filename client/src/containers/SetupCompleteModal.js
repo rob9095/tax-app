@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { withStyles } from 'material-ui/styles';
+import { Redirect } from 'react-router-dom';
 import Paper from 'material-ui/Paper';
 import CloseIcon from '@material-ui/icons/Close';
 import Typography from 'material-ui/Typography';
@@ -48,11 +49,12 @@ const styles = theme => ({
   },
 });
 
-class NoResultsModal extends Component {
+class SetupCompleteModal extends Component {
   constructor(props) {
     super(props);
     this.state = {
       open: false,
+      redirect: false,
     };
   }
 
@@ -70,23 +72,19 @@ class NoResultsModal extends Component {
     this.setState({ open: false });
   };
 
-  handleTableReset = () => {
-    this.props.onTableReset();
-    this.handleClose();
-    this.props.toggleShowNoResults();
-  }
-
-  handleNoReset = () => {
+  handleRedirect = () => {
     this.setState({
-      open: false,
+      redirect: true,
     })
-    this.props.toggleShowNoResults();
   }
 
   render() {
     const { classes } = this.props;
     return (
       <div>
+        {this.state.redirect && (
+          <Redirect to="/dashboard" />
+        )}
         <Modal
           aria-labelledby="simple-modal-title"
           aria-describedby="simple-modal-description"
@@ -95,24 +93,24 @@ class NoResultsModal extends Component {
         >
           <div style={getModalStyle()} className={classes.paper}>
             <div className={classes.formContainer}>
-              <h2>No Results Found</h2>
-              <p>Reset Table Data?</p>
+              <h2>Setup Complete</h2>
+              <p>It looks like the setup is already complete. You can run the setup again or view the Project Dashboard</p>
               <div className={classes.buttonGroup}>
                 <Button
-                  onClick={this.handleTableReset}
+                  onClick={this.handleClose}
                   className={classes.button}
                   variant="raised"
                   type="submit"
                   color="primary">
-                  Yes
+                  Run Setup Again
                 </Button>
                 <Button
-                  onClick={this.handleNoReset}
+                  onClick={this.handleRedirect}
                   className={classes.button}
                   variant="raised"
                   type="submit"
                   color="primary">
-                  No
+                  View Dashboard
                 </Button>
               </div>
             </div>
@@ -123,7 +121,7 @@ class NoResultsModal extends Component {
   }
 }
 
-NoResultsModal.propTypes = {
+SetupCompleteModal.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
@@ -137,4 +135,4 @@ function mapStateToProps(state) {
 	};
 }
 
-export default withStyles(styles)(connect(mapStateToProps, {  })(NoResultsModal));
+export default withStyles(styles)(connect(mapStateToProps, {  })(SetupCompleteModal));

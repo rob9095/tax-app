@@ -18,6 +18,7 @@ import { requestAndUpdateTasks } from '../store/actions/tasks';
 import { getMessages, getMessageReplies } from '../store/actions/messages';
 import { withStyles } from 'material-ui/styles';
 import SetupLog from './SetupLog';
+import SetupCompleteModal from './SetupCompleteModal';
 import ProgressBar from './ProgressBar';
 import Stepper, { Step, StepLabel, StepContent } from 'material-ui/Stepper';
 import Button from 'material-ui/Button';
@@ -69,7 +70,9 @@ class SetupSteps extends React.Component {
 
   componentDidMount() {
     if (this.props.currentUser.isAuthenticated) {
-      //this.props.fetchTeamworkProjectData();
+      this.setState({
+        setupComplete: this.props.currentUser.user.setupComplete,
+      })
       this.props.fetchDBProjects()
       .then((data)=>{
         this.setState({
@@ -476,6 +479,7 @@ class SetupSteps extends React.Component {
       await this.props.updateUser(user)
       this.setState({
         setupComplete: true,
+        redirect: true,
         isLoading: false,
       })
     })
@@ -491,9 +495,11 @@ class SetupSteps extends React.Component {
     const { classes } = this.props;
     const steps = getSteps();
     const { activeStep, setupComplete } = this.state;
-
     return (
       <div className="setup-steps">
+        {this.state.setupComplete && (
+          <SetupCompleteModal />
+        )}
         <h1>Setup</h1>
         <Stepper activeStep={activeStep} orientation="vertical" className={classes.stepContainer}>
           {steps.map((label, index) => {
@@ -571,9 +577,6 @@ class SetupSteps extends React.Component {
         </Stepper>
         {activeStep === steps.length && (
           <Paper square elevation={0} className={classes.resetContainer}>
-            {this.state.setupComplete && (
-              <Redirect to='/dashboard' />
-            )}
             <Typography>{`Please finish the setup process to view the Project Dashboard`}</Typography>
               <Button
                 variant="raised"
