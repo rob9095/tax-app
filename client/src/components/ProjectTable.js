@@ -24,6 +24,7 @@ import FilterListIcon from '@material-ui/icons/FilterList';
 import { lighten } from 'material-ui/styles/colorManipulator';
 import Close from '@material-ui/icons/Close';
 import TasklistMenu from '../containers/TasklistMenu';
+import NoResultsModal from '../containers/NoResultsModal';
 import ProjectTableToolbar from './ProjectTableToolbar';
 import ProjectTableHead from './ProjectTableHead';
 import ProjectNotes from './ProjectNotes';
@@ -67,6 +68,8 @@ class EnhancedTable extends React.Component {
       searchOpen: false,
       checkboxLoading: false,
       isLoading: true,
+      showNoResults: false,
+      resetTrigger: false,
     };
     this.sanitizeName = this.sanitizeName.bind(this);
     this.handleShowPopover = this.handleShowPopover.bind(this)
@@ -721,7 +724,10 @@ class EnhancedTable extends React.Component {
         rowsPerPage: results.length,
       })
     } else {
-      alert(`No results`)
+      this.setState({
+        showNoResults: true,
+      })
+      //alert('no results')
     }
     this.setState({
       currentFilters: filters,
@@ -739,6 +745,25 @@ class EnhancedTable extends React.Component {
       data: this.state.data.filter(p => p.id !== id),
       dataCopy: this.state.dataCopy.filter(p => p.id !== id),
       selected: [],
+    })
+  }
+
+  handleTableReset = () => {
+    console.log('reset from table hit')
+    this.setState({
+      resetTrigger: true,
+    })
+  }
+
+  handleResetTriggerToggle = () => {
+    this.setState({
+      resetTrigger: !this.state.resetTrigger,
+      getHeaderState: false,
+      showSaveModal: false,
+      searchOpen: false,
+      checkboxLoading: false,
+      isLoading: true,
+      showNoResults: false,
     })
   }
 
@@ -764,6 +789,11 @@ class EnhancedTable extends React.Component {
             <div className="table-loader">
               <CircularProgress />
             </div>
+          )}
+          {this.state.showNoResults && (
+            <NoResultsModal
+              onTableReset={this.handleTableReset}
+            />
           )}
           <ProjectTableToolbar
             bodyState={this.state}
@@ -803,6 +833,8 @@ class EnhancedTable extends React.Component {
                 currentFilters={this.state.currentFilters}
                 rowsPerPage={this.state.rowsPerPage}
                 loadDefaultView={this.props.loadDefaultView}
+                resetTrigger={this.state.resetTrigger}
+                toggleResetTrigger={this.handleResetTriggerToggle}
               />
               <TableBody>
                 {data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(n => {

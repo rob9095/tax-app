@@ -79,6 +79,13 @@ class ProjectTableHead extends Component {
   }
 
   componentWillReceiveProps(newProps) {
+
+    if (newProps.resetTrigger === true && this.props.resetTrigger === false) {
+      console.log('reset from header hit')
+      this.props.toggleResetTrigger();
+      this.generateColumnData();
+    }
+
     if (newProps.lastCheckedTask !== this.props.lastCheckedTask || newProps.removeTask !== this.props.removeTask) {
       this.updateColumnData(newProps.lastCheckedTask)
       // let updatedState = this.state
@@ -200,7 +207,7 @@ class ProjectTableHead extends Component {
     }
   }
 
-  componentDidMount() {
+  generateColumnData = () => {
     const columnData = [
       {
         id: 'projectName',
@@ -208,7 +215,6 @@ class ProjectTableHead extends Component {
         numeric: false,
         disablePadding: false,
         label: 'Project',
-        noSearch: true,
       },
       {
         id: 'preparer',
@@ -581,6 +587,10 @@ class ProjectTableHead extends Component {
         this.handleViewUpdate(this.props.defaultView[0], this.props.defaultView[0].title)
       },250)
     }
+  }
+
+  componentDidMount() {
+    this.generateColumnData();
   }
 
   render() {
