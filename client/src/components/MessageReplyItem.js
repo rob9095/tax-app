@@ -34,7 +34,7 @@ class MessageReplyItem extends React.Component {
     this.handleExpandClick = this.handleExpandClick.bind(this);
   }
 
-  async handleExpandClick() {
+  handleExpandClick = (e) => {
     this.setState({ expanded: !this.state.expanded });
   };
 
@@ -46,7 +46,7 @@ class MessageReplyItem extends React.Component {
     return (
         <div
           className={`note-container ${this.state.expanded ? 'expanded' : ''}`}
-          onClick={this.handleExpandClick}>
+          onClick={this.state.expanded ? null : this.handleExpandClick}>
           <span className="note-avatar">
             <Avatar alt={`${note.authorFirstName} ${note.authorLastName}`} src={note.authorAvatarUrl} />
           </span>
@@ -56,6 +56,7 @@ class MessageReplyItem extends React.Component {
           </span>
           <span className="note-toggle">
             <IconButton
+              name="expand-button"
               className={classnames(classes.expand, {
                 [classes.expandOpen]: this.state.expanded,
               })}

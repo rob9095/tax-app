@@ -611,6 +611,8 @@ class EnhancedTable extends React.Component {
   }
 
   handleGetHeadState = (headerState) => {
+    console.log('the header state is')
+    console.log(headerState)
     this.setState({
       getHeaderState: !this.state.getHeaderState,
     })
@@ -800,21 +802,20 @@ class EnhancedTable extends React.Component {
               toggleShowNoResults={this.handleShowNoResultsToggle}
             />
           )}
-          <ProjectTableToolbar
-            bodyState={this.state}
-            currentTasks={currentTasks}
-            numSelected={selected.length}
-            toggleGetHeadState={this.handleGetHeadState}
-            openSaveModal={this.state.showSaveModal}
-            toggleSaveModel={this.handleShowSaveModal}
-            tableState={this.state}
-            toggleSearchView={this.handleSearchViewToggle}
-            searchViewOpen={this.state.searchOpen}
-            rowsPerPage={this.state.rowsPerPage}
-            selectedProjects={this.state.selected}
-            toggleLoad={this.handleToggleLoad}
-            onProjectDelete={this.handleProjectDelete}
-          />
+            <ProjectTableToolbar
+              currentTasks={currentTasks}
+              numSelected={selected.length}
+              toggleGetHeadState={this.handleGetHeadState}
+              openSaveModal={this.state.showSaveModal}
+              toggleSaveModel={this.handleShowSaveModal}
+              bodyState={this.state}
+              toggleSearchView={this.handleSearchViewToggle}
+              searchViewOpen={this.state.searchOpen}
+              rowsPerPage={this.state.rowsPerPage}
+              selectedProjects={this.state.selected}
+              toggleLoad={this.handleToggleLoad}
+              onProjectDelete={this.handleProjectDelete}
+            />
           <div className={classes.tableWrapper}>
             <Table className={classes.table}>
               <ProjectTableHead

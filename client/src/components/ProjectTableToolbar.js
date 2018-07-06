@@ -47,7 +47,7 @@ class ProjectTableToolbar extends Component {
     super(props);
     this.state = {
       searchLoading: false,
-      isLoading: false,
+      saveLoading: false,
       showSaveModal: false,
       searchOpen: false,
     };
@@ -57,7 +57,7 @@ class ProjectTableToolbar extends Component {
     if (newProps.openSaveModal === true && this.props.openSaveModal === false) {
       this.setState({
         showSaveModal: true,
-        isLoading: false,
+        saveLoading: false,
       })
       this.props.toggleSaveModel();
     }
@@ -91,12 +91,11 @@ class ProjectTableToolbar extends Component {
 
   handleSaveView = () => {
     this.setState({
-      isLoading: true,
+      saveLoading: true,
     })
     setTimeout(()=>{
       this.props.toggleGetHeadState();
     },100)
-
   }
 
   handleDelete = async() => {
@@ -114,7 +113,8 @@ class ProjectTableToolbar extends Component {
   }
 
   render() {
-    const { numSelected, classes, currentTasks, tableState } = this.props;
+    const { numSelected, classes, currentTasks, bodyState } = this.props;
+    console.log(this.props.bodyState)
     return (
       <Toolbar
         className={classNames(classes.root, {
@@ -122,7 +122,7 @@ class ProjectTableToolbar extends Component {
         })}
       >
         {this.state.showSaveModal && (
-          <SaveViewModal tasks={currentTasks} tableData={tableState} toggleModal={this.toggleSaveViewModal} />
+          <SaveViewModal tasks={currentTasks} tableData={bodyState} toggleModal={this.toggleSaveViewModal} />
         )}
         <div className={classes.title}>
           {numSelected > 0 ? (
@@ -149,7 +149,7 @@ class ProjectTableToolbar extends Component {
                   aria-label="Save View"
                   onClick={this.handleSaveView}
                   >
-                    {this.state.isLoading && this.props.rowsPerPage > 200 ?
+                    {this.state.saveLoading && this.props.rowsPerPage > 180 ?
                       <CircularProgress size={24} />
                       :
                       <SaveIcon />
@@ -161,13 +161,12 @@ class ProjectTableToolbar extends Component {
                   disableRipple={true}
                   aria-label="Search"
                   onClick={this.toggleSearch}
-                  >
-                  {this.state.searchLoading && this.props.rowsPerPage > 200 ?
+                >
+                  {this.state.searchLoading && this.props.rowsPerPage > 180 ?
                     <CircularProgress size={24} />
                     :
                     <SearchIcon />
-                  }
-
+                   }
                 </IconButton>
               </Tooltip>
             </div>

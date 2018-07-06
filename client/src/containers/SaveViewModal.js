@@ -111,6 +111,7 @@ class SaveViewModal extends Component {
       });
       return
     }
+
     const tableBodyState = {
       ...this.props.tableData,
     };

@@ -589,7 +589,7 @@ class ProjectTableHead extends Component {
       //display it
       setTimeout(()=>{
         this.handleViewUpdate(this.props.defaultView[0], this.props.defaultView[0].title)
-      },250)
+      },100)
     }
   }
 
@@ -632,7 +632,7 @@ class ProjectTableHead extends Component {
                         <SearchSelect
                           key={column.id}
                           column={column}
-                          tableData={tableData}
+                          tableData={this.props.tableData}
                           onSearchMenuItemSelect={this.handleSearchMenuItemSelect}
                           currentFilters={this.props.currentFilters}
                           showNoResults={this.props.showNoResults}
