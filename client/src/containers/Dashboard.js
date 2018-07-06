@@ -30,7 +30,7 @@ class Dashboard extends Component {
       };
     }
 
-    componentDidMount = async() => {
+    componentDidMount() {
       //clear any errors from redux
       this.props.removeError();
       // un-authed user send to root
@@ -42,14 +42,6 @@ class Dashboard extends Component {
       }
       // user is authed and setup is complete
       if(this.props.currentUser.isAuthenticated && this.props.currentUser.user.setupComplete) {
-        this.props.fetchDefaultView(this.props.currentUser.user.id)
-        .then((view)=>{
-          if (view !== null && view !== undefined) {
-            this.setState({
-              loadDefaultView: true,
-            })
-          }
-        })
         this.props.fetchDBProjects()
         .then(()=> {
           this.setState({
@@ -61,6 +53,14 @@ class Dashboard extends Component {
             errorMessage: 'Unable to connect to server, please try again',
             isLoading: false,
           })
+        })
+        this.props.fetchDefaultView(this.props.currentUser.user.id)
+        .then((view)=>{
+          if (view !== null && view !== undefined) {
+            this.setState({
+              loadDefaultView: true,
+            })
+          }
         })
       }
       // user is authed, and super admin and setup is incomplete

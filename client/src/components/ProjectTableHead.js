@@ -589,7 +589,7 @@ class ProjectTableHead extends Component {
       //display it
       setTimeout(()=>{
         this.handleViewUpdate(this.props.defaultView[0], this.props.defaultView[0].title)
-      },100)
+      },250)
     }
   }
 
