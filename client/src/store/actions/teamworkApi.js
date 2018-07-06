@@ -52,7 +52,7 @@ export function getUserProfileImage(currentUser, email, updateCurrentUser) {
 		return new Promise((resolve,reject) => {
 			return teamworkApiCall('get', url, key)
 			.then(async (data) => {
-				const user = data.people.filter((person) => person['email-address'] === email)
+				const user = data.people.filter((person) => person['email-address'].toLowerCase() === email.toLowerCase())
 				if (user.length > 0 && updateCurrentUser) {
 					const formattedUser = {
 						email: currentUser.email,

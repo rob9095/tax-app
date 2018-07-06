@@ -5,12 +5,14 @@ import { addNewInvitation, getInvitations } from '../store/actions/invitations';
 import { addError, removeError } from '../store/actions/errors';
 import { withStyles } from 'material-ui/styles';
 import { FormControl, FormHelperText } from 'material-ui/Form';
+import List from 'material-ui/List';
 import Paper from 'material-ui/Paper';
 import CloseIcon from '@material-ui/icons/Close';
 import Typography from 'material-ui/Typography';
 import Modal from 'material-ui/Modal';
 import Button from 'material-ui/Button';
 import Input from 'material-ui/Input';
+import { CircularProgress } from 'material-ui/Progress';
 import InviteListItem from '../components/InviteListItem';
 import { getUserProfileImage } from '../store/actions/teamworkApi';
 
@@ -32,11 +34,9 @@ function getModalStyle() {
 const styles = theme => ({
   paper: {
     position: 'absolute',
-    width: theme.spacing.unit * 70,
     backgroundColor: theme.palette.background.paper,
     boxShadow: theme.shadows[5],
     padding: theme.spacing.unit * 4,
-    display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
   },
@@ -49,6 +49,7 @@ const styles = theme => ({
   title: {
     textAlign: 'center',
     fontWeight: 'bold',
+    paddingTop: 10,
   },
   button: {
     margin: theme.spacing.unit,
@@ -64,11 +65,23 @@ class InviteUserModal extends Component {
       email: '',
       inputErrors: false,
       errMessage: '',
+      isLoading: true,
     };
   }
 
   componentDidMount() {
-    this.props.getInvitations();
+    this.props.getInvitations()
+    .then((invites)=>{
+      this.setState({
+        isLoading: false,
+      })
+    })
+    .catch(()=>{
+      this.setState({
+        errMessage: 'Trouble contacting server, please try again.',
+        isLoading: false,
+      })
+    })
   }
 
   componentWillReceiveProps(newProps){
@@ -101,6 +114,7 @@ class InviteUserModal extends Component {
       this.setState({
         inputErrors: true,
         errMessage: 'Please enter a valid email',
+        isLoading: false,
       });
       return
     }
@@ -108,7 +122,8 @@ class InviteUserModal extends Component {
     if (!profileImg) {
       this.setState({
         inputErrors: true,
-        errMessage: `No Teamwork users found with email ${this.state.email}`
+        errMessage: `No Teamwork users found with email ${this.state.email}`,
+        isLoading: false,
       })
       return
     } else {
@@ -118,14 +133,15 @@ class InviteUserModal extends Component {
         email: this.state.email,
         profileImageUrl: profileImg,
       }
-      this.props.addNewInvitation(inviteData)
-      .then(()=>{
-        this.setState({
-          email: '',
-          inputErrors: false,
-        })
+      await this.props.addNewInvitation(inviteData)
+      this.setState({
+        email: '',
+        inputErrors: false,
       })
     }
+    this.setState({
+      isLoading: false,
+    })
   }
 
   closeErrors = () => {
@@ -162,7 +178,7 @@ class InviteUserModal extends Component {
         >
           <div style={getModalStyle()} className={classes.paper}>
             <div className={classes.formContainer}>
-              <Typography className={classes.title}>Add an Email to the access list</Typography>
+              <h2 className={classes.title}>Invite New User</h2>
               {this.state.errMessage && (
                 <Paper elevation={4} className="alert alert-error">
                   {this.state.errMessage}
@@ -171,6 +187,7 @@ class InviteUserModal extends Component {
               )}
               <FormControl>
                 <Input
+                  autoFocus
                   error={this.state.inputErrors}
                   autoComplete="off"
                   id="email"
@@ -179,7 +196,7 @@ class InviteUserModal extends Component {
                   onChange={this.handleChange}
                   value={this.state.email}
                   className='centered'
-                  placeholder="Email (same as Teamwork email)"
+                  placeholder="Email (must be same as Teamwork email)"
                 />
               </FormControl>
               <Button
@@ -191,15 +208,13 @@ class InviteUserModal extends Component {
                 Send Invite
               </Button>
             </div>
-            <h4 className={classes.title}>Current Invites</h4>
-            <div className="invite-title-container">
-              <span className="invite-title">Invited</span>
-              <span className="invite-title">Invited By</span>
-              <span className="invite-title trash">Trash</span>
-            </div>
-            <ul className="invite-list">
+            <h3 className={classes.title}>Current Invites</h3>
+            {this.state.isLoading && (
+              <CircularProgress size={24} />
+            )}
+            <List>
               {invites}
-            </ul>
+            </List>
           </div>
         </Modal>
       </div>

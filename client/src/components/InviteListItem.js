@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { deleteInvitation } from '../store/actions/invitations';
 import { addError, removeError } from '../store/actions/errors';
+import { ListItem, ListItemText } from 'material-ui/List';
+import Tooltip from 'material-ui/Tooltip';
 import IconButton from 'material-ui/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
 
@@ -19,18 +21,23 @@ class InvitationListItem extends Component {
   render() {
     const { invite } = this.props;
     return(
-      <li>
-        <span className="invited">{invite.email}</span>
-        <span className="invited-by">{invite.invitedByEmail}</span>
-        <span className="delete">
+      <ListItem
+        button={true}
+        key={invite._id}
+        >
+        <ListItemText
+          primary={invite.email}
+          secondary={`Invited By: ${invite.invitedByEmail}`}
+        />
+        <Tooltip title="Delete">
           <IconButton
             onClick={this.handleDelete}
             aria-label="Delete"
-            >
+          >
             <DeleteIcon />
           </IconButton>
-        </span>
-      </li>
+        </Tooltip>
+      </ListItem>
     )
   }
 }
