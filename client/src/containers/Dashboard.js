@@ -24,7 +24,7 @@ class Dashboard extends Component {
         removeTask: false,
         toggleCount: 0,
         isLoading: true,
-        loadDefaultView: false,
+        loadDefaultView: 'waiting',
         redirect: false,
         errorMessage: '',
       };
@@ -59,6 +59,10 @@ class Dashboard extends Component {
           if (view !== null && view !== undefined) {
             this.setState({
               loadDefaultView: true,
+            })
+          } else {
+            this.setState({
+              loadDefaultView: false,
             })
           }
         })
@@ -122,7 +126,7 @@ class Dashboard extends Component {
 
     render() {
       const { currentUser, projects, errors } = this.props;
-      {if (this.state.isLoading){
+      {if (this.state.isLoading || this.state.loadDefaultView === 'waiting'){
         return(
           <div className="dashboard-loader">
             <LinearProgress />

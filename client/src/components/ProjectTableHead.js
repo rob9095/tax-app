@@ -585,12 +585,15 @@ class ProjectTableHead extends Component {
     this.setState({
       columnData: reset === true ? this.state.columnData : columnData,
     })
-    if (this.props.loadDefaultView) {
-      //display it
-      setTimeout(()=>{
-        this.handleViewUpdate(this.props.defaultView[0], this.props.defaultView[0].title)
-      },250)
-    }
+    //wait some time to check for default view
+    console.log('in table head')
+    console.log(this.props.loadDefaultView)
+    setTimeout(()=>{
+      if (this.props.loadDefaultView) {
+        //display it
+          this.handleViewUpdate(this.props.defaultView[0], this.props.defaultView[0].title)
+      }
+    },100)
   }
 
   componentDidMount() {
