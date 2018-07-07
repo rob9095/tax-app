@@ -33,6 +33,12 @@ input:disabled, textarea:disabled {
     margin: 0 auto;
 }
 
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
 /* ANTD table */
 .th.project-table-head {
   min-width: 80px;

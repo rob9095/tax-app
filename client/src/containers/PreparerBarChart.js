@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
-// import ReactChartkick, { PieChart } from 'react-chartkick';
-// import Chart from 'chart.js';
-import {PieChart, Legend} from 'react-easy-chart';
-// import 'chartjs-plugin-datalabels';
-// ReactChartkick.addAdapter(Chart);
+import ReactChartkick, { ColumnChart } from 'react-chartkick';
+import Chart from 'chart.js';
+import 'chartjs-plugin-datalabels';
+ReactChartkick.addAdapter(Chart);
 
-class PreparerPieChart extends Component {
+class PreparerBarChart extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -29,7 +28,8 @@ class PreparerPieChart extends Component {
         }
       }
     })
-    const data = Object.entries(preparers).map((p)=>({key: p[0], value: p[1]})).filter(p=>p.value > 2)
+    const data = Object.entries(preparers).filter(p=>p[1] > 2)
+    console.log(data)
     this.setState({
       chartData: data
     })
@@ -41,20 +41,11 @@ class PreparerPieChart extends Component {
     const { projectData } = this.props
     return(
       <span>
-        <PieChart
-          labels
-          data={this.state.chartData}
-          styles={{
-            '.chart_text': {
-              fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif'
-            }
-          }}
-         />
-         <Legend data={this.state.chartData} dataId={'key'} horizontal />
+        <ColumnChart label="Projects" id="projects-chart" colors={["#c49e9f"]}  options={this.state.options} data={this.state.chartData} />
       </span>
     )
   }
 
 }
 
-export default PreparerPieChart;
+export default PreparerBarChart;

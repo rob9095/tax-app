@@ -8,10 +8,11 @@ import { fetchDBProjects } from '../store/actions/teamworkApi';
 import { fetchDefaultView } from '../store/actions/savedTableView';
 import EnhancedTable from '../components/ProjectTable';
 import ProjectChart from '../components/ProjectChart';
-import PreparerPieChart from '../containers/PreparerPieChart';
+import PreparerBarChart from '../containers/PreparerBarChart';
 import TasklistPopover from '../containers/TasklistPopover';
 import OnBoardingTabs from '../containers/OnBoardingTabs';
 import ProjectTablev2 from '../components/ProjectTablev2';
+import ChartMenuSelect from '../containers/ChartMenuSelect';
 import { LinearProgress } from 'material-ui/Progress';
 
 class Dashboard extends Component {
@@ -27,6 +28,7 @@ class Dashboard extends Component {
         loadDefaultView: 'waiting',
         redirect: false,
         errorMessage: '',
+        chartType: 'Project Status',
       };
     }
 
@@ -57,8 +59,10 @@ class Dashboard extends Component {
         this.props.fetchDefaultView(this.props.currentUser.user.id)
         .then((view)=>{
           if (view !== null && view !== undefined) {
+            console.log(view.bodyState)
             this.setState({
               loadDefaultView: true,
+              chartType: view.bodyState.chart,
             })
           } else {
             this.setState({
@@ -124,6 +128,12 @@ class Dashboard extends Component {
       })
     }
 
+    handleChartTypeChange = (chartType) => {
+      this.setState({
+        chartType,
+      })
+    }
+
     render() {
       const { currentUser, projects, errors } = this.props;
       {if (this.state.isLoading || this.state.loadDefaultView === 'waiting'){
@@ -147,14 +157,23 @@ class Dashboard extends Component {
       }}
     	return (
     		<div>
-          <h2>Project Dashboard</h2>
+          <div className="dashboard-header">
+            <h2>Project Dashboard</h2>
+            <ChartMenuSelect
+              onChartTypeChange={this.handleChartTypeChange}
+            />
+          </div>
           <div className="chart-container">
-            <ProjectChart
-              projectData={projects}
-             />
-             {/* <PreparerPieChart
-               projectData={projects.projectsInDB}
-             /> */}
+            {this.state.chartType === 'Project Status' && (
+              <ProjectChart
+                projectData={projects}
+               />
+            )}
+            {this.state.chartType === 'Preparer' && (
+              <PreparerBarChart
+                projectData={projects.projectsInDB}
+              />
+            )}
           </div>
           {this.state.showPopover && (
             <div className="tasklist-popover">
@@ -172,6 +191,7 @@ class Dashboard extends Component {
             lastCheckedTask={this.state.currentTaskName}
             removeTask={this.state.removeTask}
             loadDefaultView={this.state.loadDefaultView}
+            chart={this.state.chartType}
           />
           {/* <ProjectTablev2 projectData={projects} /> */}
     		</div>

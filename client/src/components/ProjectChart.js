@@ -27,7 +27,7 @@ class ProjectChart extends Component {
 
   componentDidMount() {
     let projectLastTasks = {};
-    this.props.projects.projectsInDB.forEach(p => {
+    this.props.projectData.projectsInDB.forEach(p => {
       if (projectLastTasks[p.lastTasklistChanged]) {
         projectLastTasks[p.lastTasklistChanged]++
       } else {

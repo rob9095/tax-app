@@ -72,6 +72,7 @@ class EnhancedTable extends React.Component {
       resetTrigger: false,
       rowsPerPageOptions: [25,50,100,250],
       noResultValue: '',
+      chart: '',
     };
     this.sanitizeName = this.sanitizeName.bind(this);
     this.handleShowPopover = this.handleShowPopover.bind(this)
@@ -105,6 +106,14 @@ class EnhancedTable extends React.Component {
 
   sanitizeTasklists = (project) => {
 
+  }
+
+  componentWillReceiveProps(newProps) {
+    if (newProps.chart !== this.state.chart) {
+      this.setState({
+        chart: newProps.chart,
+      })
+    }
   }
 
   componentDidMount(){
@@ -473,7 +482,8 @@ class EnhancedTable extends React.Component {
       data: formattedProjectData,
       dataCopy: formattedProjectData,
       isLoading: this.props.loadDefaultView ? true : false,
-      rowsPerPageOptions: [...this.state.rowsPerPageOptions, formattedProjectData.length]
+      rowsPerPageOptions: [...this.state.rowsPerPageOptions, formattedProjectData.length],
+      chart: this.props.chart,
     })
   }
 
