@@ -40,6 +40,7 @@ class Dashboard extends Component {
         this.setState({
           redirect: true,
           isLoading: false,
+          loadDefaultView: false,
         })
       }
       // user is authed and setup is complete
@@ -54,6 +55,7 @@ class Dashboard extends Component {
           this.setState({
             errorMessage: 'Unable to connect to server, please try again',
             isLoading: false,
+            loadDefaultView: false,
           })
         })
         this.props.fetchDefaultView(this.props.currentUser.user.id)
