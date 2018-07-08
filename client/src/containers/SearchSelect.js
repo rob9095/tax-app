@@ -76,6 +76,12 @@ class SearchSelect extends React.Component {
         val: this.state.val.filter(v => v !== this.props.noResultValue),
       })
     }
+    if (newProps.currentFilters.length === 0) {
+      console.log(`no filters is search select!`)
+      this.setState({
+        val: [],
+      })
+    }
   }
 
   componentDidMount(){

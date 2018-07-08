@@ -645,6 +645,11 @@ class EnhancedTable extends React.Component {
   }
 
   handleViewUpdate = (view) => {
+    if (!view) {
+      console.log('we need to remove filters and requery fresh data')
+      this.handleTableSearch([], 'clearFilters');
+      return
+    }
     this.setState({
       ...view.bodyState,
     })
@@ -808,7 +813,7 @@ class EnhancedTable extends React.Component {
           )}
           {this.state.showNoResults && (
             <NoResultsModal
-              onTableReset={this.handleTableReset}
+              onTableReset={this.handleResetTriggerToggle}
               toggleShowNoResults={this.handleShowNoResultsToggle}
             />
           )}

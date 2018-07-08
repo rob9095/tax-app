@@ -86,6 +86,12 @@ class ProjectTableHead extends Component {
     if (newProps.resetTrigger === true && this.props.resetTrigger === false) {
       console.log('reset from header hit')
       this.generateColumnData(true);
+      if (this.props.loadDefaultView) {
+        //display the view if we have it
+        this.handleViewUpdate(this.props.defaultView[0], this.props.defaultView[0].title)
+      } else {
+        this.props.triggerViewUpdate();
+      }
       this.props.toggleResetTrigger();
     }
 
