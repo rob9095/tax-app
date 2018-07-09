@@ -26,8 +26,9 @@ class ChartMenuSelect extends React.Component {
   };
 
   handleChange = event => {
-    this.setState({ [event.target.name]: event.target.value });
-    this.props.onChartTypeChange(event.target.value);
+    let value = event.target.value === 'default' ? 'Project Status' : event.taret.value
+    this.setState({ [event.target.name]: value });
+    this.props.onChartTypeChange(value);
   };
 
   render() {
@@ -45,7 +46,7 @@ class ChartMenuSelect extends React.Component {
               id: 'chart-type',
             }}
           >
-            <MenuItem value="">
+            <MenuItem value={'default'}>
               <em>Chart Type</em>
             </MenuItem>
             <MenuItem value={'Project Status'}>Project Status</MenuItem>
