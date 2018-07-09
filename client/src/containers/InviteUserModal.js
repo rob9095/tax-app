@@ -209,7 +209,13 @@ class InviteUserModal extends Component {
                 Send Invite
               </Button>
             </div>
-            <h3 className={classes.title}>Current Invites</h3>
+            <h3 className={classes.title}>
+              {invites.length > 0 ?
+                'Current Invites'
+                :
+                'No Invites Found'
+              }
+            </h3>
             {this.state.isLoading && (
               <CircularProgress size={24} />
             )}
