@@ -7,9 +7,10 @@ import Navbar from './Navbar';
 import {setCurrentUser, setAuthorizationToken} from '../store/actions/auth';
 import jwtDecode from 'jwt-decode';
 import { render } from 'react-dom';
-import { createMuiTheme, MuiThemeProvider } from 'material-ui/styles';
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 
-const theme = createMuiTheme({
+
+const muiTheme = createMuiTheme({
   palette: {
     primary: {
       light: '#831112',
@@ -40,15 +41,15 @@ if(localStorage.jwtToken) {
 }
 
 const App = () => (
-	<MuiThemeProvider theme={theme}>
-		<Provider store={store}>
-			<Router>
-				<div className="mdl_content">
+	<MuiThemeProvider theme={muiTheme}>
+  	<Provider store={store}>
+  		<Router>
+  			<div className="mdl_content">
           <Navbar />
-					<Main />
-				</div>
-			</Router>
-		</Provider>
+  				<Main />
+  			</div>
+  		</Router>
+  	</Provider>
 	</MuiThemeProvider>
 );
 

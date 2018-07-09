@@ -2,16 +2,15 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { addError, removeError } from '../store/actions/errors';
-import { withStyles } from 'material-ui/styles';
-import { FormControl, FormHelperText } from 'material-ui/Form';
-import IconButton from 'material-ui/IconButton';
+import { withStyles } from '@material-ui/core/styles';
+import IconButton from '@material-ui/core/IconButton';
 import ChatBubbleIcon from '@material-ui/icons/ChatBubble';
-import Badge from 'material-ui/Badge';
-import Paper from 'material-ui/Paper';
+import Badge from '@material-ui/core/Badge';
+import Paper from '@material-ui/core/Paper';
 import CloseIcon from '@material-ui/icons/Close';
-import Typography from 'material-ui/Typography';
-import Modal from 'material-ui/Modal';
-import Button from 'material-ui/Button';
+import Typography from '@material-ui/core/Typography';
+import Modal from '@material-ui/core/Modal';
+import Button from '@material-ui/core/Button';
 import MessageReplyItem from './MessageReplyItem';
 
 function rand() {

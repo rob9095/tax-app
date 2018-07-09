@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { logout } from '../store/actions/auth';
 import { fetchAndUpdateCompletedMilestones, fetchAndUpdateTasklists , fetchDBProjects , fetchTeamworkProjectData, updateProjectsDB } from '../store/actions/teamworkApi';
 import { requestAndUpdateTasks } from '../store/actions/tasks';
-import Button from 'material-ui/Button';
+import Button from '@material-ui/core/Button';
 
 class Homepage extends Component {
     constructor(props) {

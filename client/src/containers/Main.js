@@ -7,7 +7,7 @@ import SetupSteps from './SetupSteps';
 import AuthForm from '../components/AuthForm';
 import { authUser } from '../store/actions/auth';
 import { removeError } from '../store/actions/errors';
-import Grid from 'material-ui/Grid';
+import Grid from '@material-ui/core/Grid';
 import AccountPage from './AccountPage';
 
 const Main = props => {

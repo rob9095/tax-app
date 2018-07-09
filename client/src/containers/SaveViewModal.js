@@ -4,14 +4,14 @@ import { connect } from 'react-redux';
 import { addNewInvitation, getInvitations } from '../store/actions/invitations';
 import { addError, removeError } from '../store/actions/errors';
 import { addSavedTableView, getSavedTableViews } from '../store/actions/savedTableViews';
-import { withStyles } from 'material-ui/styles';
-import { FormControl, FormHelperText } from 'material-ui/Form';
-import Paper from 'material-ui/Paper';
+import { withStyles } from '@material-ui/core/styles';
+import FormControl from '@material-ui/core/FormControl';
+import Paper from '@material-ui/core/Paper';
 import CloseIcon from '@material-ui/icons/Close';
-import Typography from 'material-ui/Typography';
-import Modal from 'material-ui/Modal';
-import Button from 'material-ui/Button';
-import Input from 'material-ui/Input';
+import Typography from '@material-ui/core/Typography';
+import Modal from '@material-ui/core/Modal';
+import Button from '@material-ui/core/Button';
+import Input from '@material-ui/core/Input';
 import SavedViewTabs from './SavedViewTabs';
 
 function rand() {

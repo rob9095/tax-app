@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { FormControlLabel } from 'material-ui/Form';
-import Checkbox from 'material-ui/Checkbox';
-import Switch from 'material-ui/Switch';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox from '@material-ui/core/Checkbox';
+import Switch from '@material-ui/core/Switch';
 
 class TaskCheckbox extends Component {
   constructor(props) {

@@ -5,10 +5,10 @@ import { compose } from 'redux';
 import { authUser } from '../store/actions/auth';
 import { addError, removeError } from '../store/actions/errors';
 import PropTypes from 'prop-types';
-import { withStyles } from 'material-ui/styles';
-import Button from 'material-ui/Button';
-import Input from 'material-ui/Input';
-import Paper from 'material-ui/Paper';
+import { withStyles } from '@material-ui/core/styles';
+import Button from '@material-ui/core/Button';
+import Input from '@material-ui/core/Input';
+import Paper from '@material-ui/core/Paper';
 import CloseIcon from '@material-ui/icons/Close';
 
 const styles = theme => ({

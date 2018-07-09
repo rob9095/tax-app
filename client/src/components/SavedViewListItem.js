@@ -1,18 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from 'material-ui/styles';
+import { withStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux';
 import { handleSavedViewDisplay, clearSavedViewDisplay, setDefaultView } from '../store/actions/savedTableView';
 import { deleteSavedTableView, toggleSharedView, checkDefaultViewBeforeDelete } from '../store/actions/savedTableViews';
-import List, { ListItem, ListItemSecondaryAction, ListItemText } from 'material-ui/List';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
 import RemoveViewConfirmation from '../containers/RemoveViewConfirmation';
-import Paper from 'material-ui/Paper';
-import Avatar from 'material-ui/Avatar';
-import IconButton from 'material-ui/IconButton';
+import Paper from '@material-ui/core/Paper';
+import Avatar from '@material-ui/core/Avatar';
+import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import StarIcon from '@material-ui/icons/Star';
-import Tooltip from 'material-ui/Tooltip';
+import Tooltip from '@material-ui/core/Tooltip';
 
 const styles = theme => ({
   root: {

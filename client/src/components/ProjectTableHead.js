@@ -3,22 +3,18 @@ import { connect } from 'react-redux';
 import { compose } from 'redux';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
-import { withStyles } from 'material-ui/styles';
-import Table, {
-  TableBody,
-  TableCell,
-  TableHead,
-  TablePagination,
-  TableRow,
-  TableSortLabel,
-} from 'material-ui/Table';
+import { withStyles } from '@material-ui/core/styles';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import TableSortLabel from '@material-ui/core/TableSortLabel';
+import TableCell from '@material-ui/core/TableCell';
 import TasklistMenu from '../containers/TasklistMenu';
 import SearchSelect from '../containers/SearchSelect';
-import Checkbox from 'material-ui/Checkbox';
+import Checkbox from '@material-ui/core/Checkbox';
 import { saveTableState } from '../store/actions/savedTableViews';
 import { SAVE_TABLE_HEAD_STATE } from '../store/actionTypes';
 import { handleSavedViewDisplay, clearSavedViewDisplay } from '../store/actions/savedTableView';
-import { CircularProgress } from 'material-ui/Progress';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 class ProjectTableHead extends Component {
   constructor(props) {

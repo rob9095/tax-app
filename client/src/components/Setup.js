@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { fetchAndUpdateCompletedMilestones, fetchAndUpdateTasklists , fetchDBProjects , fetchTeamworkProjectData, updateProjectsDB, getUserProfileImage } from '../store/actions/teamworkApi';
 import { requestAndUpdateTasks } from '../store/actions/tasks';
 import { getMessages, getMessageReplies } from '../store/actions/messages';
-import Button from 'material-ui/Button';
+import Button from '@material-ui/core/Button';
 import OnBoardingTabs from '../containers/OnBoardingTabs';
 import AccountPage from '../containers/AccountPage';
 

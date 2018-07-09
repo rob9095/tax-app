@@ -13,7 +13,7 @@ import TasklistPopover from '../containers/TasklistPopover';
 import OnBoardingTabs from '../containers/OnBoardingTabs';
 import ProjectTablev2 from '../components/ProjectTablev2';
 import ChartMenuSelect from '../containers/ChartMenuSelect';
-import { LinearProgress } from 'material-ui/Progress';
+import LinearProgress from '@material-ui/core/LinearProgress';
 
 class Dashboard extends Component {
     constructor(props) {

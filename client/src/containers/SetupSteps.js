@@ -16,17 +16,20 @@ import {
 import { getDetailedProjects, mapTasksToProjects } from '../store/actions/projects';
 import { requestAndUpdateTasks } from '../store/actions/tasks';
 import { getMessages, getMessageReplies } from '../store/actions/messages';
-import { withStyles } from 'material-ui/styles';
+import { withStyles } from '@material-ui/core/styles';
 import SetupLog from './SetupLog';
 import SetupCompleteModal from './SetupCompleteModal';
 import ProgressBar from './ProgressBar';
-import Stepper, { Step, StepLabel, StepContent } from 'material-ui/Stepper';
-import Button from 'material-ui/Button';
-import Paper from 'material-ui/Paper';
-import { FormControl, FormHelperText } from 'material-ui/Form';
-import Input from 'material-ui/Input';
-import Typography from 'material-ui/Typography';
-import { CircularProgress } from 'material-ui/Progress';
+import Stepper from '@material-ui/core/Stepper';
+import Step from '@material-ui/core/Step';
+import StepLabel from '@material-ui/core/StepLabel';
+import StepContent from '@material-ui/core/StepContent';
+import Button from '@material-ui/core/Button';
+import Paper from '@material-ui/core/Paper';
+import FormControl from '@material-ui/core/FormControl';
+import Input from '@material-ui/core/Input';
+import Typography from '@material-ui/core/Typography';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import ErrorIcon from '@material-ui/icons/Error';
 
 const styles = theme => ({
