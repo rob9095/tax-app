@@ -25,7 +25,7 @@ export function updateUser(updateData) {
 				resolve();
 			})
 			.catch(err => {
-				dispatch(addError(err.message));
+				dispatch(addError(err ? err.message : err));
 				reject();
 			})
 		});

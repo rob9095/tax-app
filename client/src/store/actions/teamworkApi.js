@@ -68,7 +68,7 @@ export function getUserProfileImage(currentUser, email, updateCurrentUser) {
 							resolve(user);
 						})
 						.catch(err => {
-							dispatch(addError(err.message));
+							dispatch(addError(err ? err.message : err));
 							reject(err);
 						})
 					})
@@ -150,7 +150,7 @@ export const fetchAndUpdateTasklists = (id, apiKey) => {
   					resolve(response);
   			})
   			.catch(err => {
-  				dispatch(addError(err.message));
+  				dispatch(addError(err ? err.message : err));
   				reject(err);
   			})
   		});

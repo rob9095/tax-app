@@ -55,7 +55,7 @@ export function deleteSavedTableView(view) {
         dispatch(removeView(view._id));
       })
       .catch((err)=> {
-        dispatch(addError(err.message));
+        dispatch(addError(err ? err.message : err));
         reject(err.message);
       })
     })
@@ -71,7 +71,7 @@ export function addSavedTableView(view) {
           dispatch(addView(res))
         })
         .catch(err => {
-          dispatch(addError(err.message));
+          dispatch(addError(err ? err.message : err));
           reject(err.message);
         })
     });
@@ -87,7 +87,7 @@ export function getSavedTableViews(user_id) {
         user_id === 'shared' ? dispatch(loadSharedViews(res)) : dispatch(loadViews(res))
       })
       .catch((err)=> {
-        dispatch(addError(err.message));
+        dispatch(addError(err ? err.message : err));
         reject(err);
       });
     });
@@ -103,7 +103,7 @@ export function toggleSharedView(viewData) {
 				resolve(view)
 			})
 			.catch(err=>{
-				dispatch(addError(err.message))
+				dispatch(addError(err ? err.message : err))
 				reject(err);
 			})
 		})
@@ -118,7 +118,7 @@ export function checkDefaultViewBeforeDelete(viewData) {
 				resolve(res);
 			})
 			.catch(err => {
-				dispatch(addError(err.message));
+				dispatch(addError(err ? err.message : err));
 				reject(err);
 			})
 		})

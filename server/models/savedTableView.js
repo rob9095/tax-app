@@ -10,6 +10,10 @@ const SavedTableViewSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
+  },
+  usernameTitle: {
+    type: String,
+    required: true,
     unique: true,
   },
   user: {

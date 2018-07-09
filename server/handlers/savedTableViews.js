@@ -11,7 +11,11 @@ exports.addSavedTableView = async (req, res, next) => {
         message: 'Please login to save views',
       })
     }
-    let createdView = await db.SavedTableView.create(req.body);
+    let view = {
+      ...req.body,
+      usernameTitle: `${foundUser.username}-${req.body.title}`,
+    }
+    let createdView = await db.SavedTableView.create(view);
     let foundView = await db.SavedTableView.findById(createdView.id);
     foundUser.savedTableViews.push(foundView.id);
     foundUser.save();

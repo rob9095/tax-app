@@ -15,7 +15,7 @@ export function getDetailedProjects() {
 				resolve(projects);
 			})
 			.catch(err => {
-				dispatch(addError(err.message));
+				dispatch(addError(err ? err.message : err));
 				reject(err);
 			})
 		});
@@ -30,7 +30,7 @@ export function mapTasksToProjects(data) {
 				resolve(data);
 			})
 			.catch(err => {
-				dispatch(addError(err.message));
+				dispatch(addError(err ? err.message : err));
 				reject(err);
 			})
 		});
@@ -46,7 +46,7 @@ export function deleteProject(teamwork_id) {
         dispatch(removeProject(project._id))
       })
       .catch((err)=>{
-        dispatch(addError(err.message))
+        dispatch(addError(err ? err.message : err))
       })
     })
   }

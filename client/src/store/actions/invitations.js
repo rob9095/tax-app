@@ -27,7 +27,7 @@ export function deleteInvitation(data) {
         dispatch(removeInvite(invite._id));
       })
       .catch((err)=> {
-        dispatch(addError(err.message));
+        dispatch(addError(err ? err.message : err));
         reject(err.message);
       })
     })
@@ -43,7 +43,7 @@ export function addNewInvitation(data) {
           dispatch(addInvite(res))
         })
         .catch(err => {
-          dispatch(addError(err.message));
+          dispatch(addError(err ? err.message : err));
           reject(err.message);
         })
     });
@@ -59,7 +59,7 @@ export function getInvitations() {
         dispatch(loadInvites(res))
       })
       .catch((err)=> {
-        dispatch(addError(err.message));
+        dispatch(addError(err ? err.message : err));
         reject(err);
       });
     });

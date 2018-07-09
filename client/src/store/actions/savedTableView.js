@@ -66,7 +66,7 @@ export function setDefaultView(data) {
         resolve(view)
       })
       .catch((err)=>{
-        dispatch(addError(err.message))
+        dispatch(addError(err ? err.message : err))
         reject(err);
       })
     })
@@ -82,7 +82,7 @@ export function fetchDefaultView(user_id) {
         resolve(view)
       })
       .catch((err)=>{
-        dispatch(addError(err.message))
+        dispatch(addError(err ? err.message : err))
         reject(err);
       })
     })
