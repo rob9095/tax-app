@@ -689,7 +689,7 @@ class EnhancedTable extends React.Component {
       this.setState({
         data: this.state.dataCopy,
         currentFilters: [],
-        rowsPerPage: 25,
+        rowsPerPage: this.props.loadDefaultView ? this.props.defaultView.bodyState.rowsPerPage : 25,
         page: 0,
       })
       return

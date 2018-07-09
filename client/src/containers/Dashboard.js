@@ -29,6 +29,7 @@ class Dashboard extends Component {
         redirect: false,
         errorMessage: '',
         chartType: 'Project Status',
+        view : {},
       };
     }
 
@@ -65,6 +66,7 @@ class Dashboard extends Component {
             this.setState({
               loadDefaultView: true,
               chartType: view.bodyState.chart,
+              view,
             })
           } else {
             this.setState({
@@ -194,6 +196,7 @@ class Dashboard extends Component {
             removeTask={this.state.removeTask}
             loadDefaultView={this.state.loadDefaultView}
             chart={this.state.chartType}
+            defaultView={this.state.view}
           />
           {/* <ProjectTablev2 projectData={projects} /> */}
     		</div>

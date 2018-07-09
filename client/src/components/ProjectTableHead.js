@@ -56,6 +56,8 @@ class ProjectTableHead extends Component {
 
   handleViewUpdate = (view, viewTitle) => {
     console.log(`we confirmed that the new title: ${viewTitle} is different from the last one: ${this.state.savedViewTitle}`)
+    console.log('the view is')
+    console.log(view)
     // then clear any tasks if they exist
     let data = this.state.columnData
     data.forEach(c => {
