@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import PropTypes from 'prop-types';
@@ -33,11 +33,15 @@ const styles = theme => ({
 class DrawerMenu extends Component {
   constructor(props) {
     super(props);
-    this.state = {}
+    this.state = {
+      redirect: false,
+    }
   }
 
   logout = e => {
-    e.preventDefault();
+    this.setState({
+      redirect: true,
+    })
     this.props.logout();
   }
 
@@ -45,6 +49,7 @@ class DrawerMenu extends Component {
     const { classes, currentUser } = this.props;
     return (
       <div className="menu-container">
+        {this.state.redirect && (<Redirect to="/" />)}
         {currentUser.isAuthenticated && (
           <div>
             <div className="menu-header">
