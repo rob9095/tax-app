@@ -242,8 +242,7 @@ form.auth-form {
 /* Modal */
 
 .modal-close {
-  padding: 10px;
-  top: 1px;
+  top: 5px;
   position: fixed;
   right: 5px;
 }
