@@ -47,9 +47,13 @@ class DrawerMenu extends Component {
 
   render() {
     const { classes, currentUser } = this.props;
+    if (this.state.redirect) {
+      return (
+        <Redirect to="/signin" />
+      )
+    }
     return (
       <div className="menu-container">
-        {this.state.redirect && (<Redirect to="/" />)}
         {currentUser.isAuthenticated && (
           <div>
             <div className="menu-header">

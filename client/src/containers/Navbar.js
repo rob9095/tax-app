@@ -30,18 +30,26 @@ class Navbar extends Component {
   }
 
   logout = e => {
-    e.preventDefault();
     this.setState({
       redirect: true,
     })
     this.props.logout();
+    setTimeout(()=>{
+      this.setState({
+        redirect: false,
+      })
+    },100)
   }
 
   render() {
     const { classes, errors, currentUser } = this.props;
+    if (this.state.redirect) {
+      return (
+        <Redirect to="/signin" />
+      )
+    }
     return(
       <div className={classes.root}>
-        {this.state.redirect && (<Redirect to="/" />)}
         <AppBar position="static">
           <Toolbar>
             <NavbarDrawer currentUser={currentUser} />
