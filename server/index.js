@@ -27,36 +27,36 @@ app.use(bodyParser.json());
 // saved table view routes
 app.use(
 		'/api/saved-views',
-		// loginRequired,
-		// ensureCorrectUser,
+		loginRequired,
+		ensureCorrectUser,
 		savedTableViewsRoutes);
 
 // message reply routes
 app.use(
 		'/api/message-replies',
-		// loginRequired,
-		// ensureCorrectUser,
+		loginRequired,
+		ensureCorrectUser,
 		messageRepliesRoutes);
 
 // account routes
 app.use(
 		'/api/account',
-		// loginRequired,
-		// ensureCorrectUser,
+		loginRequired,
+		ensureCorrectUser,
 		accountRoutes);
 
 // invitations routes
 app.use(
 		'/api/invitations',
-		// loginRequired,
-		// ensureCorrectUser,
+		loginRequired,
+		ensureCorrectUser,
 		invitationsRoutes);
 
 // milestones router
 app.use(
 		'/api/tasks',
-		// loginRequired,
-		// ensureCorrectUser,
+		loginRequired,
+		ensureCorrectUser,
 		tasksRoutes);
 
 //auth routes
@@ -65,22 +65,22 @@ app.use('/api/auth', authRoutes);
 // milestones router
 app.use(
 		'/api/milestones',
-		// loginRequired,
-		// ensureCorrectUser,
+		loginRequired,
+		ensureCorrectUser,
 		milestonesRoutes);
 
 // tasklists router
 app.use(
 		'/api/tasklists',
-		// loginRequired,
-		// ensureCorrectUser,
+		loginRequired,
+		ensureCorrectUser,
 		tasklistsRoutes);
 
 // projects router
 app.use(
 		'/api/projects',
-		// loginRequired,
-		// ensureCorrectUser,
+		loginRequired,
+		ensureCorrectUser,
 		projectsRoutes);
 
 
