@@ -34,7 +34,7 @@ exports.processTasks = async(req, res, next) => {
         projectName: t['project-name'],
         tasklistId: t['todo-list-id'],
         tasklistName: t['todo-list-name'],
-        lastChangedOn: t['last-changed-on'],
+        lastChangedOn: t['completed_on'] ? t['completed_on'] : t['last-changed-on'],
         createdOn: t['created-on'],
         dueDate: t['due-date'],
         lockdownId: t.lockdownId,

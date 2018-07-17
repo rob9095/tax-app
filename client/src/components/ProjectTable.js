@@ -489,7 +489,7 @@ class EnhancedTable extends React.Component {
 
   handleShowTasklistTask = (task) => {
 
-    let updatedData = this.state.dataCopy
+    let updatedData = this.state.data
     updatedData.forEach(p => {
       p[task].hidden = !p[task].hidden
       // console.log(p[task].hidden)
