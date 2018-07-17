@@ -78,13 +78,21 @@ class AccountPage extends Component {
 
     handleEditProfile = () => {
       this.setState({
-        editProfile: !this.state.editProfile,
+        editProfile: true,
+        username: this.props.currentUser.user.username,
+        apiKey: this.props.currentUser.user.apiKey,
+        password: '',
+        passwordCheck: '',
+      })
+    }
+
+    handleCancelEdit = () => {
+      this.setState({
+        editProfile: false,
         username: '',
-        email: '',
         apiKey: '',
         password: '',
         passwordCheck: '',
-        profileImageUrl: '',
       })
     }
 
@@ -239,7 +247,7 @@ class AccountPage extends Component {
                     </FormControl>
                     <div className="button-group">
                       <Button
-                        onClick={this.handleEditProfile}
+                        onClick={this.handleCancelEdit}
                         className={classes.button}
                         variant="raised"
                         type="submit"
