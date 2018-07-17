@@ -43,6 +43,7 @@ export function fetchDBProjects() {
 	}
 }
 
+// need to refactor -> nested promises = no good
 export function getUserProfileImage(currentUser, email, updateCurrentUser) {
 	// we know the company id so just hard coding it here
 	// todo in future -> send request to get all companies, return list to show user, ask which company they want to link, use that id

@@ -13,6 +13,7 @@ const invitationsRoutes = require('./routes/invitations');
 const accountRoutes = require('./routes/account');
 const messageRepliesRoutes = require('./routes/messageReplies');
 const savedTableViewsRoutes = require('./routes/savedTableViews');
+const projectsWebhooks = require('./routes/projectsWebhooks');
 const { loginRequired, ensureCorrectUser } = require('./middleware/auth');
 const PORT = 8082;
 
@@ -23,6 +24,12 @@ app.use(cors())
 app.use(bodyParser.json());
 
 // all routes here
+
+// saved table view routes
+app.use(
+		'/api/webhooks/projects/',
+		projectsWebhooks);
+
 
 // saved table view routes
 app.use(
