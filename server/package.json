@@ -11,13 +11,15 @@
   "description": "",
   "dependencies": {
     "async": "^2.6.0",
+    "axios": "^0.18.0",
     "bcrypt": "^1.0.3",
     "body-parser": "^1.18.2",
     "cors": "^2.8.4",
     "dotenv": "^5.0.1",
     "express": "^4.16.3",
     "jsonwebtoken": "^8.2.0",
-    "mongoose": "^5.0.10"
+    "mongoose": "^5.0.10",
+    "querystring": "^0.2.0"
   },
   "devDependencies": {
     "locus": "^2.0.1"

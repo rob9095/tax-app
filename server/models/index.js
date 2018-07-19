@@ -13,3 +13,5 @@ module.exports.Task = require('./task');
 module.exports.Invitation = require('./invitation');
 module.exports.MessageReply = require('./messageReply');
 module.exports.SavedTableView = require('./savedTableView');
+module.exports.AccessToken = require('./accessToken');
+module.exports.OpportunityQue = require('./opportunityQue');

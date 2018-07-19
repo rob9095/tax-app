@@ -13,7 +13,8 @@ const invitationsRoutes = require('./routes/invitations');
 const accountRoutes = require('./routes/account');
 const messageRepliesRoutes = require('./routes/messageReplies');
 const savedTableViewsRoutes = require('./routes/savedTableViews');
-const projectsWebhooks = require('./routes/projectsWebhooks');
+const projectsWebhooksRoutes = require('./routes/projectsWebhooks');
+const accessTokenRoutes = require('./routes/accessTokens');
 const { loginRequired, ensureCorrectUser } = require('./middleware/auth');
 const PORT = 8082;
 
@@ -25,10 +26,15 @@ app.use(bodyParser.json());
 
 // all routes here
 
-// saved table view routes
+// infusionsoft api access token routes
+app.use(
+		'/api/access-token/',
+		accessTokenRoutes);
+
+// project webhook routes
 app.use(
 		'/api/webhooks/projects/',
-		projectsWebhooks);
+		projectsWebhooksRoutes);
 
 
 // saved table view routes
