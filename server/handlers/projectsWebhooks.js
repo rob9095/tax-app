@@ -98,5 +98,4 @@ const handleNewOpportunity = async (o) => {
     replyByEmailEnabled: true,
   }
   let createdProject = await teamworkApiCall('post', 'https://taxsamaritan.teamwork.com/projects', user.apiKey, projectData)
-  let createdTasklists
 }
