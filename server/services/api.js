@@ -2,15 +2,28 @@ const axios = require("axios");
 const querystring = require('querystring');
 
 exports.teamworkApiCall = (method, path, key, data) => {
-  const headerObj = {
-		headers: {"Authorization": "BASIC " + Buffer.from(key + ":xxx").toString('base64')}
-	};
+  if (!data) {
+    data = {}
+  }
+  let secret = new Buffer(key + ":xxx").toString("base64");
+  const headerObj = JSON.stringify({
+    headers: {
+      "Authorization": "BASIC " + secret,
+      "Content-Type": "application/json"
+     }
+	});
+  console.log('the header obj is')
+  console.log(headerObj)
 	return new Promise((resolve, reject) => {
 		return axios[method.toLowerCase()](path, data, headerObj)
 		.then(res => {
+      console.log('teamwork res is')
+      console.log(res.data)
 			return resolve(res.data);
 		})
 		.catch(err => {
+      console.log('teamwork err is')
+      console.log(err)
 			return reject(err.response.data.error);
 		});
 	});
@@ -32,13 +45,9 @@ exports.refreshTokenApiCall = (method, path, token) => {
 	return new Promise((resolve, reject) => {
 		return axios[method.toLowerCase()](path, data, headerObj)
 		.then(res => {
-      console.log('res is')
-      console.log(res)
 			return resolve(res.data);
 		})
 		.catch(err => {
-      console.log('err is')
-      console.log(err)
 			return reject(err.response.data.error);
 		});
 	});
@@ -54,13 +63,9 @@ exports.infusionsoftApiCall = (method, path, token, data) => {
   return new Promise((resolve, reject) => {
     return axios[method.toLowerCase()](path, headerObj)
     .then(res => {
-      console.log('res is')
-      console.log(res)
       return resolve(res.data);
     })
     .catch(err => {
-      console.log('err is')
-      console.log(err)
       return reject(err.response.data.error);
     });
   });

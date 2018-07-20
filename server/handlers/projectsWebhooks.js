@@ -1,6 +1,85 @@
 const db = require('../models');
 const mongoose = require('mongoose');
 const { refreshTokenApiCall, infusionsoftApiCall, teamworkApiCall } = require('../services/api');
+const querystring = require('querystring');
+
+const daysToAddArr = [
+  {
+    tasklist: "INITIAL PAYMENT",
+    daysToAdd: "0",
+  },
+  {
+    tasklist: "PROVIDE INFORMATION",
+    daysToAdd: "9",
+  },
+  {
+    tasklist: "PREPARATION",
+    daysToAdd: "30",
+  },
+  {
+    tasklist: "FINALIZE PAYMENT",
+    daysToAdd: "37",
+  },
+  {
+    tasklist: "CLIENT REVIEW",
+    daysToAdd: "44",
+  },
+  {
+    tasklist: "FINALIZE ENGAGEMENT",
+    daysToAdd: "54",
+  },
+]
+
+const tasksArray = [
+  {
+    insoftLabel: "Form 5471",
+    teamworkLabel: "Questionnaire-Form 5471 (Foreign Corporation)",
+  },
+  {
+    insoftLabel: "Form 8621 (Distribution/Disposition)",
+    teamworkLabel: "Questionnaire-FBAR and Form 8938",
+  },
+  {
+    insoftLabel: "Form 8621 (Distribution/Disposition)",
+    teamworkLabel: "Questionnaire-Schedule D",
+  },
+  {
+    insoftLabel: "Form 8621 (Annual Disclosure Only)",
+    teamworkLabel: "Questionnaire-FBAR and Form 8938",
+  },
+  {
+    insoftLabel: "Form 8621 (Annual Disclosure Only)",
+    teamworkLabel: "Questionnaire-Schedule D",
+  },
+  {
+    insoftLabel: "Schedule A",
+    teamworkLabel: "Questionnaire-Schedule A",
+  },
+  {
+    insoftLabel: "Schedule B",
+    teamworkLabel: "Questionnaire-Schedule B",
+  },
+  {
+    insoftLabel: "Schedule C",
+    teamworkLabel: "Questionnaire-Schedule C",
+  },
+  {
+    insoftLabel: "Schedule D",
+    teamworkLabel: "Questionnaire-Schedule D",
+  },
+  {
+    insoftLabel: "Schedule E",
+    teamworkLabel: "Questionnaire-Schedule E",
+  },
+  {
+    insoftLabel: "FinCen Form 114 (FBAR)/Form 8938",
+    teamworkLabel: "Questionnaire-FBAR and Form 8938",
+  },
+  {
+    insoftLabel: "Streamlined Procedure Package",
+    teamworkLabel: "Questionnaire-FBAR and Form 8938",
+  },
+]
 
 const checkInfusionsoftOppStage = (hookData, token) => {
   return new Promise((resolve,reject) => {
@@ -43,6 +122,9 @@ const refreshAccessToken = async (token) => {
 // infusion soft web hook to trigger a new project creation
 exports.handleProjectCreationTrigger = async (req, res, next) => {
   try {
+    //battle against undefined and bad responses
+    let opportunity = {};
+    let orderData = {};
     const secret = req.headers['X-Hook-Secret'.toLowerCase()];
     res.header('X-Hook-Secret', secret);
     console.log(req.body)
@@ -58,7 +140,7 @@ exports.handleProjectCreationTrigger = async (req, res, next) => {
     }
 
     // check if the opportunity is at the correct stage
-    let opportunity = await checkInfusionsoftOppStage(req.body, token)
+    opportunity = await checkInfusionsoftOppStage(req.body, token)
 
     // skip out if the opportunity doesn't have the right stage
     if (opportunity.stage.name !== 'Custom Stage 1') {
@@ -66,7 +148,7 @@ exports.handleProjectCreationTrigger = async (req, res, next) => {
     }
     // get the order items for this opportunity
     // let orderData = await infusionsoftApiCall('get', `https://api.infusionsoft.com/crm/rest/v1/orders?contact_id=${opportunity.contact.id}`, token)
-    let orderData = await infusionsoftApiCall('get', `https://api.infusionsoft.com/crm/rest/v1/orders?contact_id=26717`, token)
+    orderData = await infusionsoftApiCall('get', `https://api.infusionsoft.com/crm/rest/v1/orders?contact_id=26717`, token)
     console.log(orderData)
     // add opportunity to the que in database
     const formattedOpportunity = {
@@ -76,8 +158,18 @@ exports.handleProjectCreationTrigger = async (req, res, next) => {
       orderData,
       dateCreated: opportunity.date_created,
     }
-    let createdOpp = await db.OpportunityQue.create(formattedOpportunity)
-    handleNewOpportunity(createdOpp)
+    // double check if this opportunity que already exists
+    let foundOpp = await db.OpportunityQue.findOne({id: opportunity.id})
+    if (foundOpp) {
+      //update it
+      foundOpp.set(formattedOpportunity)
+      foundOpp.save();
+      handleNewOpportunity(foundOpp)
+    } else {
+      //create it
+      let createdOpp = await db.OpportunityQue.create(formattedOpportunity)
+      handleNewOpportunity(createdOpp)
+    }
     // handle sending the data to teamwork
     return res.status(200).json({
       status: "OK",
@@ -87,15 +179,118 @@ exports.handleProjectCreationTrigger = async (req, res, next) => {
   }
 }
 
+const loopTasks = async (currentTasks, order, user, tasklist) => {
+  console.log('we are starting to loop tasklist:')
+  console.log(tasklist)
+  //date adder method
+  Date.prototype.addDays = function(days) {
+      let date = new Date(this.valueOf());
+      date.setDate(date.getDate() + days);
+      return date;
+  }
+  //find days to add based on task list
+  let daysToAdd = daysToAddArr.find(t => t.tasklist === tasklist).daysToAdd
+  // loop over tasks
+  for (let task of currentTasks) {
+    //if tasklist is provide information lets check the order and update accordingly.
+    // Set dates for existing order items and mark task completed if task doesn't exist in the order
+    if (tasklist === 'PROVIDE INFORMATION') {
+      // get the task map in the tasks array to check if task exists in infusionsoft opportunity order
+      let taskMap = tasksArray.find(t => t.teamworkLabel === task.content)
+      // if the taskMap was is a match
+      if (taskMap) {
+        // check if the order includes the task
+        if (order.find(item => item.name === taskMap.insoftLabel)) {
+          // if we have a match update the dates
+          let date = new Date();
+          let taskData = querystring.stringify({
+            "due-date": date.addDays(daysToAdd),
+            "start-date": date,
+          })
+          console.log('we found a matching task with the order, updating task')
+          console.log(task)
+          await teamworkApiCall('put', `https://taxsamaritan.teamwork.com/tasks/${task.id}.json`, user.apiKey, taskData)
+          console.log('updated following task succesfully')
+          console.log(task)
+        }
+      } else {
+        // if no match mark task completed
+        console.log('task not found in order, marking complete')
+        await teamworkApiCall('put', `https://taxsamaritan.teamwork.com/tasks/${task.id}/complete.json`, user.apiKey)
+        console.log('task marked complete succesfully')
+      }
+    } else {
+      //if tasklist is not provide information just set the dates
+      console.log('tasklist is not Provide Information so just updating dates')
+      let date = new Date();
+      let taskData = querystring.stringify({
+        "due-date": date.addDays(daysToAdd),
+        "start-date": date,
+      })
+      await teamworkApiCall('put', `https://taxsamaritan.teamwork.com/tasks/${task.id}.json`, user.apiKey, taskData)
+      console.log('dates updated succesfully')
+    }
+  }
+}
+
 
 const handleNewOpportunity = async (o) => {
+  console.log('starting to add new project to teamwork')
+  // battle agaist undefined or bad responses
+  let response = {};
+  let templates = {
+    tasklists: [],
+  };
+  let order = {};
+  let tasks = {
+    "todo-items": [],
+  };
   let user = await db.User.findOne({isSuperAdmin: true})
-  let projectData = {
-    name: o.name,
-    startDate: o.dateCreated,
-    companyId: 31966,
-    privacyEnabled: true,
-    replyByEmailEnabled: true,
+  let projectData = JSON.stringify({
+    project: {
+      name: o.name,
+      startDate: o.dateCreated,
+      companyId: 31966,
+      privacyEnabled: true,
+      replyByEmailEnabled: true,
+      "category-id": 13228,
+    }
+  })
+  // create the project
+  await teamworkApiCall('post', 'https://taxsamaritan.teamwork.com/projects', user.apiKey, projectData)
+  console.log('project added to teamwork')
+  // 13228 is cat id for client onboarding category, easiest way to retrieve project after creation
+  response = await teamworkApiCall('get', 'https://taxsamaritan.teamwork.com/projects.json?catId=13228', user.apiKey)
+  let newProject = response.projects[0]
+  console.log('the new project from teamwork is')
+  console.log(newProject)
+  // get the task list templates
+  templates = await teamworkApiCall('get', 'https://taxsamaritan.teamwork.com/tasklists/templates.json', user.apiKey)
+  console.log('we got the templates from teamwork')
+  // request data to send when copying tasklist templates to new project
+  let reqData = querystring.stringify({
+    "projectId": newProject.id,
+  })
+  // loop the templates and copy them to the new project
+  for (let tasklist of templates.tasklists) {
+    console.log('updating template' + tasklist)
+    await teamworkApiCall('put', `https://taxsamaritan.teamwork.com/tasklist/${tasklist.id}/move.json`, user.apiKey, reqData)
+    console.log(tasklist + 'update successful')
   }
-  let createdProject = await teamworkApiCall('post', 'https://taxsamaritan.teamwork.com/projects', user.apiKey, projectData)
+  // get the order from opportunity to get correct tasks for provide information tasklist
+  order = o.orderData.orders.find(order => order.title === o.name)
+  console.log('the order is')
+  console.log(order)
+  // get all the tasks for the project
+  tasks = await teamworkApiCall('get', `https://taxsamaritan.teamwork.com/projects/${newProject.id}/tasks.json`, user.apiKey)
+  console.log('the tasks from teamwork are')
+  console.log(tasks)
+  // loop the tasklists and perform neccesary updates to each task
+  for (let tasklist of templates.tasklists) {
+    let currentTasks = tasks['todo-items'].filter(t => t['todo-list-name'] === tasklist);
+    console.log('the current tasks are')
+    console.log(currentTasks)
+    await loopTasks(currentTasks, order, user, tasklist.name)
+  }
+  // update project in teamwork and assign correct category. write backend function that adds this project to our db.  remove opportunityQue from our db.
 }
