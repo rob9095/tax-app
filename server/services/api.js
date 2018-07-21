@@ -1,21 +1,27 @@
 const axios = require("axios");
 const querystring = require('querystring');
 
-exports.teamworkApiCall = (method, path, key, data) => {
-  if (!data) {
-    data = {}
-  }
+exports.teamworkApiCall = (method, url, key, data) => {
   let secret = new Buffer(key + ":xxx").toString("base64");
-  const headerObj = JSON.stringify({
+  const headerObj = {
     headers: {
       "Authorization": "BASIC " + secret,
       "Content-Type": "application/json"
      }
-	});
+	};
   console.log('the header obj is')
   console.log(headerObj)
+  let config = {
+    method,
+    url,
+    data,
+    headers: {
+      "Authorization": "BASIC " + secret,
+      "Content-Type": "application/json"
+     }
+  }
 	return new Promise((resolve, reject) => {
-		return axios[method.toLowerCase()](path, data, headerObj)
+		return axios(config)
 		.then(res => {
       console.log('teamwork res is')
       console.log(res.data)

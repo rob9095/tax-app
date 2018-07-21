@@ -79,6 +79,14 @@ const tasksArray = [
     insoftLabel: "Streamlined Procedure Package",
     teamworkLabel: "Questionnaire-FBAR and Form 8938",
   },
+  {
+    insoftLabel: "Getting Started",
+    teamworkLabel: "Getting Started",
+  },
+  {
+    insoftLabel: "Tax Organizer",
+    teamworkLabel: "Tax Organizer",
+  },
 ]
 
 const checkInfusionsoftOppStage = (hookData, token) => {
@@ -179,6 +187,14 @@ exports.handleProjectCreationTrigger = async (req, res, next) => {
   }
 }
 
+const formatDate = (d) => {
+  var date = new Date(d);
+  var month = date.getMonth() + 1;
+  var day = date.getDate();
+  var due_date = date.getFullYear() + (month < 10 ? '0' : '') + month + (day < 10 ? '0' : '') + day;
+  return due_date
+}
+
 const loopTasks = async (currentTasks, order, user, tasklist) => {
   console.log('we are starting to loop tasklist:')
   console.log(tasklist)
@@ -186,10 +202,15 @@ const loopTasks = async (currentTasks, order, user, tasklist) => {
   Date.prototype.addDays = function(days) {
       let date = new Date(this.valueOf());
       date.setDate(date.getDate() + days);
+
       return date;
   }
   //find days to add based on task list
   let daysToAdd = daysToAddArr.find(t => t.tasklist === tasklist).daysToAdd
+  // format today's date
+  let date = formatDate(new Date())
+  // format the due date for this tasklist
+  let dueDate = formatDate(new Date().addDays(daysToAdd))
   // loop over tasks
   for (let task of currentTasks) {
     //if tasklist is provide information lets check the order and update accordingly.
@@ -202,16 +223,17 @@ const loopTasks = async (currentTasks, order, user, tasklist) => {
         // check if the order includes the task
         if (order.find(item => item.name === taskMap.insoftLabel)) {
           // if we have a match update the dates
-          let date = new Date();
-          let taskData = querystring.stringify({
-            "due-date": date.addDays(daysToAdd),
-            "start-date": date,
+          let taskData = JSON.stringify({
+            "todo-item": {
+              "due-date": dueDate,
+              "start-date": date,
+            }
           })
           console.log('we found a matching task with the order, updating task')
-          console.log(task)
+          console.log(task.id)
           await teamworkApiCall('put', `https://taxsamaritan.teamwork.com/tasks/${task.id}.json`, user.apiKey, taskData)
           console.log('updated following task succesfully')
-          console.log(task)
+          console.log(task.id)
         }
       } else {
         // if no match mark task completed
@@ -222,10 +244,11 @@ const loopTasks = async (currentTasks, order, user, tasklist) => {
     } else {
       //if tasklist is not provide information just set the dates
       console.log('tasklist is not Provide Information so just updating dates')
-      let date = new Date();
-      let taskData = querystring.stringify({
-        "due-date": date.addDays(daysToAdd),
-        "start-date": date,
+      let taskData = JSON.stringify({
+        "todo-item": {
+          "due-date": dueDate,
+          "start-date": date,
+        }
       })
       await teamworkApiCall('put', `https://taxsamaritan.teamwork.com/tasks/${task.id}.json`, user.apiKey, taskData)
       console.log('dates updated succesfully')
@@ -241,55 +264,63 @@ const handleNewOpportunity = async (o) => {
   let templates = {
     tasklists: [],
   };
-  let order = {};
+  let order = [];
   let tasks = {
     "todo-items": [],
   };
   let user = await db.User.findOne({isSuperAdmin: true})
   let projectData = JSON.stringify({
-    project: {
-      name: o.name,
-      startDate: o.dateCreated,
-      companyId: 31966,
-      privacyEnabled: true,
-      replyByEmailEnabled: true,
-      "category-id": 13228,
+    "project": {
+      "name": o.name,
+      "companyId": "31966",
+      "privacyEnabled": "true",
+      "replyByEmailEnabled": "true",
+      "category-id": "13228"
     }
   })
-  // create the project
-  await teamworkApiCall('post', 'https://taxsamaritan.teamwork.com/projects', user.apiKey, projectData)
+  // create the project, category id 13228 is for onboarding client
+  let createdProjectRes = await teamworkApiCall('post', 'https://taxsamaritan.teamwork.com/projects.json', user.apiKey, projectData)
+  if (!createdProjectRes.id) {
+    console.log('project not created succesfully')
+    return
+  }
   console.log('project added to teamwork')
-  // 13228 is cat id for client onboarding category, easiest way to retrieve project after creation
-  response = await teamworkApiCall('get', 'https://taxsamaritan.teamwork.com/projects.json?catId=13228', user.apiKey)
-  let newProject = response.projects[0]
-  console.log('the new project from teamwork is')
-  console.log(newProject)
+  console.log('the created project res is')
+  console.log(createdProjectRes)
+  // fetch the project
+  // newProject = await teamworkApiCall('get', `https://taxsamaritan.teamwork.com/projects/${createdProjectRes.id}.json`, user.apiKey).project
+  // console.log('the new project from teamwork is')
+  // console.log(newProject)
   // get the task list templates
   templates = await teamworkApiCall('get', 'https://taxsamaritan.teamwork.com/tasklists/templates.json', user.apiKey)
   console.log('we got the templates from teamwork')
   // request data to send when copying tasklist templates to new project
-  let reqData = querystring.stringify({
-    "projectId": newProject.id,
+  let reqData = JSON.stringify({
+    "projectId": createdProjectRes.id,
   })
   // loop the templates and copy them to the new project
   for (let tasklist of templates.tasklists) {
     console.log('updating template' + tasklist)
-    await teamworkApiCall('put', `https://taxsamaritan.teamwork.com/tasklist/${tasklist.id}/move.json`, user.apiKey, reqData)
-    console.log(tasklist + 'update successful')
+    await teamworkApiCall('put', `https://taxsamaritan.teamwork.com/tasklist/${tasklist.id}/copy.json`, user.apiKey, reqData)
+    console.log(tasklist + 'moved to new project successfully')
   }
   // get the order from opportunity to get correct tasks for provide information tasklist
   order = o.orderData.orders.find(order => order.title === o.name)
-  console.log('the order is')
-  console.log(order)
+  if (order) {
+    console.log('the order is')
+    console.log(order)
+  } else {
+    console.log('cannot find order!')
+  }
   // get all the tasks for the project
-  tasks = await teamworkApiCall('get', `https://taxsamaritan.teamwork.com/projects/${newProject.id}/tasks.json`, user.apiKey)
-  console.log('the tasks from teamwork are')
-  console.log(tasks)
+  tasks = await teamworkApiCall('get', `https://taxsamaritan.teamwork.com/projects/${createdProjectRes.id}/tasks.json`, user.apiKey)
+  console.log('the total tasks from teamwork are')
+  console.log(tasks.length)
   // loop the tasklists and perform neccesary updates to each task
   for (let tasklist of templates.tasklists) {
-    let currentTasks = tasks['todo-items'].filter(t => t['todo-list-name'] === tasklist);
-    console.log('the current tasks are')
-    console.log(currentTasks)
+    let currentTasks = tasks['todo-items'].filter(t => t['todo-list-name'] === tasklist.name);
+    console.log('the total current tasks are')
+    console.log(currentTasks.length)
     await loopTasks(currentTasks, order, user, tasklist.name)
   }
   // update project in teamwork and assign correct category. write backend function that adds this project to our db.  remove opportunityQue from our db.
