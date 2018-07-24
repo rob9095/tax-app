@@ -3,6 +3,25 @@ const mongoose = require('mongoose');
 const { refreshTokenApiCall, infusionsoftApiCall, teamworkApiCall } = require('../services/api');
 const querystring = require('querystring');
 
+
+const defaultMessages = [
+  {
+    name: "Welcome To The Tax Samaritan Family",
+    isPrivate: 0,
+    htmlBody: "<div class='fr-view'>Welcome to the Tax Samaritan family! We appreciate your business and want you to know that we are here for one reason...to serve you!<br><br>We like to keep the communication lines with our customers open so we can provide the best possible service - at all times. We'll always be here to answer your questions or address concerns. We value your feedback. Please use our centralized and secure collaboration site for all future communications versus email (which is far less secure) and will allow us to respond to you more efficiently while having a nice organized repository of communications that you can refer to later.<br><br>For right now though, if you have any questions about the requested information, please feel free to let me know anytime.<br><br>Again, welcome to the Tax Samaritan family and please let me know if there is anything I can help with!<br><br><br><br>Have a great day!<br>Randall Brody, Founder and Owner of Tax Samaritan</div>",
+  },
+  {
+    name: "Internal Project Status Notes",
+    isPrivate: 1,
+    htmlBody: "Add internal status notes, outstanding info requested from TP, etc.",
+  },
+  {
+    name: "Requested Information",
+    isPrivate: 0,
+    htmlBody: `I just wanted to check in and see if you had any questions\nabout the requested information needed or the use of your collaboration portal for your engagement.\nIf you do, please don't hesitate to let me know anytime.\n\n<br><br><br>Best regards.`,
+  }
+]
+
 const specialTasks = [
   {
     name: "Getting Started",
@@ -335,6 +354,7 @@ const handleNewOpportunity = async (o) => {
   console.log('project added to teamwork')
   console.log('the created project res is')
   console.log(createdProjectRes)
+
   // remove unneeded project features
   let featuresData = JSON.stringify({
     "project": {
@@ -350,6 +370,18 @@ const handleNewOpportunity = async (o) => {
     }
   })
   await teamworkApiCall('put', `https://taxsamaritan.teamwork.com/projects/${createdProjectRes.id}.json`, user.apiKey, featuresData)
+
+  // loop default messages arr and create the project default messages
+  for (let message of defaultMessages) {
+    let messageData = JSON.stringify({
+      "post": {
+        "title": message.name,
+        "private": message.isPrivate,
+        "body": message.htmlBody
+      }
+    })
+    await teamworkApiCall('post', `https://taxsamaritan.teamwork.com/projects/${createdProjectRes.id}/posts.json`, user.apiKey, messageData)
+  }
   // get the task list templates
   templates = await teamworkApiCall('get', 'https://taxsamaritan.teamwork.com/tasklists/templates.json', user.apiKey)
   console.log('we got the templates from teamwork')
