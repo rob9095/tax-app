@@ -335,10 +335,21 @@ const handleNewOpportunity = async (o) => {
   console.log('project added to teamwork')
   console.log('the created project res is')
   console.log(createdProjectRes)
-  // fetch the project
-  // newProject = await teamworkApiCall('get', `https://taxsamaritan.teamwork.com/projects/${createdProjectRes.id}.json`, user.apiKey).project
-  // console.log('the new project from teamwork is')
-  // console.log(newProject)
+  // remove unneeded project features
+  let featuresData = JSON.stringify({
+    "project": {
+      "use-tasks": "1",
+      "use-messages": "1",
+      "use-time": "0",
+      "use-riskregister": "0",
+      "use-billing": "0",
+      "use-milestones": "1",
+      "use-files": "1",
+      "use-notebook": "0",
+      "use-links": "0"
+    }
+  })
+  await teamworkApiCall('put', `https://taxsamaritan.teamwork.com/projects/${createdProjectRes.id}.json`, user.apiKey, featuresData)
   // get the task list templates
   templates = await teamworkApiCall('get', 'https://taxsamaritan.teamwork.com/tasklists/templates.json', user.apiKey)
   console.log('we got the templates from teamwork')
@@ -372,4 +383,5 @@ const handleNewOpportunity = async (o) => {
     await loopTasks(currentTasks, order, user, tasklist.name)
   }
   // update project in teamwork and assign correct category. write backend function that adds this project to our db.  remove opportunityQue from our db.
+
 }
