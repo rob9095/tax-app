@@ -9,8 +9,6 @@ exports.teamworkApiCall = (method, url, key, data) => {
       "Content-Type": "application/json"
      }
 	};
-  console.log('the header obj is')
-  console.log(headerObj)
   let config = {
     method,
     url,
@@ -23,8 +21,6 @@ exports.teamworkApiCall = (method, url, key, data) => {
 	return new Promise((resolve, reject) => {
 		return axios(config)
 		.then(res => {
-      console.log('teamwork res is')
-      console.log(res.data)
 			return resolve(res.data);
 		})
 		.catch(err => {
