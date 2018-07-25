@@ -1,7 +1,6 @@
 const db = require('../models');
 const mongoose = require('mongoose');
 const { refreshTokenApiCall, infusionsoftApiCall, teamworkApiCall } = require('../services/api');
-const querystring = require('querystring');
 
 
 const defaultMessages = [
