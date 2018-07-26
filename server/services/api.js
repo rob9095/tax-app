@@ -26,7 +26,7 @@ exports.teamworkApiCall = (method, url, key, data) => {
 		.catch(err => {
       console.log('teamwork err is')
       console.log(err)
-			return reject(err.response.data.error);
+			return reject(err.response.data);
 		});
 	});
 }

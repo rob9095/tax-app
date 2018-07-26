@@ -17,7 +17,7 @@ const defaultMessages = [
   {
     name: "Requested Information",
     isPrivate: 0,
-    htmlBody: `I just wanted to check in and see if you had any questions\nabout the requested information needed or the use of your collaboration portal for your engagement.\nIf you do, please don't hesitate to let me know anytime.\n\n<br><br><br>Best regards.`,
+    htmlBody: "I just wanted to check in and see if you had any questions about the requested information needed or the use of your collaboration portal for your engagement. If you do, please don't hesitate to let me know anytime.<br><br><br>Best regards.",
   }
 ]
 
@@ -258,7 +258,28 @@ const formatDate = (d) => {
   return due_date
 }
 
-const loopTasks = async (currentTasks, order, user, tasklist) => {
+const createMilestone = async (tasklist, dates, responsiblePartyId, project_id, apiKey) => {
+  let isPrivate = tasklist === 'PREPARATION' || tasklist === 'INITIAL PAYMENT' ? true : false
+  let milestoneData = JSON.stringify({
+    "milestone":{
+      "changeFollowerIds": "",
+      "description": "",
+      "deadline": dates.dueDate,
+      "notify": tasklist === 'PROVIDE INFORMATION' ? true : false,
+      "responsible-party-ids": responsiblePartyId.toString(),
+      "tags": "",
+      "reminder": false,
+      "title": tasklist,
+      "grant-access-to": "",
+      "private": isPrivate
+    },
+    "move-upcoming-milestones":false,
+    "move-upcoming-milestones-off-weekends":false
+  })
+  await teamworkApiCall('post', `https://taxsamaritan.teamwork.com/projects/${project_id}/milestones.json`, apiKey, milestoneData)
+}
+
+const handleTasklistUpdates = async (currentTasks, order, user, tasklist, client, project_id) => {
   console.log('we are starting to loop tasklist:')
   console.log(tasklist)
   //date adder method
@@ -278,6 +299,9 @@ const loopTasks = async (currentTasks, order, user, tasklist) => {
     date,
     dueDate,
   }
+  // create the milestone => 171813 is tax samaritan operations account id
+  let responsiblePartyId = tasklist === 'PROVIDE INFORMATION' ? client.id : 171813
+  await createMilestone(tasklist, dates, responsiblePartyId, project_id, user.apiKey)
   // loop over tasks
   for (let task of currentTasks) {
     //if tasklist is provide information lets check the order and update accordingly.
@@ -320,6 +344,37 @@ const loopTasks = async (currentTasks, order, user, tasklist) => {
       console.log(task.id)
     }
   }
+}
+
+const addNewTeamworkUser = async (project_id, user, apiKey) => {
+  // 42983 is tax samaritan client teamwork company
+  // check if client exists
+  let existingPerson = await teamworkApiCall('get', `https://taxsamaritan.teamwork.com/projects/api/v2/companies/42983/people.json?searchTerm=${user.email}`, apiKey)
+  if (existingPerson.people.length > 0) {
+    return existingPerson.people[0]
+  }
+  // need to add check if person exists, test and see what happens when try to create existing user
+  const personData = JSON.stringify({
+    "person": {
+      "email-address": user.email,
+      "user-name": user.email,
+      "first-name": `${user.first_name} `,
+      "last-name": user.last_name,
+      "company-id": 42983,
+      "sendInvite": true,
+      "administrator": false,
+      "canAddProjects": false,
+      "canManagePeople": false,
+      "canAccessAllProjects": false,
+      "accessProjectIds": project_id,
+      "setProjectAdmin": false,
+      "getUserDetails": true,
+      "continueIfUserExists": false,
+      "user-type": "account"
+    },
+    "assignDefaultProjects": false
+  })
+  return await teamworkApiCall('post', 'https://taxsamaritan.teamwork.com/people.json', apiKey, personData)
 }
 
 
@@ -365,10 +420,30 @@ const handleNewOpportunity = async (o) => {
       "use-milestones": "1",
       "use-files": "1",
       "use-notebook": "0",
-      "use-links": "0"
+      "use-links": "0",
+      "use-comments": "0"
     }
   })
   await teamworkApiCall('put', `https://taxsamaritan.teamwork.com/projects/${createdProjectRes.id}.json`, user.apiKey, featuresData)
+
+  //create client account and send invite to project
+  let teamworkClient = await addNewTeamworkUser(createdProjectRes.id, o.contact, user.apiKey)
+
+  //add client to project
+  let addData = JSON.stringify({
+    "add": {
+      "userIdList": teamworkClient.id.toString()
+    }
+  })
+  await teamworkApiCall('post', `https://taxsamaritan.teamwork.com/projects/${createdProjectRes.id}/people.json`, user.apiKey, addData)
+  .then((res)=>{
+    console.log('client succesfully added to project')
+  })
+  .catch((err)=>{
+    console.log('unable to add client to project')
+    console.log(err)
+    return
+  })
 
   // loop default messages arr and create the project default messages
   for (let message of defaultMessages) {
@@ -406,12 +481,12 @@ const handleNewOpportunity = async (o) => {
   tasks = await teamworkApiCall('get', `https://taxsamaritan.teamwork.com/projects/${createdProjectRes.id}/tasks.json`, user.apiKey)
   console.log('the total tasks from teamwork are')
   console.log(tasks.length)
-  // loop the tasklists and perform neccesary updates to each task
+  // loop the tasklists and create milestones/update the tasks
   for (let tasklist of templates.tasklists) {
     let currentTasks = tasks['todo-items'].filter(t => t['todo-list-name'] === tasklist.name);
     console.log('the total current tasks are')
     console.log(currentTasks.length)
-    await loopTasks(currentTasks, order, user, tasklist.name)
+    await handleTasklistUpdates(currentTasks, order, user, tasklist.name, teamworkClient, createdProjectRes.id)
   }
   // update project in teamwork and assign correct category. write backend function that adds this project to our db.  remove opportunityQue from our db.
 
