@@ -9,7 +9,6 @@ const addProject = (project) => {
       let check = project.name.split('-');
       if (check[0] !== 'Tax') {
         resolve('skip');
-        return;
       }
       let foundProject = await db.Project.findOne({teamwork_id: project.teamwork_id});
       if (foundProject) {
@@ -148,7 +147,7 @@ exports.updateProjectInternalMessage = async (req, res, next) => {
     if (foundProject === null) {
       return next({
         status: 400,
-        message: `Project ID: ${req.projectId} not found`
+        message: `Project ID: ${req.body.projectId} not found`
       })
     }
     foundProject.internalProjectMessageId = req.body.messageId
@@ -165,7 +164,7 @@ exports.removeProject = async (req, res, next) => {
     if (foundProject === null) {
       return next({
         status: 400,
-        message: `Project ID: ${req.projectId} not found`
+        message: `Project ID: ${req.body.projectId} not found`
       })
     }
     await foundProject.remove();

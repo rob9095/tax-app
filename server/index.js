@@ -17,6 +17,7 @@ const projectsWebhooksRoutes = require('./routes/projectsWebhooks');
 const accessTokenRoutes = require('./routes/accessTokens');
 const { loginRequired, ensureCorrectUser } = require('./middleware/auth');
 const PORT = 8082;
+exports.serverPort = PORT
 
 app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));

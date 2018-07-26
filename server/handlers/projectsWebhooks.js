@@ -1,6 +1,6 @@
 const db = require('../models');
 const mongoose = require('mongoose');
-const { refreshTokenApiCall, infusionsoftApiCall, teamworkApiCall } = require('../services/api');
+const { refreshTokenApiCall, infusionsoftApiCall, teamworkApiCall, localApiCall } = require('../services/api');
 
 
 const defaultMessages = [
@@ -380,6 +380,9 @@ const addNewTeamworkUser = async (project_id, user, apiKey) => {
 
 
 const handleNewOpportunity = async (o) => {
+  // get admin teamwork api key
+  let user = await db.User.findOne({isSuperAdmin: true})
+
   console.log('starting to add new project to teamwork')
   // battle agaist undefined or bad responses
   let response = {};
@@ -390,10 +393,9 @@ const handleNewOpportunity = async (o) => {
   let tasks = {
     "todo-items": [],
   };
-  let user = await db.User.findOne({isSuperAdmin: true})
   let projectData = JSON.stringify({
     "project": {
-      "name": o.name,
+      "name": `Tax-${o.name.replace(' ', '_')}`,
       "companyId": "31966",
       "privacyEnabled": "true",
       "replyByEmailEnabled": "true",
@@ -488,6 +490,102 @@ const handleNewOpportunity = async (o) => {
     console.log(currentTasks.length)
     await handleTasklistUpdates(currentTasks, order, user, tasklist.name, teamworkClient, createdProjectRes.id)
   }
-  // update project in teamwork and assign correct category. write backend function that adds this project to our db.  remove opportunityQue from our db.
+  // write backend function that adds this project to our db.  remove opportunityQue from our db.
+  console.log('finished adding project succesfully to teamwork')
+  await addNewProjectToDb(createdProjectRes.id, user.apiKey, o)
+}
 
+const addNewProjectToDb = async (project_id, apiKey, o) => {
+  console.log('starting to add new project to local db')
+  // add local project
+  const projectRes = await teamworkApiCall('get', `https://taxsamaritan.teamwork.com/projects/${project_id}.json`, apiKey)
+  const projectData = {
+    "projects": [],
+  }
+  projectData.projects.push({
+    teamwork_id: projectRes.project.id,
+    name: projectRes.project.name,
+    createdOn: projectRes.project['created-on'],
+    status: projectRes.project.status,
+    preparer: projectRes.project.category.name,
+  })
+  await localApiCall('post', '/api/projects', projectData)
+  console.log('project added')
+
+  // add local tasklists for project
+  const tasklistRes = await teamworkApiCall('get', `https://taxsamaritan.teamwork.com/projects/${project_id}/tasklists.json?status=all`, apiKey)
+  let tasklists = tasklistRes.tasklists.map(t => ({
+    teamwork_id: t.id,
+    teamworkProject_id: t.projectId,
+    projectName: t.projectName,
+    taskName: t.name,
+    complete: t.complete,
+    status: t.status,
+    uncompleteCount: t['uncomplete-count']
+  }))
+  const taskListData = {
+    tasklists
+  }
+  await localApiCall('post', `/api/tasklists`, taskListData)
+  console.log('tasklists added')
+
+  // add local tasks
+  const taskRes = await teamworkApiCall('get', `https://taxsamaritan.teamwork.com/projects/${project_id}/tasks.json?includeCompletedTasks=true&pageSize=250`, apiKey)
+  await localApiCall('post', `/api/tasks`, taskRes)
+  console.log('tasks added')
+
+  // add internal message id to local project
+  const messageIdRes = await teamworkApiCall('get', `https://taxsamaritan.teamwork.com/projects/${project_id}/posts.json`, apiKey)
+  const message = messageIdRes.posts.filter(m => m.title === 'Internal Project Status Notes')[0]
+  const messageData = {
+    projectId: project_id,
+    messageId: message.id
+  }
+  await localApiCall('post', '/api/projects/update-message-id', messageData);
+  console.log('message id added')
+
+  // add local comments from message id
+  const messageReplyRes = await teamworkApiCall('get', `https://taxsamaritan.teamwork.com/messages/${messageData.messageId}/replies.json`, apiKey)
+  if (messageReplyRes.messageReplies.length > 0) {
+    const messageReplies = messageReplyRes.messageReplies.map(m=>({
+      teamwork_id: m.id,
+      projectId: project_id,
+      messageId: m.messageId,
+      isRead: m.isRead,
+      numNotified: m.numNotified,
+      postedOn: m['posted-on'],
+      authorAvatarUrl: m['author-avatar-url'],
+      lastChangedOn: m['last-changed-on'],
+      htmlBody: m['html-body'],
+      body: m.body,
+      authorFirstname: m['author-firstname'],
+      authorLastname: m['author-lastname'],
+      replyNo: m.replyNo,
+    }))
+    await localApiCall('post', `/api/message-replies`, messageReplies)
+  } else {
+    console.log('no message replies to add')
+  }
+  console.log('message replies added')
+
+  //map tasks to project
+  let createdProject = await db.Project.find({teamwork_id: project_id})
+  const formattedProject = [];
+  for (let p of createdProject) {
+    tasklists = await db.Tasklist.find({teamworkProject_id: p.teamwork_id})
+    tasks = await db.Task.find({teamworkProject_id: p.teamwork_id})
+    formattedProject.push({
+      projectData: p,
+      projectTasklists: tasklists,
+      projectTasks: tasks
+    })
+  }
+  await localApiCall('post', '/api/projects/map-projects', formattedProject)
+  console.log('finished mapping tasks to project')
+  console.log('finished adding project to local db')
+
+  // remove opportunity que
+  let foundOppQue = await db.OpportunityQue.findOne({id: o.id})
+  await foundOppQue.remove();
+  console.log(`opportunity deleted, id was: ${o.id}`)
 }
