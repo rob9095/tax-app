@@ -240,11 +240,12 @@ const handleSpecialTask = async (task, taskInfo, apiKey) => {
   }
 }
 
-const updateTeamworkTask = async (task, apiKey, dates) => {
+const updateTeamworkTask = async (task, apiKey, dates, responsiblePartyId) => {
   let taskData = JSON.stringify({
     "todo-item": {
       "due-date": dates.dueDate,
       "start-date": dates.date,
+      "responsible-party-id": responsiblePartyId,
     }
   })
   await teamworkApiCall('put', `https://taxsamaritan.teamwork.com/tasks/${task.id}.json`, apiKey, taskData)
@@ -319,7 +320,7 @@ const handleTasklistUpdates = async (currentTasks, order, user, tasklist, client
           // if we have a match update the dates
           console.log('we found a matching task with the order, updating task')
           console.log(task.id)
-          await updateTeamworkTask(task, user.apiKey, dates)
+          await updateTeamworkTask(task, user.apiKey, dates, responsiblePartyId)
           console.log('updated following task succesfully')
           console.log(task.id)
         } else if (sTaskInfo) {
@@ -327,7 +328,7 @@ const handleTasklistUpdates = async (currentTasks, order, user, tasklist, client
           console.log('special task found, handling it')
           await handleSpecialTask(task, sTaskInfo, user.apiKey);
           // update dates for task
-          await updateTeamworkTask(task, user.apiKey, dates)
+          await updateTeamworkTask(task, user.apiKey, dates, responsiblePartyId)
         } else {
           // task is in provide information but its not a special task or a taskMap order match, marking task completed
           console.log('task not found in order or special tasks, marking complete')
@@ -339,7 +340,7 @@ const handleTasklistUpdates = async (currentTasks, order, user, tasklist, client
     } else {
       // if tasklist is not provide information just set the dates
       console.log('tasklist is not Provide Information so just updating dates')
-      await updateTeamworkTask(task, user.apiKey, dates)
+      await updateTeamworkTask(task, user.apiKey, dates, responsiblePartyId)
       console.log('dates updated succesfully for task id')
       console.log(task.id)
     }
@@ -353,7 +354,7 @@ const addNewTeamworkUser = async (project_id, user, apiKey) => {
   if (existingPerson.people.length > 0) {
     return existingPerson.people[0]
   }
-  // need to add check if person exists, test and see what happens when try to create existing user
+  //create client if they don't exist
   const personData = JSON.stringify({
     "person": {
       "email-address": user.email,
@@ -396,7 +397,6 @@ const handleNewOpportunity = async (o) => {
       "companyId": "31966",
       "privacyEnabled": "true",
       "replyByEmailEnabled": "true",
-      "category-id": "13228"
     }
   })
   // create the project, category id 13228 is for onboarding client
