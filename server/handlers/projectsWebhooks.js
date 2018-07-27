@@ -393,9 +393,11 @@ const handleNewOpportunity = async (o) => {
   let tasks = {
     "todo-items": [],
   };
+  const pYear = o.name.split('-')[1]
+  const name = `Tax-${o.contact.last_name}_${o.contact.first_name} (${pYear})`
   let projectData = JSON.stringify({
     "project": {
-      "name": `Tax-${o.name.replace(' ', '_')}`,
+      name,
       "companyId": "31966",
       "privacyEnabled": "true",
       "replyByEmailEnabled": "true",
