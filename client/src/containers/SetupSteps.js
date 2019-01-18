@@ -54,7 +54,7 @@ class SetupSteps extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      activeStep: 0,
+      activeStep: 4,
       showNext: true,
       showBack: false,
       buttonDisabled: true,

@@ -2,12 +2,24 @@ const db = require('../models');
 const mongoose = require('mongoose');
 mongoose.Promise = Promise;
 
+const validStatuses = [
+  "CLIENT REVIEW",
+  "FINALIZE ENGAGEMENT",
+  "PROVIDE INFORMATION",
+  "PREPARATION",
+  "INITIAL PAYMENT",
+  "FINALIZE PAYMENT"
+];
+
 
 const addProject = (project) => {
   return new Promise(async (resolve, reject) => {
     try {
       let check = project.name.split('-');
       if (check[0] !== 'Tax') {
+        resolve('skip');
+      }
+      if (!validStatuses.includes(project.status)) {
         resolve('skip');
       }
       let foundProject = await db.Project.findOne({teamwork_id: project.teamwork_id});
